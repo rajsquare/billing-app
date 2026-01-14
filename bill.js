@@ -9,15 +9,23 @@ const productSearch = document.getElementById("productSearch");
 const searchResults = document.getElementById("searchResults");
 const billItemsContainer = document.getElementById("billItems");
 const grandTotalEl = document.getElementById("grandTotal");
+const billDateInput = document.getElementById("billDate");
+
+// AUTO SET TODAY DATE (editable)
+if (billDateInput) {
+  billDateInput.valueAsDate = new Date();
+}
 
 // LOAD PRODUCTS
 fetch("productList.json")
   .then(res => res.json())
-  .then(data => products = data);
+  .then(data => {
+    products = data;
+  });
 
-// CUSTOMER TYPE
-btnW.onclick = () => setCustomerType("W");
-btnR.onclick = () => setCustomerType("R");
+// CUSTOMER TYPE SELECTION
+btnW.addEventListener("click", () => setCustomerType("W"));
+btnR.addEventListener("click", () => setCustomerType("R"));
 
 function setCustomerType(type) {
   selectedCustomerType = type;
@@ -28,6 +36,7 @@ function setCustomerType(type) {
   productSearch.disabled = false;
   productSearch.focus();
 
+  // Reprice existing items if any
   billItems.forEach(item => {
     item.price = getDefaultPrice(item.product);
     calculateLineTotal(item);
@@ -36,31 +45,36 @@ function setCustomerType(type) {
   renderBill();
 }
 
-// SEARCH
+// SEARCH PRODUCTS
 productSearch.addEventListener("input", () => {
-  const q = productSearch.value.toLowerCase().trim();
+  const query = productSearch.value.toLowerCase().trim();
   searchResults.innerHTML = "";
-  if (!q) return;
+
+  if (!query) return;
 
   products
-    .filter(p => p.productName.toLowerCase().includes(q))
+    .filter(p => p.productName.toLowerCase().includes(query))
     .slice(0, 15)
     .forEach(product => {
       const div = document.createElement("div");
       div.className = "search-item";
       div.textContent = product.productName;
-      div.onclick = () => {
-        addProduct(product);
+
+      div.addEventListener("click", () => {
+        addProductToBill(product);
         productSearch.value = "";
         searchResults.innerHTML = "";
         productSearch.focus();
-      };
+      });
+
       searchResults.appendChild(div);
     });
 });
 
-// ADD PRODUCT
-function addProduct(product) {
+// ADD PRODUCT TO BILL
+function addProductToBill(product) {
+  if (!selectedCustomerType) return;
+
   const item = {
     id: Date.now() + Math.random(),
     product,
@@ -73,19 +87,22 @@ function addProduct(product) {
   renderBill();
 }
 
-// PRICE BY TYPE
+// GET PRICE BASED ON CUSTOMER TYPE
 function getDefaultPrice(product) {
-  return selectedCustomerType === "W" ? product.wPrice : product.rPrice;
+  return selectedCustomerType === "W"
+    ? product.wPrice
+    : product.rPrice;
 }
 
-// CALCULATION
+// CALCULATE LINE TOTAL
 function calculateLineTotal(item) {
   const price = parseFloat(item.price) || 0;
   const qty = parseFloat(item.quantity) || 0;
+
   item.lineTotal = Math.round(price * qty);
 }
 
-// RENDER
+// RENDER BILL
 function renderBill() {
   billItemsContainer.innerHTML = "";
 
@@ -93,56 +110,60 @@ function renderBill() {
     const row = document.createElement("div");
     row.className = "bill-row";
 
-    const title = document.createElement("div");
-    title.className = "bill-row-header";
-    title.textContent = item.product.productName;
-    row.appendChild(title);
+    // PRODUCT NAME
+    const header = document.createElement("div");
+    header.className = "bill-row-header";
+    header.textContent = item.product.productName;
+    row.appendChild(header);
 
+    // INPUTS
     const inputs = document.createElement("div");
     inputs.className = "bill-inputs";
 
-    // PRICE
+    // PRICE INPUT
     const priceInput = document.createElement("input");
     priceInput.type = "number";
     priceInput.placeholder = "Price";
     priceInput.value = item.price ?? "";
-    priceInput.oninput = () => {
+    priceInput.addEventListener("input", () => {
       item.price = priceInput.value;
       calculateLineTotal(item);
       updateTotals();
-      totalEl.textContent = item.lineTotal;
-    };
+      lineTotalEl.textContent = item.lineTotal;
+    });
     inputs.appendChild(priceInput);
 
-    // QUANTITY (KG or PP)
+    // QUANTITY INPUT (KG or PP)
     const qtyInput = document.createElement("input");
     qtyInput.type = "number";
     qtyInput.placeholder = item.product.priceType === "KG" ? "Kg" : "Qty";
     qtyInput.step = item.product.priceType === "KG" ? "0.01" : "1";
     qtyInput.value = item.quantity;
-    qtyInput.oninput = () => {
+    qtyInput.addEventListener("input", () => {
       item.quantity = qtyInput.value;
       calculateLineTotal(item);
       updateTotals();
-      totalEl.textContent = item.lineTotal;
-    };
+      lineTotalEl.textContent = item.lineTotal;
+    });
     inputs.appendChild(qtyInput);
 
     row.appendChild(inputs);
 
-    const totalEl = document.createElement("div");
-    totalEl.className = "line-total";
-    totalEl.textContent = item.lineTotal;
-    row.appendChild(totalEl);
+    // LINE TOTAL
+    const lineTotalEl = document.createElement("div");
+    lineTotalEl.className = "line-total";
+    lineTotalEl.textContent = item.lineTotal;
+    row.appendChild(lineTotalEl);
 
-    const del = document.createElement("button");
-    del.className = "delete-btn";
-    del.textContent = "✕";
-    del.onclick = () => {
+    // DELETE BUTTON
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete-btn";
+    deleteBtn.textContent = "✕";
+    deleteBtn.addEventListener("click", () => {
       billItems = billItems.filter(b => b.id !== item.id);
       renderBill();
-    };
-    row.appendChild(del);
+    });
+    row.appendChild(deleteBtn);
 
     billItemsContainer.appendChild(row);
   });
@@ -150,12 +171,15 @@ function renderBill() {
   updateTotals();
 }
 
-// TOTAL
+// UPDATE GRAND TOTAL
 function updateTotals() {
-  grandTotalEl.textContent = billItems.reduce((s, i) => s + i.lineTotal, 0);
+  const total = billItems.reduce((sum, item) => sum + item.lineTotal, 0);
+  grandTotalEl.textContent = Math.round(total);
 }
 
-// CLOSE SEARCH
+// CLOSE SEARCH RESULTS ON OUTSIDE TAP
 document.addEventListener("click", e => {
-  if (!e.target.closest(".search-section")) searchResults.innerHTML = "";
+  if (!e.target.closest(".search-section")) {
+    searchResults.innerHTML = "";
+  }
 });
