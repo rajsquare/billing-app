@@ -1,185 +1,192 @@
-let products = [];
-let selectedCustomerType = null;
-let billItems = [];
-
-// ELEMENTS
-const btnW = document.getElementById("btnW");
-const btnR = document.getElementById("btnR");
-const productSearch = document.getElementById("productSearch");
-const searchResults = document.getElementById("searchResults");
-const billItemsContainer = document.getElementById("billItems");
-const grandTotalEl = document.getElementById("grandTotal");
-const billDateInput = document.getElementById("billDate");
-
-// AUTO SET TODAY DATE (editable)
-if (billDateInput) {
-  billDateInput.valueAsDate = new Date();
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
-// LOAD PRODUCTS
-fetch("productList.json")
-  .then(res => res.json())
-  .then(data => {
-    products = data;
-  });
-
-// CUSTOMER TYPE SELECTION
-btnW.addEventListener("click", () => setCustomerType("W"));
-btnR.addEventListener("click", () => setCustomerType("R"));
-
-function setCustomerType(type) {
-  selectedCustomerType = type;
-
-  btnW.classList.toggle("active", type === "W");
-  btnR.classList.toggle("active", type === "R");
-
-  productSearch.disabled = false;
-  productSearch.focus();
-
-  // Reprice existing items if any
-  billItems.forEach(item => {
-    item.price = getDefaultPrice(item.product);
-    calculateLineTotal(item);
-  });
-
-  renderBill();
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* HARD LOCK horizontal scroll */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  background: #f4f4f4;
+  color: #222;
 }
 
-// SEARCH PRODUCTS
-productSearch.addEventListener("input", () => {
-  const query = productSearch.value.toLowerCase().trim();
-  searchResults.innerHTML = "";
-
-  if (!query) return;
-
-  products
-    .filter(p => p.productName.toLowerCase().includes(query))
-    .slice(0, 15)
-    .forEach(product => {
-      const div = document.createElement("div");
-      div.className = "search-item";
-      div.textContent = product.productName;
-
-      div.addEventListener("click", () => {
-        addProductToBill(product);
-        productSearch.value = "";
-        searchResults.innerHTML = "";
-        productSearch.focus();
-      });
-
-      searchResults.appendChild(div);
-    });
-});
-
-// ADD PRODUCT TO BILL
-function addProductToBill(product) {
-  if (!selectedCustomerType) return;
-
-  const item = {
-    id: Date.now() + Math.random(),
-    product,
-    price: getDefaultPrice(product),
-    quantity: "",
-    lineTotal: 0
-  };
-
-  billItems.push(item);
-  renderBill();
+/* TOP BAR */
+.customer-type {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  padding: 8px;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-// GET PRICE BASED ON CUSTOMER TYPE
-function getDefaultPrice(product) {
-  return selectedCustomerType === "W"
-    ? product.wPrice
-    : product.rPrice;
+.type-btn {
+  padding: 10px 0;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+  background: #fafafa;
 }
 
-// CALCULATE LINE TOTAL
-function calculateLineTotal(item) {
-  const price = parseFloat(item.price) || 0;
-  const qty = parseFloat(item.quantity) || 0;
-
-  item.lineTotal = Math.round(price * qty);
+.type-btn.active {
+  background: #111;
+  color: #fff;
+  border-color: #111;
 }
 
-// RENDER BILL
-function renderBill() {
-  billItemsContainer.innerHTML = "";
-
-  billItems.forEach(item => {
-    const row = document.createElement("div");
-    row.className = "bill-row";
-
-    // PRODUCT NAME
-    const header = document.createElement("div");
-    header.className = "bill-row-header";
-    header.textContent = item.product.productName;
-    row.appendChild(header);
-
-    // INPUTS
-    const inputs = document.createElement("div");
-    inputs.className = "bill-inputs";
-
-    // PRICE INPUT
-    const priceInput = document.createElement("input");
-    priceInput.type = "number";
-    priceInput.placeholder = "Price";
-    priceInput.value = item.price ?? "";
-    priceInput.addEventListener("input", () => {
-      item.price = priceInput.value;
-      calculateLineTotal(item);
-      updateTotals();
-      lineTotalEl.textContent = item.lineTotal;
-    });
-    inputs.appendChild(priceInput);
-
-    // QUANTITY INPUT (KG or PP)
-    const qtyInput = document.createElement("input");
-    qtyInput.type = "number";
-    qtyInput.placeholder = item.product.priceType === "KG" ? "Kg" : "Qty";
-    qtyInput.step = item.product.priceType === "KG" ? "0.01" : "1";
-    qtyInput.value = item.quantity;
-    qtyInput.addEventListener("input", () => {
-      item.quantity = qtyInput.value;
-      calculateLineTotal(item);
-      updateTotals();
-      lineTotalEl.textContent = item.lineTotal;
-    });
-    inputs.appendChild(qtyInput);
-
-    row.appendChild(inputs);
-
-    // LINE TOTAL
-    const lineTotalEl = document.createElement("div");
-    lineTotalEl.className = "line-total";
-    lineTotalEl.textContent = item.lineTotal;
-    row.appendChild(lineTotalEl);
-
-    // DELETE BUTTON
-    const deleteBtn = document.createElement("button");
-    deleteBtn.className = "delete-btn";
-    deleteBtn.textContent = "✕";
-    deleteBtn.addEventListener("click", () => {
-      billItems = billItems.filter(b => b.id !== item.id);
-      renderBill();
-    });
-    row.appendChild(deleteBtn);
-
-    billItemsContainer.appendChild(row);
-  });
-
-  updateTotals();
+.print-btn {
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #eee;
 }
 
-// UPDATE GRAND TOTAL
-function updateTotals() {
-  const total = billItems.reduce((sum, item) => sum + item.lineTotal, 0);
-  grandTotalEl.textContent = Math.round(total);
+/* HEADER */
+.bill-header.compact {
+  display: grid;
+  grid-template-columns: 70px 1fr 120px;
+  gap: 8px;
+  padding: 8px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-// CLOSE SEARCH RESULTS ON OUTSIDE TAP
-document.addEventListener("click", e => {
-  if (!e.target.closest(".search-section")) {
-    searchResults.innerHTML = "";
+.bill-header.compact input {
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* SEARCH */
+.search-section {
+  padding: 10px;
+  background: #fff;
+}
+
+#productSearch {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #bbb;
+}
+
+.search-results {
+  margin-top: 8px;
+  background: #fff;
+  border-radius: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+/* BILL */
+.bill-items {
+  padding: 10px;
+  padding-bottom: 150px;
+}
+
+.bill-row {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  position: relative;
+}
+
+.bill-row-header {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.bill-inputs {
+  display: flex;
+  gap: 8px;
+}
+
+.bill-inputs input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.line-total {
+  margin-top: 8px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #c00;
+}
+
+/* NOTES */
+.notes-section {
+  padding: 10px;
+  background: #fff;
+}
+
+.notes-section textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* TOTAL */
+.total-section {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #111;
+  color: #fff;
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* PRINT STYLES */
+@media print {
+  body {
+    background: #fff;
   }
-});
+
+  .customer-type,
+  .search-section,
+  .delete-btn,
+  .print-btn {
+    display: none !important;
+  }
+
+  .bill-row {
+    box-shadow: none;
+    border-bottom: 1px solid #ccc;
+    border-radius: 0;
+  }
+
+  .total-section {
+    position: static;
+    color: #000;
+    background: none;
+    border-top: 2px solid #000;
+    margin-top: 10px;
+  }
+
+  textarea {
+    border: none;
+  }
+}
