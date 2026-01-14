@@ -1,0 +1,178 @@
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  background: #f4f4f4;
+  color: #222;
+}
+
+/* CUSTOMER TYPE */
+.customer-type {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.type-btn {
+  flex: 1;
+  padding: 14px 0;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+  background: #fafafa;
+  cursor: pointer;
+}
+
+.type-btn.active {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+/* BILL HEADER */
+.bill-header {
+  padding: 10px 12px;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.bill-header input {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* SEARCH */
+.search-section {
+  padding: 12px;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+#productSearch {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #bbb;
+}
+
+#productSearch:disabled {
+  background: #f0f0f0;
+  color: #888;
+}
+
+/* SEARCH RESULTS */
+.search-results {
+  margin-top: 8px;
+  background: #fff;
+  border-radius: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.search-item {
+  padding: 14px;
+  border-bottom: 1px solid #eee;
+  font-size: 15px;
+}
+
+.search-item:last-child {
+  border-bottom: none;
+}
+
+.search-item:active {
+  background: #f2f2f2;
+}
+
+/* BILL ITEMS */
+.bill-items {
+  padding: 12px;
+  padding-bottom: 120px;
+}
+
+/* BILL ROW */
+.bill-row {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  position: relative;
+}
+
+.bill-row-header {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+/* INPUT GROUP */
+.bill-inputs {
+  display: flex;
+  gap: 8px;
+}
+
+.bill-inputs input {
+  flex: 1;
+  padding: 10px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* LINE TOTAL */
+.line-total {
+  margin-top: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  text-align: right;
+}
+
+/* DELETE BUTTON */
+.delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 14px;
+  color: #c00;
+  background: none;
+  border: none;
+}
+
+/* TOTAL */
+.total-section {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #111;
+  color: #fff;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total-label {
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+.total-value {
+  font-size: 22px;
+  font-weight: 700;
+}
