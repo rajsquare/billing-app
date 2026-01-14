@@ -1,17 +1,22 @@
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
+  width: 100%;
   min-height: 100vh;
-  overflow-x: hidden;
-  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden; /* hard lock horizontal scroll */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Arial, sans-serif;
   background: #f4f4f4;
+  color: #222;
 }
 
-/* APP */
+/* APP WRAPPER */
 #app {
   min-height: 100vh;
   display: flex;
@@ -27,19 +32,31 @@ html, body {
   background: #fff;
   position: sticky;
   top: 0;
+  z-index: 10;
 }
 
-.type-btn,
-.print-btn {
+.type-btn {
   padding: 8px 14px;
+  font-size: 15px;
+  font-weight: 600;
   border-radius: 999px;
-  border: 1px solid #ccc;
-  background: #f5f5f5;
+  border: 1px solid #ddd;
+  background: #fafafa;
 }
 
 .type-btn.active {
   background: #111;
   color: #fff;
+  border-color: #111;
+}
+
+.print-btn {
+  justify-self: end;
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 999px;
+  border: 1px solid #ccc;
+  background: #eee;
 }
 
 /* HEADER */
@@ -49,74 +66,108 @@ html, body {
   gap: 8px;
   padding: 8px;
   background: #fff;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-.bill-header input {
+.bill-header.compact input {
+  width: 100%;
   padding: 8px;
+  font-size: 14px;
   border-radius: 6px;
   border: 1px solid #ccc;
+  min-width: 0;
 }
 
 /* SEARCH */
 .search-section {
   padding: 10px;
   background: #fff;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 #productSearch {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #bbb;
+}
+
+#productSearch:disabled {
+  background: #f0f0f0;
+}
+
+/* SEARCH RESULTS */
+.search-results {
+  margin-top: 8px;
+  background: #fff;
+  border-radius: 8px;
+  max-height: 260px;
+  overflow-y: auto;
 }
 
 /* BILL ITEMS */
 .bill-items {
-  flex: 1;
+  flex: 1; /* 🔑 THIS WAS MISSING */
   padding: 10px;
-  padding-bottom: 120px;
+  padding-bottom: 120px; /* space for total bar */
+  overflow-y: auto;
 }
 
 .bill-row {
   background: #fff;
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 10px;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
   position: relative;
 }
 
 .bill-row-header {
-  font-weight: bold;
+  font-weight: 600;
+  margin-bottom: 8px;
 }
 
 .bill-inputs {
   display: flex;
   gap: 8px;
-  margin-top: 6px;
 }
 
 .bill-inputs input {
   flex: 1;
-  padding: 8px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
 .line-total {
+  margin-top: 8px;
+  font-weight: 600;
   text-align: right;
-  font-weight: bold;
-  margin-top: 6px;
 }
 
 .delete-btn {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  border: none;
+  top: 10px;
+  right: 10px;
   background: none;
+  border: none;
+  color: #c00;
 }
 
 /* NOTES */
 .notes-section {
   padding: 10px;
   background: #fff;
+  border-top: 1px solid #e0e0e0;
+}
+
+.notes-section textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: none;
 }
 
 /* TOTAL BAR */
@@ -128,11 +179,11 @@ html, body {
   padding: 14px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 18px;
 }
 
 /* ================= PRINT ================= */
-
 #printInvoice {
   display: none;
 }
@@ -151,46 +202,5 @@ html, body {
     padding: 20px;
     font-size: 12px;
     color: #000;
-  }
-
-  h2 {
-    text-align: center;
-    margin-bottom: 10px;
-  }
-
-  .invoice-meta {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-  }
-
-  th, td {
-    border: 1px solid #000;
-    padding: 6px;
-  }
-
-  th {
-    background: #eee;
-  }
-
-  td.num {
-    text-align: right;
-  }
-
-  .invoice-total {
-    margin-top: 10px;
-    text-align: right;
-    font-size: 14px;
-    font-weight: bold;
-  }
-
-  .invoice-notes {
-    margin-top: 10px;
   }
 }
