@@ -1,5 +1,5 @@
 let products = [];
-let selectedCustomerType = null; // "W" or "R"
+let selectedCustomerType = null;
 let billItems = [];
 
 // ELEMENTS
@@ -13,27 +13,21 @@ const grandTotalEl = document.getElementById("grandTotal");
 // LOAD PRODUCTS
 fetch("productList.json")
   .then(res => res.json())
-  .then(data => {
-    products = data;
-  });
+  .then(data => products = data);
 
-// CUSTOMER TYPE SELECTION
-btnW.addEventListener("click", () => setCustomerType("W"));
-btnR.addEventListener("click", () => setCustomerType("R"));
+// CUSTOMER TYPE
+btnW.onclick = () => setCustomerType("W");
+btnR.onclick = () => setCustomerType("R");
 
 function setCustomerType(type) {
   selectedCustomerType = type;
 
-  btnW.classList.remove("active");
-  btnR.classList.remove("active");
-
-  if (type === "W") btnW.classList.add("active");
-  if (type === "R") btnR.classList.add("active");
+  btnW.classList.toggle("active", type === "W");
+  btnR.classList.toggle("active", type === "R");
 
   productSearch.disabled = false;
   productSearch.focus();
 
-  // Reprice existing items
   billItems.forEach(item => {
     item.price = getDefaultPrice(item.product);
     calculateLineTotal(item);
@@ -42,68 +36,56 @@ function setCustomerType(type) {
   renderBill();
 }
 
-// SEARCH LOGIC
+// SEARCH
 productSearch.addEventListener("input", () => {
-  const query = productSearch.value.toLowerCase().trim();
+  const q = productSearch.value.toLowerCase().trim();
   searchResults.innerHTML = "";
+  if (!q) return;
 
-  if (!query) return;
-
-  const matches = products
-    .filter(p => p.productName.toLowerCase().includes(query))
-    .slice(0, 15);
-
-  matches.forEach(product => {
-    const div = document.createElement("div");
-    div.className = "search-item";
-    div.textContent = product.productName;
-
-    div.addEventListener("click", () => {
-      addProductToBill(product);
-      productSearch.value = "";
-      searchResults.innerHTML = "";
-      productSearch.focus();
+  products
+    .filter(p => p.productName.toLowerCase().includes(q))
+    .slice(0, 15)
+    .forEach(product => {
+      const div = document.createElement("div");
+      div.className = "search-item";
+      div.textContent = product.productName;
+      div.onclick = () => {
+        addProduct(product);
+        productSearch.value = "";
+        searchResults.innerHTML = "";
+        productSearch.focus();
+      };
+      searchResults.appendChild(div);
     });
-
-    searchResults.appendChild(div);
-  });
 });
 
 // ADD PRODUCT
-function addProductToBill(product) {
-  if (!selectedCustomerType) return;
-
+function addProduct(product) {
   const item = {
     id: Date.now() + Math.random(),
     product,
     price: getDefaultPrice(product),
-    quantity: product.priceType === "KG" ? 1 : 1,
+    quantity: "",
     lineTotal: 0
   };
 
-  calculateLineTotal(item);
   billItems.push(item);
   renderBill();
 }
 
-// PRICE BASED ON CUSTOMER TYPE
+// PRICE BY TYPE
 function getDefaultPrice(product) {
-  return selectedCustomerType === "W"
-    ? product.wPrice
-    : product.rPrice;
+  return selectedCustomerType === "W" ? product.wPrice : product.rPrice;
 }
 
-// CALCULATE LINE TOTAL
+// CALCULATION
 function calculateLineTotal(item) {
-  if (item.product.priceType === "KG") {
-    const qty = parseFloat(item.quantity) || 0;
-    item.lineTotal = Math.round(qty * (item.price || 0));
-  } else {
-    item.lineTotal = Math.round(item.price || 0);
-  }
+  const price = parseFloat(item.price) || 0;
+  const qty = parseFloat(item.quantity) || 0;
+  item.lineTotal = Math.round(price * qty);
 }
 
-// RENDER BILL
+// RENDER
 function renderBill() {
   billItemsContainer.innerHTML = "";
 
@@ -111,62 +93,56 @@ function renderBill() {
     const row = document.createElement("div");
     row.className = "bill-row";
 
-    // HEADER
-    const header = document.createElement("div");
-    header.className = "bill-row-header";
-    header.textContent = item.product.productName;
-    row.appendChild(header);
+    const title = document.createElement("div");
+    title.className = "bill-row-header";
+    title.textContent = item.product.productName;
+    row.appendChild(title);
 
-    // INPUTS
     const inputs = document.createElement("div");
     inputs.className = "bill-inputs";
 
-    // PRICE INPUT
+    // PRICE
     const priceInput = document.createElement("input");
     priceInput.type = "number";
-    priceInput.value = item.price ?? "";
     priceInput.placeholder = "Price";
-    priceInput.addEventListener("input", () => {
-      item.price = parseFloat(priceInput.value) || 0;
+    priceInput.value = item.price ?? "";
+    priceInput.oninput = () => {
+      item.price = priceInput.value;
       calculateLineTotal(item);
       updateTotals();
-      lineTotalEl.textContent = item.lineTotal;
-    });
+      totalEl.textContent = item.lineTotal;
+    };
     inputs.appendChild(priceInput);
 
-    // QUANTITY INPUT (KG ONLY)
-    if (item.product.priceType === "KG") {
-      const qtyInput = document.createElement("input");
-      qtyInput.type = "number";
-      qtyInput.step = "0.01";
-      qtyInput.value = item.quantity;
-      qtyInput.placeholder = "Kg";
-      qtyInput.addEventListener("input", () => {
-        item.quantity = parseFloat(qtyInput.value) || 0;
-        calculateLineTotal(item);
-        updateTotals();
-        lineTotalEl.textContent = item.lineTotal;
-      });
-      inputs.appendChild(qtyInput);
-    }
+    // QUANTITY (KG or PP)
+    const qtyInput = document.createElement("input");
+    qtyInput.type = "number";
+    qtyInput.placeholder = item.product.priceType === "KG" ? "Kg" : "Qty";
+    qtyInput.step = item.product.priceType === "KG" ? "0.01" : "1";
+    qtyInput.value = item.quantity;
+    qtyInput.oninput = () => {
+      item.quantity = qtyInput.value;
+      calculateLineTotal(item);
+      updateTotals();
+      totalEl.textContent = item.lineTotal;
+    };
+    inputs.appendChild(qtyInput);
 
     row.appendChild(inputs);
 
-    // LINE TOTAL
-    const lineTotalEl = document.createElement("div");
-    lineTotalEl.className = "line-total";
-    lineTotalEl.textContent = item.lineTotal;
-    row.appendChild(lineTotalEl);
+    const totalEl = document.createElement("div");
+    totalEl.className = "line-total";
+    totalEl.textContent = item.lineTotal;
+    row.appendChild(totalEl);
 
-    // DELETE BUTTON
-    const deleteBtn = document.createElement("button");
-    deleteBtn.className = "delete-btn";
-    deleteBtn.textContent = "✕";
-    deleteBtn.addEventListener("click", () => {
+    const del = document.createElement("button");
+    del.className = "delete-btn";
+    del.textContent = "✕";
+    del.onclick = () => {
       billItems = billItems.filter(b => b.id !== item.id);
       renderBill();
-    });
-    row.appendChild(deleteBtn);
+    };
+    row.appendChild(del);
 
     billItemsContainer.appendChild(row);
   });
@@ -174,15 +150,12 @@ function renderBill() {
   updateTotals();
 }
 
-// UPDATE GRAND TOTAL
+// TOTAL
 function updateTotals() {
-  const total = billItems.reduce((sum, item) => sum + item.lineTotal, 0);
-  grandTotalEl.textContent = Math.round(total);
+  grandTotalEl.textContent = billItems.reduce((s, i) => s + i.lineTotal, 0);
 }
 
-// CLOSE SEARCH ON OUTSIDE TAP
+// CLOSE SEARCH
 document.addEventListener("click", e => {
-  if (!e.target.closest(".search-section")) {
-    searchResults.innerHTML = "";
-  }
+  if (!e.target.closest(".search-section")) searchResults.innerHTML = "";
 });
