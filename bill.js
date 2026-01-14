@@ -1,6 +1,6 @@
 let products = [];
-let selectedCustomerType = null;
 let billItems = [];
+let customerType = "";
 
 const btnW = document.getElementById("btnW");
 const btnR = document.getElementById("btnR");
@@ -9,19 +9,18 @@ const productSearch = document.getElementById("productSearch");
 const searchResults = document.getElementById("searchResults");
 const billItemsContainer = document.getElementById("billItems");
 const grandTotalEl = document.getElementById("grandTotal");
-const billDateInput = document.getElementById("billDate");
 
-billDateInput.valueAsDate = new Date();
+document.getElementById("billDate").valueAsDate = new Date();
 
 fetch("productList.json")
   .then(r => r.json())
   .then(d => products = d);
 
-btnW.onclick = () => setCustomerType("W");
-btnR.onclick = () => setCustomerType("R");
+btnW.onclick = () => setType("W");
+btnR.onclick = () => setType("R");
 
-function setCustomerType(t) {
-  selectedCustomerType = t;
+function setType(t) {
+  customerType = t;
   btnW.classList.toggle("active", t === "W");
   btnR.classList.toggle("active", t === "R");
   productSearch.disabled = false;
@@ -36,84 +35,89 @@ productSearch.oninput = () => {
     .forEach(p => {
       const d = document.createElement("div");
       d.textContent = p.productName;
-      d.onclick = () => {
-        billItems.push({
-          product: p,
-          price: selectedCustomerType === "W" ? p.wPrice : p.rPrice,
-          quantity: "",
-          lineTotal: 0
-        });
-        productSearch.value = "";
-        render();
-      };
+      d.onclick = () => addItem(p);
       searchResults.appendChild(d);
     });
 };
+
+function addItem(p) {
+  billItems.push({
+    product: p,
+    price: customerType === "W" ? p.wPrice : p.rPrice,
+    qty: "",
+    total: 0
+  });
+  productSearch.value = "";
+  render();
+}
 
 function render() {
   billItemsContainer.innerHTML = "";
   billItems.forEach((i, idx) => {
     const d = document.createElement("div");
+    d.className = "bill-row";
     d.innerHTML = `
-      <strong>${i.product.productName}</strong><br>
-      <input placeholder="Price" value="${i.price}">
-      <input placeholder="Qty" value="${i.quantity}">
-      <div>${i.lineTotal}</div>
-      <button>✕</button>
+      <div class="bill-row-header">${i.product.productName}</div>
+      <div class="bill-inputs">
+        <input placeholder="Price" value="${i.price}">
+        <input placeholder="Qty" value="${i.qty}">
+      </div>
+      <div class="line-total">${i.total}</div>
+      <button class="delete-btn">✕</button>
     `;
+
     d.querySelectorAll("input")[0].oninput = e => {
       i.price = +e.target.value || 0;
       calc(i);
     };
     d.querySelectorAll("input")[1].oninput = e => {
-      i.quantity = +e.target.value || 0;
+      i.qty = +e.target.value || 0;
       calc(i);
     };
     d.querySelector("button").onclick = () => {
       billItems.splice(idx, 1);
       render();
     };
+
     billItemsContainer.appendChild(d);
   });
   updateTotal();
 }
 
 function calc(i) {
-  i.lineTotal = Math.round((i.price || 0) * (i.quantity || 0));
+  i.total = Math.round((i.price || 0) * (i.qty || 0));
   render();
 }
 
 function updateTotal() {
-  grandTotalEl.textContent = billItems.reduce((s, i) => s + i.lineTotal, 0);
+  grandTotalEl.textContent = billItems.reduce((s, i) => s + i.total, 0);
 }
 
 printBtn.onclick = () => {
-  const invoice = document.getElementById("printInvoice");
+  const inv = document.getElementById("printInvoice");
+  const billNo = billNumber.value || "";
+  const cust = customerName.value || "";
+  const date = billDate.value;
+  const notes = billNotes.value;
 
-  const billNo = document.getElementById("billNumber").value || "";
-  const cust = document.getElementById("customerName").value || "";
-  const date = document.getElementById("billDate").value;
-  const notes = document.getElementById("billNotes").value;
-
-  let rows = billItems.map(i => `
+  let rows = billItems.map((i, idx) => `
     <tr>
+      <td>${idx + 1}</td>
       <td>${i.product.productName}</td>
       <td class="num">${i.price}</td>
-      <td class="num">${i.quantity}</td>
-      <td class="num">${i.lineTotal}</td>
+      <td class="num">${i.qty}</td>
+      <td class="num">${i.total}</td>
     </tr>
   `).join("");
 
-  invoice.innerHTML = `
-    <div class="invoice-header">
-      <h2>Your Business Name</h2>
-    </div>
+  inv.innerHTML = `
+    <h2>Your Business Name</h2>
 
     <div class="invoice-meta">
       <div>
         Bill #: ${billNo}<br>
         Customer: ${cust}<br>
-        Type: ${selectedCustomerType}
+        Type: ${customerType}
       </div>
       <div>
         Date: ${date}
@@ -121,15 +125,14 @@ printBtn.onclick = () => {
     </div>
 
     <table>
-      <thead>
-        <tr>
-          <th>Item</th>
-          <th>Rate</th>
-          <th>Qty</th>
-          <th>Amount</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
+      <tr>
+        <th>#</th>
+        <th>Item</th>
+        <th>Rate</th>
+        <th>Qty</th>
+        <th>Amount</th>
+      </tr>
+      ${rows}
     </table>
 
     <div class="invoice-total">
