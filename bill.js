@@ -2,191 +2,142 @@ let products = [];
 let selectedCustomerType = null;
 let billItems = [];
 
-// ELEMENTS
 const btnW = document.getElementById("btnW");
 const btnR = document.getElementById("btnR");
 const printBtn = document.getElementById("printBtn");
-
 const productSearch = document.getElementById("productSearch");
 const searchResults = document.getElementById("searchResults");
 const billItemsContainer = document.getElementById("billItems");
 const grandTotalEl = document.getElementById("grandTotal");
 const billDateInput = document.getElementById("billDate");
 
-// AUTO SET TODAY DATE (EDITABLE)
-if (billDateInput) {
-  billDateInput.valueAsDate = new Date();
-}
+billDateInput.valueAsDate = new Date();
 
-// LOAD PRODUCTS
 fetch("productList.json")
-  .then(res => res.json())
-  .then(data => {
-    products = data;
-  });
+  .then(r => r.json())
+  .then(d => products = d);
 
-// CUSTOMER TYPE SELECTION
-btnW.addEventListener("click", () => setCustomerType("W"));
-btnR.addEventListener("click", () => setCustomerType("R"));
+btnW.onclick = () => setCustomerType("W");
+btnR.onclick = () => setCustomerType("R");
 
-function setCustomerType(type) {
-  selectedCustomerType = type;
-
-  btnW.classList.toggle("active", type === "W");
-  btnR.classList.toggle("active", type === "R");
-
+function setCustomerType(t) {
+  selectedCustomerType = t;
+  btnW.classList.toggle("active", t === "W");
+  btnR.classList.toggle("active", t === "R");
   productSearch.disabled = false;
-  productSearch.focus();
-
-  // Reprice existing items
-  billItems.forEach(item => {
-    item.price = getDefaultPrice(item.product);
-    calculateLineTotal(item);
-  });
-
-  renderBill();
 }
 
-// SEARCH PRODUCTS
-productSearch.addEventListener("input", () => {
-  const query = productSearch.value.toLowerCase().trim();
+productSearch.oninput = () => {
+  const q = productSearch.value.toLowerCase();
   searchResults.innerHTML = "";
+  if (!q) return;
 
-  if (!query) return;
-
-  products
-    .filter(p => p.productName.toLowerCase().includes(query))
-    .slice(0, 15)
-    .forEach(product => {
-      const div = document.createElement("div");
-      div.className = "search-item";
-      div.textContent = product.productName;
-
-      div.addEventListener("click", () => {
-        addProductToBill(product);
+  products.filter(p => p.productName.toLowerCase().includes(q)).slice(0, 10)
+    .forEach(p => {
+      const d = document.createElement("div");
+      d.textContent = p.productName;
+      d.onclick = () => {
+        billItems.push({
+          product: p,
+          price: selectedCustomerType === "W" ? p.wPrice : p.rPrice,
+          quantity: "",
+          lineTotal: 0
+        });
         productSearch.value = "";
-        searchResults.innerHTML = "";
-        productSearch.focus();
-      });
-
-      searchResults.appendChild(div);
+        render();
+      };
+      searchResults.appendChild(d);
     });
-});
+};
 
-// ADD PRODUCT TO BILL
-function addProductToBill(product) {
-  if (!selectedCustomerType) return;
-
-  const item = {
-    id: Date.now() + Math.random(),
-    product,
-    price: getDefaultPrice(product),
-    quantity: "",
-    lineTotal: 0
-  };
-
-  billItems.push(item);
-  renderBill();
-}
-
-// GET PRICE BASED ON CUSTOMER TYPE
-function getDefaultPrice(product) {
-  return selectedCustomerType === "W"
-    ? product.wPrice
-    : product.rPrice;
-}
-
-// CALCULATE LINE TOTAL
-function calculateLineTotal(item) {
-  const price = parseFloat(item.price) || 0;
-  const qty = parseFloat(item.quantity) || 0;
-
-  item.lineTotal = Math.round(price * qty);
-}
-
-// RENDER BILL
-function renderBill() {
+function render() {
   billItemsContainer.innerHTML = "";
-
-  billItems.forEach(item => {
-    const row = document.createElement("div");
-    row.className = "bill-row";
-
-    // PRODUCT NAME
-    const header = document.createElement("div");
-    header.className = "bill-row-header";
-    header.textContent = item.product.productName;
-    row.appendChild(header);
-
-    // INPUTS
-    const inputs = document.createElement("div");
-    inputs.className = "bill-inputs";
-
-    // PRICE INPUT
-    const priceInput = document.createElement("input");
-    priceInput.type = "number";
-    priceInput.placeholder = "Price";
-    priceInput.value = item.price ?? "";
-    priceInput.addEventListener("input", () => {
-      item.price = priceInput.value;
-      calculateLineTotal(item);
-      updateTotals();
-      lineTotalEl.textContent = item.lineTotal;
-    });
-    inputs.appendChild(priceInput);
-
-    // QUANTITY INPUT (KG OR PP)
-    const qtyInput = document.createElement("input");
-    qtyInput.type = "number";
-    qtyInput.placeholder = item.product.priceType === "KG" ? "Kg" : "Qty";
-    qtyInput.step = item.product.priceType === "KG" ? "0.01" : "1";
-    qtyInput.value = item.quantity;
-    qtyInput.addEventListener("input", () => {
-      item.quantity = qtyInput.value;
-      calculateLineTotal(item);
-      updateTotals();
-      lineTotalEl.textContent = item.lineTotal;
-    });
-    inputs.appendChild(qtyInput);
-
-    row.appendChild(inputs);
-
-    // LINE TOTAL
-    const lineTotalEl = document.createElement("div");
-    lineTotalEl.className = "line-total";
-    lineTotalEl.textContent = item.lineTotal;
-    row.appendChild(lineTotalEl);
-
-    // DELETE BUTTON
-    const deleteBtn = document.createElement("button");
-    deleteBtn.className = "delete-btn";
-    deleteBtn.textContent = "✕";
-    deleteBtn.addEventListener("click", () => {
-      billItems = billItems.filter(b => b.id !== item.id);
-      renderBill();
-    });
-    row.appendChild(deleteBtn);
-
-    billItemsContainer.appendChild(row);
+  billItems.forEach((i, idx) => {
+    const d = document.createElement("div");
+    d.innerHTML = `
+      <strong>${i.product.productName}</strong><br>
+      <input placeholder="Price" value="${i.price}">
+      <input placeholder="Qty" value="${i.quantity}">
+      <div>${i.lineTotal}</div>
+      <button>✕</button>
+    `;
+    d.querySelectorAll("input")[0].oninput = e => {
+      i.price = +e.target.value || 0;
+      calc(i);
+    };
+    d.querySelectorAll("input")[1].oninput = e => {
+      i.quantity = +e.target.value || 0;
+      calc(i);
+    };
+    d.querySelector("button").onclick = () => {
+      billItems.splice(idx, 1);
+      render();
+    };
+    billItemsContainer.appendChild(d);
   });
-
-  updateTotals();
+  updateTotal();
 }
 
-// UPDATE GRAND TOTAL
-function updateTotals() {
-  const total = billItems.reduce((sum, item) => sum + item.lineTotal, 0);
-  grandTotalEl.textContent = Math.round(total);
+function calc(i) {
+  i.lineTotal = Math.round((i.price || 0) * (i.quantity || 0));
+  render();
 }
 
-// CLOSE SEARCH RESULTS ON OUTSIDE TAP
-document.addEventListener("click", e => {
-  if (!e.target.closest(".search-section")) {
-    searchResults.innerHTML = "";
-  }
-});
+function updateTotal() {
+  grandTotalEl.textContent = billItems.reduce((s, i) => s + i.lineTotal, 0);
+}
 
-// PRINT / SAVE AS PDF
-printBtn.addEventListener("click", () => {
+printBtn.onclick = () => {
+  const invoice = document.getElementById("printInvoice");
+
+  const billNo = document.getElementById("billNumber").value || "";
+  const cust = document.getElementById("customerName").value || "";
+  const date = document.getElementById("billDate").value;
+  const notes = document.getElementById("billNotes").value;
+
+  let rows = billItems.map(i => `
+    <tr>
+      <td>${i.product.productName}</td>
+      <td class="num">${i.price}</td>
+      <td class="num">${i.quantity}</td>
+      <td class="num">${i.lineTotal}</td>
+    </tr>
+  `).join("");
+
+  invoice.innerHTML = `
+    <div class="invoice-header">
+      <h2>Your Business Name</h2>
+    </div>
+
+    <div class="invoice-meta">
+      <div>
+        Bill #: ${billNo}<br>
+        Customer: ${cust}<br>
+        Type: ${selectedCustomerType}
+      </div>
+      <div>
+        Date: ${date}
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Rate</th>
+          <th>Qty</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+
+    <div class="invoice-total">
+      TOTAL: ${grandTotalEl.textContent}
+    </div>
+
+    ${notes ? `<div class="invoice-notes">Notes: ${notes}</div>` : ""}
+  `;
+
   window.print();
-});
+};
