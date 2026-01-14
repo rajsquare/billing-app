@@ -8,15 +8,16 @@
 </head>
 <body>
 
-  <!-- CUSTOMER TYPE -->
+  <!-- CUSTOMER TYPE + PRINT -->
   <div class="customer-type">
     <button id="btnW" class="type-btn">W</button>
     <button id="btnR" class="type-btn">R</button>
+    <button id="printBtn" class="print-btn">Print / PDF</button>
   </div>
 
-  <!-- COMPACT BILL HEADER -->
+  <!-- COMPACT HEADER -->
   <div class="bill-header compact">
-    <input id="billNumber" type="text" placeholder="Bill No" inputmode="numeric" />
+    <input id="billNumber" type="number" placeholder="Bill #" />
     <input id="customerName" type="text" placeholder="Customer" />
     <input id="billDate" type="date" />
   </div>
@@ -38,11 +39,7 @@
 
   <!-- NOTES -->
   <div class="notes-section">
-    <textarea
-      id="billNotes"
-      placeholder="Additional notes (optional)"
-      rows="3"
-    ></textarea>
+    <textarea id="billNotes" rows="3" placeholder="Additional notes (optional)"></textarea>
   </div>
 
   <!-- TOTAL -->
