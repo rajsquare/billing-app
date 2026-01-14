@@ -9,7 +9,7 @@
 </head>
 <body>
 
-  <!-- CUSTOMER TYPE SELECTION -->
+  <!-- CUSTOMER TYPE -->
   <div class="customer-type">
     <button id="btnW" class="type-btn">W</button>
     <button id="btnR" class="type-btn">R</button>
@@ -22,6 +22,11 @@
       id="billNumber"
       placeholder="Bill Number (optional)"
       inputmode="numeric"
+    />
+    <input
+      type="text"
+      id="customerName"
+      placeholder="Customer Name (optional)"
     />
   </div>
 
@@ -40,7 +45,7 @@
   <!-- BILL ITEMS -->
   <div id="billItems" class="bill-items"></div>
 
-  <!-- GRAND TOTAL -->
+  <!-- TOTAL -->
   <div class="total-section">
     <div class="total-label">TOTAL</div>
     <div id="grandTotal" class="total-value">0</div>
