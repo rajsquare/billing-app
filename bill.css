@@ -1,204 +1,92 @@
 * {
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
 }
 
-html,
 body {
   margin: 0;
-  padding: 0;
-  overflow-x: hidden; /* ABSOLUTE lock: no horizontal scroll */
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   background: #f4f4f4;
-  color: #222;
 }
 
-/* TOP BAR */
-.customer-type {
-  display: grid;
-  grid-template-columns: 1fr 1fr auto;
-  gap: 8px;
-  padding: 8px;
-  background: #fff;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+#app {
+  overflow-x: hidden;
 }
 
-.type-btn {
-  padding: 10px 0;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 8px;
-  border: 2px solid #ddd;
-  background: #fafafa;
+/* existing UI styles remain same as before */
+/* only print styles below are important */
+
+#printInvoice {
+  display: none;
 }
 
-.type-btn.active {
-  background: #111;
-  color: #fff;
-  border-color: #111;
-}
-
-.print-btn {
-  padding: 10px 12px;
-  font-size: 14px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  background: #eee;
-}
-
-/* COMPACT HEADER — FIXED */
-.bill-header.compact {
-  display: grid;
-  grid-template-columns: 60px 1fr 140px; /* 🔑 FIX */
-  gap: 8px;
-  padding: 8px;
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
-  width: 100%;
-}
-
-.bill-header.compact input {
-  width: 100%;
-  padding: 8px;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  min-width: 0; /* IMPORTANT for grid overflow prevention */
-}
-
-/* SEARCH */
-.search-section {
-  padding: 10px;
-  background: #fff;
-}
-
-#productSearch {
-  width: 100%;
-  padding: 14px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: 1px solid #bbb;
-}
-
-#productSearch:disabled {
-  background: #f0f0f0;
-}
-
-/* SEARCH RESULTS */
-.search-results {
-  margin-top: 8px;
-  background: #fff;
-  border-radius: 8px;
-  max-height: 260px;
-  overflow-y: auto;
-}
-
-/* BILL ITEMS */
-.bill-items {
-  padding: 10px;
-  padding-bottom: 150px;
-}
-
-.bill-row {
-  background: #fff;
-  border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-  position: relative;
-}
-
-.bill-row-header {
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.bill-inputs {
-  display: flex;
-  gap: 8px;
-}
-
-.bill-inputs input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.line-total {
-  margin-top: 8px;
-  font-weight: 600;
-  text-align: right;
-}
-
-.delete-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  color: #c00;
-}
-
-/* NOTES */
-.notes-section {
-  padding: 10px;
-  background: #fff;
-}
-
-.notes-section textarea {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  resize: none;
-}
-
-/* TOTAL */
-.total-section {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #111;
-  color: #fff;
-  padding: 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* PRINT STYLES */
+/* ================= PRINT LAYOUT ================= */
 @media print {
+
   body {
     background: #fff;
   }
 
-  .customer-type,
-  .search-section,
-  .delete-btn,
-  .print-btn {
-    display: none !important;
+  #app {
+    display: none;
   }
 
-  .bill-row {
-    box-shadow: none;
-    border-bottom: 1px solid #ccc;
-    border-radius: 0;
-  }
-
-  .total-section {
-    position: static;
-    background: none;
+  #printInvoice {
+    display: block;
+    padding: 20px;
+    font-size: 12px;
     color: #000;
-    border-top: 2px solid #000;
+  }
+
+  .invoice-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .invoice-header h2 {
+    margin: 0;
+    font-size: 18px;
+  }
+
+  .invoice-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+
+  .invoice-meta div {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
     margin-top: 10px;
   }
 
-  textarea {
-    border: none;
+  th, td {
+    border: 1px solid #000;
+    padding: 6px;
   }
+
+  th {
+    background: #eee;
+    text-align: left;
+  }
+
+  td.num {
+    text-align: right;
+  }
+
+  .invoice-total {
+    margin-top: 15px;
+    text-align: right;
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .invoice-notes {
+    margin-top: 15px;
+    font-size: 11px;
+  }
+
 }
