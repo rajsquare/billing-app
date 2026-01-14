@@ -2,51 +2,47 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Billing</title>
   <link rel="stylesheet" href="bill.css" />
 </head>
 <body>
 
-  <!-- CUSTOMER TYPE + PRINT -->
-  <div class="customer-type">
-    <button id="btnW" class="type-btn">W</button>
-    <button id="btnR" class="type-btn">R</button>
-    <button id="printBtn" class="print-btn">Print / PDF</button>
+  <!-- APP UI -->
+  <div id="app">
+
+    <div class="customer-type">
+      <button id="btnW" class="type-btn">W</button>
+      <button id="btnR" class="type-btn">R</button>
+      <button id="printBtn" class="print-btn">Print / PDF</button>
+    </div>
+
+    <div class="bill-header compact">
+      <input id="billNumber" type="number" placeholder="Bill #" />
+      <input id="customerName" type="text" placeholder="Customer" />
+      <input id="billDate" type="date" />
+    </div>
+
+    <div class="search-section">
+      <input id="productSearch" type="text" placeholder="Search product" disabled />
+      <div id="searchResults" class="search-results"></div>
+    </div>
+
+    <div id="billItems" class="bill-items"></div>
+
+    <div class="notes-section">
+      <textarea id="billNotes" rows="3" placeholder="Additional notes (optional)"></textarea>
+    </div>
+
+    <div class="total-section">
+      <div>TOTAL</div>
+      <div id="grandTotal">0</div>
+    </div>
+
   </div>
 
-  <!-- COMPACT HEADER -->
-  <div class="bill-header compact">
-    <input id="billNumber" type="number" placeholder="Bill #" />
-    <input id="customerName" type="text" placeholder="Customer" />
-    <input id="billDate" type="date" />
-  </div>
-
-  <!-- SEARCH -->
-  <div class="search-section">
-    <input
-      type="text"
-      id="productSearch"
-      placeholder="Search product"
-      disabled
-      autocomplete="off"
-    />
-    <div id="searchResults" class="search-results"></div>
-  </div>
-
-  <!-- BILL ITEMS -->
-  <div id="billItems" class="bill-items"></div>
-
-  <!-- NOTES -->
-  <div class="notes-section">
-    <textarea id="billNotes" rows="3" placeholder="Additional notes (optional)"></textarea>
-  </div>
-
-  <!-- TOTAL -->
-  <div class="total-section">
-    <div class="total-label">TOTAL</div>
-    <div id="grandTotal" class="total-value">0</div>
-  </div>
+  <!-- PRINT INVOICE -->
+  <div id="printInvoice"></div>
 
   <script src="bill.js"></script>
 </body>
