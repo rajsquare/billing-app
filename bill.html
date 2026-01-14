@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Billing</title>
-
   <link rel="stylesheet" href="bill.css" />
 </head>
 <body>
@@ -15,22 +14,14 @@
     <button id="btnR" class="type-btn">R</button>
   </div>
 
-  <!-- BILL HEADER -->
-  <div class="bill-header">
-    <input
-      type="text"
-      id="billNumber"
-      placeholder="Bill Number (optional)"
-      inputmode="numeric"
-    />
-    <input
-      type="text"
-      id="customerName"
-      placeholder="Customer Name (optional)"
-    />
+  <!-- COMPACT BILL HEADER -->
+  <div class="bill-header compact">
+    <input id="billNumber" type="text" placeholder="Bill No" inputmode="numeric" />
+    <input id="customerName" type="text" placeholder="Customer" />
+    <input id="billDate" type="date" />
   </div>
 
-  <!-- PRODUCT SEARCH -->
+  <!-- SEARCH -->
   <div class="search-section">
     <input
       type="text"
@@ -44,6 +35,15 @@
 
   <!-- BILL ITEMS -->
   <div id="billItems" class="bill-items"></div>
+
+  <!-- NOTES -->
+  <div class="notes-section">
+    <textarea
+      id="billNotes"
+      placeholder="Additional notes (optional)"
+      rows="3"
+    ></textarea>
+  </div>
 
   <!-- TOTAL -->
   <div class="total-section">
