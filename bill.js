@@ -10,12 +10,20 @@ const searchResults = document.getElementById("searchResults");
 const billItemsContainer = document.getElementById("billItems");
 const grandTotalEl = document.getElementById("grandTotal");
 
-document.getElementById("billDate").valueAsDate = new Date();
+const billNumber = document.getElementById("billNumber");
+const customerName = document.getElementById("customerName");
+const billDate = document.getElementById("billDate");
+const billNotes = document.getElementById("billNotes");
 
+// AUTO SET DATE
+billDate.valueAsDate = new Date();
+
+// LOAD PRODUCTS
 fetch("productList.json")
   .then(r => r.json())
   .then(d => products = d);
 
+// CUSTOMER TYPE
 btnW.onclick = () => setType("W");
 btnR.onclick = () => setType("R");
 
@@ -26,20 +34,25 @@ function setType(t) {
   productSearch.disabled = false;
 }
 
+// SEARCH
 productSearch.oninput = () => {
   const q = productSearch.value.toLowerCase();
   searchResults.innerHTML = "";
   if (!q) return;
 
-  products.filter(p => p.productName.toLowerCase().includes(q)).slice(0, 10)
+  products
+    .filter(p => p.productName.toLowerCase().includes(q))
+    .slice(0, 10)
     .forEach(p => {
       const d = document.createElement("div");
       d.textContent = p.productName;
+      d.className = "search-item";
       d.onclick = () => addItem(p);
       searchResults.appendChild(d);
     });
 };
 
+// ADD ITEM
 function addItem(p) {
   billItems.push({
     product: p,
@@ -47,33 +60,57 @@ function addItem(p) {
     qty: "",
     total: 0
   });
+
   productSearch.value = "";
+  searchResults.innerHTML = "";
   render();
 }
 
+// RENDER BILL
 function render() {
   billItemsContainer.innerHTML = "";
+
   billItems.forEach((i, idx) => {
     const d = document.createElement("div");
     d.className = "bill-row";
+
+    const isKg = i.product.priceType === "KG";
+
     d.innerHTML = `
       <div class="bill-row-header">${i.product.productName}</div>
+
       <div class="bill-inputs">
-        <input placeholder="Price" value="${i.price}">
-        <input placeholder="Qty" value="${i.qty}">
+        <input 
+          type="number" 
+          placeholder="Price" 
+          value="${i.price}"
+        />
+
+        <input 
+          type="number" 
+          placeholder="${isKg ? "Kg" : "Qty"}"
+          step="${isKg ? "0.01" : "1"}"
+          value="${i.qty}"
+        />
       </div>
+
       <div class="line-total">${i.total}</div>
       <button class="delete-btn">✕</button>
     `;
 
-    d.querySelectorAll("input")[0].oninput = e => {
-      i.price = +e.target.value || 0;
-      calc(i);
+    const priceInput = d.querySelectorAll("input")[0];
+    const qtyInput = d.querySelectorAll("input")[1];
+
+    priceInput.oninput = e => {
+      i.price = parseFloat(e.target.value) || 0;
+      calculate(i);
     };
-    d.querySelectorAll("input")[1].oninput = e => {
-      i.qty = +e.target.value || 0;
-      calc(i);
+
+    qtyInput.oninput = e => {
+      i.qty = parseFloat(e.target.value) || 0;
+      calculate(i);
     };
+
     d.querySelector("button").onclick = () => {
       billItems.splice(idx, 1);
       render();
@@ -81,20 +118,28 @@ function render() {
 
     billItemsContainer.appendChild(d);
   });
+
   updateTotal();
 }
 
-function calc(i) {
-  i.total = Math.round((i.price || 0) * (i.qty || 0));
+// CALCULATE LINE TOTAL
+function calculate(i) {
+  const price = parseFloat(i.price) || 0;
+  const qty = parseFloat(i.qty) || 0;
+  i.total = Math.round(price * qty);
   render();
 }
 
+// UPDATE GRAND TOTAL
 function updateTotal() {
-  grandTotalEl.textContent = billItems.reduce((s, i) => s + i.total, 0);
+  const total = billItems.reduce((s, i) => s + i.total, 0);
+  grandTotalEl.textContent = total;
 }
 
+// PRINT / PDF
 printBtn.onclick = () => {
   const inv = document.getElementById("printInvoice");
+
   const billNo = billNumber.value || "";
   const cust = customerName.value || "";
   const date = billDate.value;
