@@ -2,6 +2,7 @@ let products = [];
 let billItems = [];
 let customerType = "";
 
+// ELEMENTS
 const btnW = document.getElementById("btnW");
 const btnR = document.getElementById("btnR");
 const printBtn = document.getElementById("printBtn");
@@ -32,6 +33,7 @@ function setType(t) {
   btnW.classList.toggle("active", t === "W");
   btnR.classList.toggle("active", t === "R");
   productSearch.disabled = false;
+  productSearch.focus();
 }
 
 // SEARCH
@@ -66,17 +68,17 @@ function addItem(p) {
   render();
 }
 
-// RENDER BILL
+// RENDER BILL (ONLY WHEN ADD / DELETE)
 function render() {
   billItemsContainer.innerHTML = "";
 
   billItems.forEach((i, idx) => {
-    const d = document.createElement("div");
-    d.className = "bill-row";
+    const row = document.createElement("div");
+    row.className = "bill-row";
 
     const isKg = i.product.priceType === "KG";
 
-    d.innerHTML = `
+    row.innerHTML = `
       <div class="bill-row-header">${i.product.productName}</div>
 
       <div class="bill-inputs">
@@ -99,38 +101,44 @@ function render() {
       <button class="delete-btn">✕</button>
     `;
 
-    const priceInput = d.querySelectorAll("input")[0];
-    const qtyInput = d.querySelectorAll("input")[1];
+    const priceInput = row.querySelectorAll("input")[0];
+    const qtyInput = row.querySelectorAll("input")[1];
+    const lineTotalEl = row.querySelector(".line-total");
 
+    // PRICE INPUT HANDLER
     priceInput.oninput = e => {
       i.price = parseFloat(e.target.value) || 0;
-      calculate(i);
+      updateLine(i, lineTotalEl);
     };
 
+    // QTY INPUT HANDLER (NO RE-RENDER)
     qtyInput.oninput = e => {
-      // replace comma with dot for safety
       const raw = e.target.value.replace(",", ".");
       i.qty = raw;
-      calculate(i);
+      updateLine(i, lineTotalEl);
     };
 
-    d.querySelector("button").onclick = () => {
+    // DELETE
+    row.querySelector("button").onclick = () => {
       billItems.splice(idx, 1);
       render();
     };
 
-    billItemsContainer.appendChild(d);
+    billItemsContainer.appendChild(row);
   });
 
   updateTotal();
 }
 
-// CALCULATE LINE TOTAL
-function calculate(i) {
+// UPDATE SINGLE LINE + GRAND TOTAL (NO DOM REBUILD)
+function updateLine(i, lineTotalEl) {
   const price = parseFloat(i.price) || 0;
   const qty = parseFloat(i.qty) || 0;
+
   i.total = Math.round(price * qty);
-  render();
+  lineTotalEl.textContent = i.total;
+
+  updateTotal();
 }
 
 // UPDATE GRAND TOTAL
