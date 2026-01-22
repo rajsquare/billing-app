@@ -81,15 +81,16 @@ function render() {
 
       <div class="bill-inputs">
         <input 
-          type="number" 
+          type="number"
           placeholder="Price" 
           value="${i.price}"
         />
 
         <input 
-          type="number" 
+          type="text"
           placeholder="${isKg ? "Kg" : "Qty"}"
-          step="${isKg ? "0.01" : "1"}"
+          inputmode="${isKg ? "decimal" : "numeric"}"
+          pattern="${isKg ? "[0-9]*[.,]?[0-9]*" : "[0-9]*"}"
           value="${i.qty}"
         />
       </div>
@@ -107,7 +108,9 @@ function render() {
     };
 
     qtyInput.oninput = e => {
-      i.qty = parseFloat(e.target.value) || 0;
+      // replace comma with dot for safety
+      const raw = e.target.value.replace(",", ".");
+      i.qty = raw;
       calculate(i);
     };
 
