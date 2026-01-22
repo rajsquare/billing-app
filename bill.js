@@ -16,7 +16,7 @@ const customerName = document.getElementById("customerName");
 const billDate = document.getElementById("billDate");
 const billNotes = document.getElementById("billNotes");
 
-// AUTO SET DATE
+// AUTO DATE
 billDate.valueAsDate = new Date();
 
 // LOAD PRODUCTS
@@ -68,7 +68,7 @@ function addItem(p) {
   render();
 }
 
-// RENDER BILL (ONLY WHEN ADD / DELETE)
+// RENDER BILL (ONLY ADD / DELETE)
 function render() {
   billItemsContainer.innerHTML = "";
 
@@ -105,20 +105,17 @@ function render() {
     const qtyInput = row.querySelectorAll("input")[1];
     const lineTotalEl = row.querySelector(".line-total");
 
-    // PRICE INPUT HANDLER
     priceInput.oninput = e => {
       i.price = parseFloat(e.target.value) || 0;
       updateLine(i, lineTotalEl);
     };
 
-    // QTY INPUT HANDLER (NO RE-RENDER)
     qtyInput.oninput = e => {
       const raw = e.target.value.replace(",", ".");
       i.qty = raw;
       updateLine(i, lineTotalEl);
     };
 
-    // DELETE
     row.querySelector("button").onclick = () => {
       billItems.splice(idx, 1);
       render();
@@ -130,7 +127,7 @@ function render() {
   updateTotal();
 }
 
-// UPDATE SINGLE LINE + GRAND TOTAL (NO DOM REBUILD)
+// UPDATE LINE
 function updateLine(i, lineTotalEl) {
   const price = parseFloat(i.price) || 0;
   const qty = parseFloat(i.qty) || 0;
@@ -147,7 +144,8 @@ function updateTotal() {
   grandTotalEl.textContent = total;
 }
 
-// PRINT / PDF
+// ================= PRINT / PDF (NEW PROFESSIONAL FORMAT) =================
+
 printBtn.onclick = () => {
   const inv = document.getElementById("printInvoice");
 
@@ -167,32 +165,27 @@ printBtn.onclick = () => {
   `).join("");
 
   inv.innerHTML = `
-    <h2>Your Business Name</h2>
+    <div class="invoice-title">Your Business Name</div>
 
-    <div class="invoice-meta">
-      <div>
-        Bill #: ${billNo}<br>
-        Customer: ${cust}<br>
-        Type: ${customerType}
-      </div>
-      <div>
-        Date: ${date}
-      </div>
+    <div class="invoice-header-line">
+      Bill No: ${billNo} &nbsp;&nbsp; | &nbsp;&nbsp;
+      Customer: ${cust} &nbsp;&nbsp; | &nbsp;&nbsp;
+      Date: ${date}
     </div>
 
     <table>
       <tr>
-        <th>#</th>
+        <th>Sr.</th>
         <th>Item</th>
-        <th>Rate</th>
-        <th>Qty</th>
-        <th>Amount</th>
+        <th class="num">Rate</th>
+        <th class="num">Qty</th>
+        <th class="num">Amount</th>
       </tr>
       ${rows}
     </table>
 
     <div class="invoice-total">
-      TOTAL: ${grandTotalEl.textContent}
+      Total: ${grandTotalEl.textContent}
     </div>
 
     ${notes ? `<div class="invoice-notes">Notes: ${notes}</div>` : ""}
