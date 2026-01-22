@@ -68,7 +68,7 @@ function addItem(p) {
   render();
 }
 
-// RENDER BILL (ONLY ADD / DELETE)
+// RENDER BILL
 function render() {
   billItemsContainer.innerHTML = "";
 
@@ -144,7 +144,7 @@ function updateTotal() {
   grandTotalEl.textContent = total;
 }
 
-// ================= PRINT / PDF (NEW PROFESSIONAL FORMAT) =================
+// ================= PRINT / PDF =================
 
 printBtn.onclick = () => {
   const inv = document.getElementById("printInvoice");
@@ -165,7 +165,7 @@ printBtn.onclick = () => {
   `).join("");
 
   inv.innerHTML = `
-    <div class="invoice-title">Your Business Name</div>
+    <div class="invoice-title">HV</div>
 
     <div class="invoice-header-line">
       Bill No: ${billNo} &nbsp;&nbsp; | &nbsp;&nbsp;
