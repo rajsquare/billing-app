@@ -140,6 +140,20 @@ html, body {
 
 @media print {
 
+  /* REMOVE CHROME HEADER / FOOTER (URL, DATE, PAGE NO) */
+  @page {
+    margin: 20mm;
+  }
+
+  body::after,
+  body::before {
+    content: none !important;
+  }
+
+  a[href]:after {
+    content: none !important;
+  }
+
   body {
     background: #fff;
   }
@@ -155,7 +169,7 @@ html, body {
     color: #000;
   }
 
-  /* HEADER */
+  /* TITLE */
   .invoice-title {
     text-align: center;
     font-size: 18px;
@@ -163,6 +177,7 @@ html, body {
     margin-bottom: 6px;
   }
 
+  /* HEADER LINE */
   .invoice-header-line {
     text-align: center;
     margin-bottom: 12px;
