@@ -4,7 +4,7 @@
     "productName": "Nirmal Frying Pan / Saucepan",
     "wPrice": 1450,
     "priceType": "KG",
-    "rPrice": 1600
+    "rPrice": 1700
   },
   {
     "sr": 2,
@@ -46,21 +46,21 @@
     "productName": "Nirmal Copper Sipri",
     "wPrice": 1700,
     "priceType": "KG",
-    "rPrice": 1800
+    "rPrice": 2000
   },
   {
     "sr": 8,
     "productName": "Chirag Gadu",
     "wPrice": 1670,
     "priceType": "KG",
-    "rPrice": 1800
+    "rPrice": 1900
   },
   {
     "sr": 9,
     "productName": "Chirag Gangal",
     "wPrice": 1750,
     "priceType": "KG",
-    "rPrice": 1900
+    "rPrice": 2000
   },
   {
     "sr": 10,
@@ -74,140 +74,140 @@
     "productName": "Chirag Pawali (1x8)",
     "wPrice": 1630,
     "priceType": "KG",
-    "rPrice": 1800
+    "rPrice": 1900
   },
   {
     "sr": 12,
     "productName": "Chirag Pawali (7x8)",
     "wPrice": 1650,
     "priceType": "KG",
-    "rPrice": 1800
+    "rPrice": 1900
   },
   {
     "sr": 13,
     "productName": "Chirag Kulfi Matka",
     "wPrice": 1670,
     "priceType": "KG",
-    "rPrice": 1800
+    "rPrice": 1900
   },
   {
     "sr": 14,
     "productName": "Chirag Taman",
-    "wPrice": 1610,
+    "wPrice": 1630,
     "priceType": "KG",
-    "rPrice": 1800
+    "rPrice": 1900
   },
   {
     "sr": 15,
     "productName": "Chirag Nashik Kalsi",
     "wPrice": 1650,
     "priceType": "KG",
-    "rPrice": 1800
+    "rPrice": 1900
   },
   {
     "sr": 16,
     "productName": "Print Thal (upto 24\")",
     "wPrice": 920,
     "priceType": "KG",
-    "rPrice": 1050
+    "rPrice": 1100
   },
   {
     "sr": 17,
     "productName": "Print Thal (25\"x26\")",
     "wPrice": 940,
     "priceType": "KG",
-    "rPrice": 1050
+    "rPrice": 1100
   },
   {
     "sr": 18,
     "productName": "Print Thal (26\"+)",
     "wPrice": 970,
     "priceType": "KG",
-    "rPrice": 1100
+    "rPrice": 1150
   },
   {
     "sr": 19,
     "productName": "Jalebi Thal (upto 24)",
     "wPrice": 940,
     "priceType": "KG",
-    "rPrice": 1050
+    "rPrice": 1100
   },
   {
     "sr": 20,
     "productName": "Jalebi Thal (24+)",
     "wPrice": 960,
     "priceType": "KG",
-    "rPrice": 1050
+    "rPrice": 1100
   },
   {
     "sr": 21,
     "productName": "Plain Thali (10.5”)",
     "wPrice": 1050,
     "priceType": "KG",
-    "rPrice": 1150
+    "rPrice": 1200
   },
   {
     "sr": 22,
     "productName": "Plain Thali",
     "wPrice": 980,
     "priceType": "KG",
-    "rPrice": 1150
+    "rPrice": 1200
   },
   {
     "sr": 23,
     "productName": "Print Thali",
     "wPrice": 1050,
     "priceType": "KG",
-    "rPrice": 1150
+    "rPrice": 1200
   },
   {
     "sr": 24,
     "productName": "Handa",
     "wPrice": 1000,
     "priceType": "KG",
-    "rPrice": 1150
+    "rPrice": 1200
   },
   {
     "sr": 25,
     "productName": "Kalsi",
     "wPrice": 1020,
     "priceType": "KG",
-    "rPrice": 1150
+    "rPrice": 1200
   },
   {
     "sr": 26,
     "productName": "Kalsi (upto 1.5 kg)",
     "wPrice": 1070,
     "priceType": "KG",
-    "rPrice": 1150
+    "rPrice": 1200
   },
   {
     "sr": 27,
     "productName": "Katora",
     "wPrice": 980,
     "priceType": "KG",
-    "rPrice": 1150
+    "rPrice": 1200
   },
   {
     "sr": 28,
     "productName": "Lota / Glass",
     "wPrice": 1000,
     "priceType": "KG",
-    "rPrice": 1150
+    "rPrice": 1200
   },
   {
     "sr": 29,
     "productName": "Palta",
     "wPrice": 1000,
     "priceType": "KG",
-    "rPrice": 1200
+    "rPrice": 1300
   },
   {
     "sr": 30,
     "productName": "Kalchul",
     "wPrice": 1000,
     "priceType": "KG",
-    "rPrice": 1200
+    "rPrice": 1300
   },
   {
     "sr": 31,
@@ -240,16 +240,16 @@
   {
     "sr": 35,
     "productName": "Batoi",
-    "wPrice": 980,
+    "wPrice": 1000,
     "priceType": "KG",
-    "rPrice": 1150
+    "rPrice": 1200
   },
   {
     "sr": 36,
     "productName": "Batoi (Light Weight)",
-    "wPrice": 1030,
+    "wPrice": 1050,
     "priceType": "KG",
-    "rPrice": 1150
+    "rPrice": 1200
   },
   {
     "sr": 37,
@@ -270,35 +270,35 @@
     "productName": "Kodam (Plain)",
     "wPrice": 1700,
     "priceType": "KG",
-    "rPrice": 1900
+    "rPrice": 2000
   },
   {
     "sr": 40,
     "productName": "Kodam (Nakshi)",
     "wPrice": 1800,
     "priceType": "KG",
-    "rPrice": 2000
+    "rPrice": 2100
   },
   {
     "sr": 41,
     "productName": "Supda",
     "wPrice": 950,
     "priceType": "KG",
-    "rPrice": 1150
+    "rPrice": 1200
   },
   {
     "sr": 42,
     "productName": "Ghamela",
     "wPrice": 1000,
     "priceType": "KG",
-    "rPrice": 1150
+    "rPrice": 1300
   },
   {
     "sr": 43,
     "productName": "Ghamela (Sheet)",
     "wPrice": 1400,
     "priceType": "KG",
-    "rPrice": 1500
+    "rPrice": 1700
   },
   {
     "sr": 44,
@@ -312,14 +312,14 @@
     "productName": "Masala Box Coloured",
     "wPrice": 1800,
     "priceType": "KG",
-    "rPrice": 1950
+    "rPrice": 2000
   },
   {
     "sr": 46,
     "productName": "Masala Box (Light)(Small)",
     "wPrice": 700,
     "priceType": "PP",
-    "rPrice": 800
+    "rPrice": 900
   },
   {
     "sr": 47,
@@ -333,7 +333,7 @@
     "productName": "Masala / Roti Box (Big)",
     "wPrice": 1700,
     "priceType": "KG",
-    "rPrice": 1900
+    "rPrice": 2000
   },
   {
     "sr": 49,
@@ -347,14 +347,14 @@
     "productName": "Masala Box Square (4)",
     "wPrice": 1700,
     "priceType": "PP",
-    "rPrice": 1800
+    "rPrice": 2000
   },
   {
     "sr": 51,
     "productName": "Masala Box Square (6)",
     "wPrice": 2300,
     "priceType": "PP",
-    "rPrice": null
+    "rPrice": 2500
   },
   {
     "sr": 52,
@@ -403,35 +403,35 @@
     "productName": "Panpeti (0)",
     "wPrice": 2300,
     "priceType": "PP",
-    "rPrice": 2500
+    "rPrice": 2700
   },
   {
     "sr": 59,
     "productName": "Panpeti (1)",
     "wPrice": 2800,
     "priceType": "PP",
-    "rPrice": 3000
+    "rPrice": 3200
   },
   {
     "sr": 60,
     "productName": "Panpeti (2)",
     "wPrice": 3300,
     "priceType": "PP",
-    "rPrice": 3500
+    "rPrice": 3700
   },
   {
     "sr": 61,
     "productName": "Panpeti Jali (S)",
     "wPrice": 1700,
     "priceType": "PP",
-    "rPrice": 1800
+    "rPrice": 1900
   },
   {
     "sr": 62,
     "productName": "Panpeti Jali (B)",
     "wPrice": 1900,
     "priceType": "PP",
-    "rPrice": 2000
+    "rPrice": 2200
   },
   {
     "sr": 63,
@@ -529,14 +529,14 @@
     "productName": "Coffee Filter (Hammered) (2)",
     "wPrice": 750,
     "priceType": "PP",
-    "rPrice": 1000
+    "rPrice": 900
   },
   {
     "sr": 77,
     "productName": "Coffee Filter (Hammered) (3)",
     "wPrice": 850,
     "priceType": "PP",
-    "rPrice": 1100
+    "rPrice": 1000
   },
   {
     "sr": 78,
@@ -599,54 +599,54 @@
     "productName": "Copper Chilamchi Badna Set",
     "wPrice": 5400,
     "priceType": "PP",
-    "rPrice": 5500
+    "rPrice": 6000
   },
   {
     "sr": 87,
     "productName": "Copper Badna Only",
     "wPrice": 3000,
     "priceType": "PP",
-    "rPrice": 3200
+    "rPrice": 3600
   },
   {
     "sr": 88,
     "productName": "Copper Chilamchi Only",
     "wPrice": 2600,
     "priceType": "PP",
-    "rPrice": 2500
+    "rPrice": 3000
   },
   {
     "sr": 89,
     "productName": "Diamond Badna",
     "wPrice": 1400,
     "priceType": "KG",
-    "rPrice": 1500
+    "rPrice": 1700
   },
   {
     "sr": 90,
     "productName": "Diamond Badna K-2",
-    "wPrice": 650,
+    "wPrice": 700,
     "priceType": "PP",
     "rPrice": 800
   },
   {
     "sr": 91,
     "productName": "Diamond Badna K-3",
-    "wPrice": 750,
+    "wPrice": 800,
     "priceType": "PP",
     "rPrice": 900
   },
   {
     "sr": 92,
     "productName": "Diamond Badna K-4",
-    "wPrice": 850,
+    "wPrice": 900,
     "priceType": "PP",
     "rPrice": 1000
   },
   {
     "sr": 93,
     "productName": "Diamond Badna K-5",
-    "wPrice": 1050,
+    "wPrice": 1000,
     "priceType": "PP",
     "rPrice": 1200
   },
@@ -669,14 +669,14 @@
     "productName": "Kettle 500 ml Brass",
     "wPrice": 1200,
     "priceType": "PP",
-    "rPrice": 1325
+    "rPrice": 1400
   },
   {
     "sr": 97,
     "productName": "Kettle 500 ml Copper",
-    "wPrice": 1350,
+    "wPrice": 1400,
     "priceType": "PP",
-    "rPrice": 1450
+    "rPrice": 1600
   },
   {
     "sr": 98,
@@ -688,7 +688,7 @@
   {
     "sr": 99,
     "productName": "Kettle 1 Ltr Copper",
-    "wPrice": 1800,
+    "wPrice": 1850,
     "priceType": "PP",
     "rPrice": 2200
   },
@@ -730,7 +730,7 @@
   {
     "sr": 105,
     "productName": "Kettle 5 Ltr Brass and Copper",
-    "wPrice": 5700,
+    "wPrice": 6000,
     "priceType": "PP",
     "rPrice": 6400
   },
@@ -753,21 +753,21 @@
     "productName": "Badna (16)",
     "wPrice": 750,
     "priceType": "PP",
-    "rPrice": 850
+    "rPrice": 900
   },
   {
     "sr": 109,
     "productName": "Badna (18)",
     "wPrice": 800,
     "priceType": "PP",
-    "rPrice": 950
+    "rPrice": 1000
   },
   {
     "sr": 110,
     "productName": "Badna (20)",
     "wPrice": 850,
     "priceType": "PP",
-    "rPrice": 1050
+    "rPrice": 1100
   },
   {
     "sr": 111,
@@ -781,14 +781,14 @@
     "productName": "Ring Patiya Brass",
     "wPrice": 1500,
     "priceType": "KG",
-    "rPrice": 1700
+    "rPrice": 1800
   },
   {
     "sr": 113,
     "productName": "Ring Patiya Copper",
     "wPrice": 1800,
     "priceType": "KG",
-    "rPrice": 2000
+    "rPrice": 2200
   },
   {
     "sr": 114,
@@ -802,7 +802,7 @@
     "productName": "Degchi Copper",
     "wPrice": 1800,
     "priceType": "KG",
-    "rPrice": 2000
+    "rPrice": 2200
   },
   {
     "sr": 116,
@@ -828,14 +828,14 @@
   {
     "sr": 119,
     "productName": "Patili (Cover) Brass",
-    "wPrice": 1750,
+    "wPrice": 1800,
     "priceType": "KG",
-    "rPrice": 1900
+    "rPrice": 2000
   },
   {
     "sr": 120,
     "productName": "Patili (Cover) Copper",
-    "wPrice": 1950,
+    "wPrice": 2000,
     "priceType": "KG",
     "rPrice": 2200
   },
@@ -900,14 +900,14 @@
     "productName": "Lucknowee / Sipri (1 to 4) Copper",
     "wPrice": 1700,
     "priceType": "KG",
-    "rPrice": 1900
+    "rPrice": 2000
   },
   {
     "sr": 130,
     "productName": "Lucknowee / Sipri (5 to 6) Copper",
     "wPrice": 1720,
     "priceType": "KG",
-    "rPrice": 1900
+    "rPrice": 2000
   },
   {
     "sr": 131,
@@ -918,7 +918,7 @@
   },
   {
     "sr": 132,
-    "productName": "Rice Handi 0 (zero) Brass",
+    "productName": "Rice Handi (0) Brass",
     "wPrice": 1500,
     "priceType": "KG",
     "rPrice": 1700
@@ -998,21 +998,21 @@
     "productName": "Rice Pot (1)",
     "wPrice": 1000,
     "priceType": "PP",
-    "rPrice": 1100
+    "rPrice": 1200
   },
   {
     "sr": 144,
     "productName": "Rice Pot (2)",
     "wPrice": 1250,
     "priceType": "PP",
-    "rPrice": 1400
+    "rPrice": 1500
   },
   {
     "sr": 145,
     "productName": "Rice Pot (3)",
     "wPrice": 1450,
     "priceType": "PP",
-    "rPrice": 1700
+    "rPrice": 1800
   },
   {
     "sr": 146,
@@ -1026,7 +1026,7 @@
     "productName": "Ghee Pot (New model)",
     "wPrice": 800,
     "priceType": "PP",
-    "rPrice": 900
+    "rPrice": 950
   },
   {
     "sr": 148,
@@ -1040,19 +1040,19 @@
     "productName": "Ghee Pot (Big)",
     "wPrice": 750,
     "priceType": "PP",
-    "rPrice": 900
+    "rPrice": 950
   },
   {
     "sr": 150,
     "productName": "Urli (Standard)",
-    "wPrice": 1370,
+    "wPrice": 1380,
     "priceType": "KG",
     "rPrice": 1600
   },
   {
     "sr": 151,
     "productName": "Urli (18/20)",
-    "wPrice": 1420,
+    "wPrice": 1430,
     "priceType": "KG",
     "rPrice": 1600
   },
@@ -1075,7 +1075,7 @@
     "productName": "Elephant Urli",
     "wPrice": 1680,
     "priceType": "KG",
-    "rPrice": 1800
+    "rPrice": 1900
   },
   {
     "sr": 155,
@@ -1110,7 +1110,7 @@
     "productName": "Basket (Oval)",
     "wPrice": 1600,
     "priceType": "KG",
-    "rPrice": 1600
+    "rPrice": 1900
   },
   {
     "sr": 160,
@@ -1142,7 +1142,7 @@
   },
   {
     "sr": 164,
-    "productName": "Planter Copper",
+    "productName": null,
     "wPrice": null,
     "priceType": null,
     "rPrice": null
@@ -1194,14 +1194,14 @@
     "productName": "Copper Gangal (20x24)",
     "wPrice": 1650,
     "priceType": "KG",
-    "rPrice": 1800
+    "rPrice": 1900
   },
   {
     "sr": 172,
     "productName": "Copper Gangal (28)",
     "wPrice": 1850,
     "priceType": "KG",
-    "rPrice": 2000
+    "rPrice": 2200
   },
   {
     "sr": 173,
@@ -1243,35 +1243,35 @@
     "productName": "Fruit / Carving Bowl / Kalash",
     "wPrice": 1850,
     "priceType": "KG",
-    "rPrice": 2000
+    "rPrice": 2200
   },
   {
     "sr": 179,
     "productName": "Brass Tawa (without handle)",
     "wPrice": 1250,
     "priceType": "KG",
-    "rPrice": 1400
+    "rPrice": 1500
   },
   {
     "sr": 180,
     "productName": "Brass Tawa (Handle)",
     "wPrice": 1150,
     "priceType": "KG",
-    "rPrice": 1400
+    "rPrice": 1500
   },
   {
     "sr": 181,
     "productName": "Brass Tawa (Hammered)",
     "wPrice": 1350,
     "priceType": "KG",
-    "rPrice": 1500
+    "rPrice": 1600
   },
   {
     "sr": 182,
     "productName": "Dosa Tawa (Set)",
     "wPrice": 2500,
     "priceType": "PP",
-    "rPrice": 2700
+    "rPrice": 2800
   },
   {
     "sr": 183,
@@ -1292,28 +1292,28 @@
     "productName": "Tadka Pan (1)",
     "wPrice": 2100,
     "priceType": "PP",
-    "rPrice": 600
+    "rPrice": 800
   },
   {
     "sr": 186,
     "productName": "Tadka Pan (2)",
     "wPrice": 2100,
     "priceType": "PP",
-    "rPrice": 700
+    "rPrice": 900
   },
   {
     "sr": 187,
     "productName": "Tadka Pan (3)",
     "wPrice": 2100,
     "priceType": "PP",
-    "rPrice": 800
+    "rPrice": 1000
   },
   {
     "sr": 188,
     "productName": "Chutney Stand",
     "wPrice": 1800,
     "priceType": "KG",
-    "rPrice": 2000
+    "rPrice": 2200
   },
   {
     "sr": 189,
@@ -1332,9 +1332,9 @@
   {
     "sr": 191,
     "productName": "Coffee Davara Copper",
-    "wPrice": 375,
+    "wPrice": 400,
     "priceType": "PP",
-    "rPrice": 400
+    "rPrice": 500
   },
   {
     "sr": 192,
@@ -1348,7 +1348,7 @@
     "productName": "Bujara",
     "wPrice": 350,
     "priceType": "PP",
-    "rPrice": 450
+    "rPrice": 500
   },
   {
     "sr": 194,
@@ -1376,19 +1376,19 @@
     "productName": "Bucket (12)",
     "wPrice": 1400,
     "priceType": "KG",
-    "rPrice": 1500
+    "rPrice": 1600
   },
   {
     "sr": 198,
     "productName": "Saucepan (H)",
     "wPrice": 1350,
     "priceType": "KG",
-    "rPrice": 1500
+    "rPrice": 1600
   },
   {
     "sr": 199,
     "productName": "Ugal Dan",
-    "wPrice": 900,
+    "wPrice": 1000,
     "priceType": "KG",
     "rPrice": 1200
   },
@@ -1430,7 +1430,7 @@
   {
     "sr": 205,
     "productName": "Ashok Pillar",
-    "wPrice": 450,
+    "wPrice": 500,
     "priceType": "PP",
     "rPrice": 600
   },
@@ -1460,14 +1460,14 @@
     "productName": "Only Cup",
     "wPrice": 300,
     "priceType": "PP",
-    "rPrice": 450
+    "rPrice": 400
   },
   {
     "sr": 210,
     "productName": "Parampara Lagan Brass",
     "wPrice": 1550,
     "priceType": "KG",
-    "rPrice": 1700
+    "rPrice": 1800
   },
   {
     "sr": 211,
@@ -1481,18 +1481,18 @@
     "productName": "Pawali (N)",
     "wPrice": 1850,
     "priceType": "KG",
-    "rPrice": 2000
+    "rPrice": 2200
   },
   {
     "sr": 213,
-    "productName": "Pawali (BR.)",
+    "productName": "Pawali Brass",
     "wPrice": 1150,
     "priceType": "KG",
-    "rPrice": 1200
+    "rPrice": 1300
   },
   {
     "sr": 214,
-    "productName": "Pawali (Copper)",
+    "productName": "Pawali Copper",
     "wPrice": 1600,
     "priceType": "KG",
     "rPrice": 1800
@@ -1530,7 +1530,7 @@
     "productName": "Brass Top 50x52",
     "wPrice": 1290,
     "priceType": "KG",
-    "rPrice": 1300
+    "rPrice": 1400
   },
   {
     "sr": 220,
@@ -1558,7 +1558,7 @@
     "productName": "Brass Langdi",
     "wPrice": 1150,
     "priceType": "KG",
-    "rPrice": 1200
+    "rPrice": 1300
   },
   {
     "sr": 224,
@@ -1572,7 +1572,7 @@
     "productName": "Brass Tasla / Kadhai (6x7)",
     "wPrice": 1150,
     "priceType": "KG",
-    "rPrice": 1400
+    "rPrice": 1300
   },
   {
     "sr": 226,
@@ -1586,7 +1586,7 @@
     "productName": "Brass Tasla / Kadhai (15x24)",
     "wPrice": 1150,
     "priceType": "KG",
-    "rPrice": 1300
+    "rPrice": 1200
   },
   {
     "sr": 228,
@@ -1597,10 +1597,10 @@
   },
   {
     "sr": 229,
-    "productName": "Brass Tasla / Kadhai (6x7 K+P)",
+    "productName": "Brass Tasla / Kadhai (6x7)(K+P)",
     "wPrice": 1200,
     "priceType": "KG",
-    "rPrice": 1400
+    "rPrice": 1300
   },
   {
     "sr": 230,
@@ -1716,7 +1716,7 @@
   },
   {
     "sr": 246,
-    "productName": "Brass Parat 32x to 36",
+    "productName": "Brass Parat 32 to 36",
     "wPrice": 1100,
     "priceType": "KG",
     "rPrice": 1200
@@ -1780,7 +1780,7 @@
   {
     "sr": 255,
     "productName": "Copper Tasla / Kadhai (K+P)",
-    "wPrice": 1950,
+    "wPrice": 2000,
     "priceType": "KG",
     "rPrice": 2200
   },
@@ -1793,7 +1793,7 @@
   },
   {
     "sr": 257,
-    "productName": "Copper Samavar / Kettle (0 to 13)",
+    "productName": "Copper Samavar / Kettle (0 to 12)",
     "wPrice": 1650,
     "priceType": "KG",
     "rPrice": 1800
@@ -1803,21 +1803,21 @@
     "productName": "Copper Samavar / Kettle (13+)",
     "wPrice": 1750,
     "priceType": "KG",
-    "rPrice": 1700
+    "rPrice": 1900
   },
   {
     "sr": 259,
     "productName": "Copper Top (Reg.)",
     "wPrice": 1700,
     "priceType": "KG",
-    "rPrice": 1750
+    "rPrice": 2000
   },
   {
     "sr": 260,
     "productName": "Copper Top (Heavy)",
-    "wPrice": 1750,
+    "wPrice": 1800,
     "priceType": "KG",
-    "rPrice": 1800
+    "rPrice": 2000
   },
   {
     "sr": 261,
@@ -1829,7 +1829,7 @@
   {
     "sr": 262,
     "productName": "Copper Deg/Sipri (Heavy K+P)",
-    "wPrice": 1850,
+    "wPrice": 1900,
     "priceType": "KG",
     "rPrice": 2000
   },
@@ -1880,26 +1880,26 @@
     "productName": "Copper Lid (8x14)",
     "wPrice": 1700,
     "priceType": "KG",
-    "rPrice": 2000
+    "rPrice": 2200
   },
   {
     "sr": 270,
     "productName": "Copper Lid (6x7.5)",
     "wPrice": 1800,
     "priceType": "KG",
-    "rPrice": 2000
+    "rPrice": 2200
   },
   {
     "sr": 271,
     "productName": "Brass Lid (8x14)",
-    "wPrice": 1000,
+    "wPrice": 1100,
     "priceType": "KG",
     "rPrice": 1400
   },
   {
     "sr": 272,
     "productName": "Brass Lid (6x7.5)",
-    "wPrice": 1250,
+    "wPrice": 1300,
     "priceType": "KG",
     "rPrice": 1400
   },
@@ -1992,7 +1992,7 @@
     "productName": "Brass 7 No. Glass",
     "wPrice": 530,
     "priceType": "PP",
-    "rPrice": 700
+    "rPrice": 600
   },
   {
     "sr": 286,
@@ -2013,21 +2013,21 @@
     "productName": "Brass Prince Glass",
     "wPrice": 350,
     "priceType": "PP",
-    "rPrice": 500
+    "rPrice": 400
   },
   {
     "sr": 289,
     "productName": "Brass Ringer Matki Glass",
     "wPrice": 350,
     "priceType": "PP",
-    "rPrice": 500
+    "rPrice": 400
   },
   {
     "sr": 290,
     "productName": "Brass Ringer (V) 5 No. Glass",
     "wPrice": 400,
     "priceType": "PP",
-    "rPrice": 500
+    "rPrice": 450
   },
   {
     "sr": 291,
@@ -2066,10 +2066,10 @@
   },
   {
     "sr": 296,
-    "productName": "Brass Etching (W/O) Pendi Glass",
-    "wPrice": 230,
-    "priceType": "PP",
-    "rPrice": 300
+    "productName": null,
+    "wPrice": null,
+    "priceType": null,
+    "rPrice": null
   },
   {
     "sr": 297,
@@ -2080,8 +2080,8 @@
   },
   {
     "sr": 298,
-    "productName": "Brass Nirmal Glass",
-    "wPrice": 1200,
+    "productName": null,
+    "wPrice": null,
     "priceType": "KG",
     "rPrice": null
   },
@@ -2097,7 +2097,7 @@
     "productName": "Matte Glass",
     "wPrice": 280,
     "priceType": "PP",
-    "rPrice": 400
+    "rPrice": 350
   },
   {
     "sr": 301,
@@ -2136,28 +2136,28 @@
   },
   {
     "sr": 306,
-    "productName": "BrassJug – Prince/Peacock",
+    "productName": "Brass Jug – Prince/Peacock",
     "wPrice": 1700,
     "priceType": "PP",
     "rPrice": 2000
   },
   {
     "sr": 307,
-    "productName": "BrassJug – Prince/Peacock (Cover)",
+    "productName": "Brass Jug – Prince/Peacock (Cover)",
     "wPrice": 1800,
     "priceType": "PP",
     "rPrice": 2200
   },
   {
     "sr": 308,
-    "productName": "BrassJug – Ringer",
+    "productName": "Brass Jug – Ringer",
     "wPrice": 1400,
     "priceType": "PP",
     "rPrice": 1500
   },
   {
     "sr": 309,
-    "productName": "BrassJug – Ringer Matki",
+    "productName": "Brass Jug – Ringer Matki",
     "wPrice": 1400,
     "priceType": "PP",
     "rPrice": 1500
@@ -2181,7 +2181,7 @@
     "productName": "Copper Bottle (HV) (S)",
     "wPrice": 550,
     "priceType": "PP",
-    "rPrice": null
+    "rPrice": 700
   },
   {
     "sr": 313,
@@ -2216,14 +2216,14 @@
     "productName": "Copper Jug – Lily",
     "wPrice": 1000,
     "priceType": "PP",
-    "rPrice": 1000
+    "rPrice": 1200
   },
   {
     "sr": 318,
     "productName": "Copper Jug – Rose",
     "wPrice": 900,
     "priceType": "PP",
-    "rPrice": 1000
+    "rPrice": 1200
   },
   {
     "sr": 319,
@@ -2256,9 +2256,9 @@
   {
     "sr": 323,
     "productName": "Copper Glass (SPL)",
-    "wPrice": 2150,
+    "wPrice": 2200,
     "priceType": "KG",
-    "rPrice": 2400
+    "rPrice": 2600
   },
   {
     "sr": 324,
@@ -2319,14 +2319,14 @@
   {
     "sr": 332,
     "productName": "Kansa Glass (S)",
-    "wPrice": 400,
+    "wPrice": 500,
     "priceType": "PP",
-    "rPrice": 500
+    "rPrice": 600
   },
   {
     "sr": 333,
     "productName": "Kansa Glass (B)",
-    "wPrice": 600,
+    "wPrice": 700,
     "priceType": "PP",
     "rPrice": 800
   },
@@ -2356,7 +2356,7 @@
     "productName": "Brass Thali (8 to 14)",
     "wPrice": 1330,
     "priceType": "KG",
-    "rPrice": 1550
+    "rPrice": 1600
   },
   {
     "sr": 338,
@@ -2370,7 +2370,7 @@
     "productName": "Brass Thali (20+)",
     "wPrice": 1530,
     "priceType": "KG",
-    "rPrice": 1600
+    "rPrice": 1700
   },
   {
     "sr": 340,
@@ -2391,7 +2391,7 @@
     "productName": "Brass Pan Thal",
     "wPrice": 1400,
     "priceType": "KG",
-    "rPrice": 1500
+    "rPrice": 1700
   },
   {
     "sr": 343,
@@ -2419,28 +2419,28 @@
     "productName": "Brass Rect./Oval Tray",
     "wPrice": 1500,
     "priceType": "KG",
-    "rPrice": 2000
+    "rPrice": 1700
   },
   {
     "sr": 347,
     "productName": "Brass Dana Plate ",
-    "wPrice": 1400,
+    "wPrice": 1500,
     "priceType": "KG",
-    "rPrice": 1700
+    "rPrice": 1800
   },
   {
     "sr": 348,
     "productName": "Copper Dana Plate",
     "wPrice": 1600,
     "priceType": "KG",
-    "rPrice": 2000
+    "rPrice": 1800
   },
   {
     "sr": 349,
     "productName": "Brass China Plate",
     "wPrice": 1400,
     "priceType": "KG",
-    "rPrice": 1500
+    "rPrice": 1700
   },
   {
     "sr": 350,
@@ -2465,7 +2465,7 @@
   },
   {
     "sr": 353,
-    "productName": "Copper Tray (W/O Dana)",
+    "productName": "Copper Tray without Dana",
     "wPrice": 1900,
     "priceType": "KG",
     "rPrice": 2000
@@ -2517,7 +2517,7 @@
     "productName": "Swastik Thali",
     "wPrice": 1500,
     "priceType": "KG",
-    "rPrice": 1500
+    "rPrice": 1700
   },
   {
     "sr": 361,
@@ -2531,49 +2531,49 @@
     "productName": "Brass Thali (Deep) (N)",
     "wPrice": 1400,
     "priceType": "KG",
-    "rPrice": 1500
+    "rPrice": 1700
   },
   {
     "sr": 363,
     "productName": "Brass Thali Set Sanskriti",
     "wPrice": 2200,
     "priceType": "PP",
-    "rPrice": 2400
+    "rPrice": 2500
   },
   {
     "sr": 364,
     "productName": "Kansa Massager (S)",
-    "wPrice": 650,
+    "wPrice": 700,
     "priceType": "PP",
-    "rPrice": 800
+    "rPrice": 900
   },
   {
     "sr": 365,
     "productName": "Kansa Massager (DH)",
-    "wPrice": 850,
+    "wPrice": 900,
     "priceType": "PP",
-    "rPrice": 1000
+    "rPrice": 1200
   },
   {
     "sr": 366,
     "productName": "Kansa Massage Wati",
-    "wPrice": 450,
+    "wPrice": 400,
     "priceType": "PP",
     "rPrice": 500
   },
   {
     "sr": 367,
     "productName": "Kansa Handmade",
-    "wPrice": 3600,
+    "wPrice": 3800,
     "priceType": "KG",
-    "rPrice": 4000
+    "rPrice": 4400
   },
   {
     "sr": 368,
     "productName": "Kansa Maharaja Thali",
-    "wPrice": 3600,
+    "wPrice": 3800,
     "priceType": "KG",
-    "rPrice": 4000
+    "rPrice": 4400
   },
   {
     "sr": 369,
@@ -2587,14 +2587,14 @@
     "productName": "Kansa Glass (S) Handmade",
     "wPrice": 600,
     "priceType": "PP",
-    "rPrice": 600
+    "rPrice": 700
   },
   {
     "sr": 371,
     "productName": "Kansa Glass (B) Handmade",
     "wPrice": 800,
     "priceType": "PP",
-    "rPrice": 800
+    "rPrice": 1000
   },
   {
     "sr": 372,
@@ -2613,23 +2613,23 @@
   {
     "sr": 374,
     "productName": "Kansa Handmade (SP)",
-    "wPrice": 3600,
+    "wPrice": 3800,
     "priceType": "KG",
-    "rPrice": 4000
+    "rPrice": 4400
   },
   {
     "sr": 375,
     "productName": "Kansa Bowl (S) (SP)",
-    "wPrice": 550,
+    "wPrice": 600,
     "priceType": "PP",
-    "rPrice": 600
+    "rPrice": 800
   },
   {
     "sr": 376,
     "productName": "Kansa Donga (S) (SP)",
-    "wPrice": 3600,
+    "wPrice": 3800,
     "priceType": "PP",
-    "rPrice": 4000
+    "rPrice": 4400
   },
   {
     "sr": 377,
@@ -2818,28 +2818,28 @@
     "productName": "Hammered Spoon (coffee)",
     "wPrice": 60,
     "priceType": "PP",
-    "rPrice": 60
+    "rPrice": 80
   },
   {
     "sr": 404,
     "productName": "Hammered Spoon (Tea)",
     "wPrice": 90,
     "priceType": "PP",
-    "rPrice": 100
+    "rPrice": 120
   },
   {
     "sr": 405,
     "productName": "Hammered Spoon (Baby)",
     "wPrice": 100,
     "priceType": "PP",
-    "rPrice": 110
+    "rPrice": 130
   },
   {
     "sr": 406,
     "productName": "Hammered Spoon (Dessert)",
     "wPrice": 110,
     "priceType": "PP",
-    "rPrice": 120
+    "rPrice": 150
   },
   {
     "sr": 407,
@@ -2851,30 +2851,30 @@
   {
     "sr": 408,
     "productName": "Copper Spoon (Baby)",
-    "wPrice": 120,
-    "priceType": "PP",
-    "rPrice": 150
-  },
-  {
-    "sr": 409,
-    "productName": "Copper Spoon (Dessert)",
     "wPrice": 150,
     "priceType": "PP",
     "rPrice": 200
   },
   {
+    "sr": 409,
+    "productName": "Copper Spoon (Dessert)",
+    "wPrice": 200,
+    "priceType": "PP",
+    "rPrice": 250
+  },
+  {
     "sr": 410,
     "productName": "Chakkri Spoon",
-    "wPrice": 120,
+    "wPrice": 150,
     "priceType": "PP",
     "rPrice": 200
   },
   {
     "sr": 411,
     "productName": "Pakkad",
-    "wPrice": 430,
+    "wPrice": 450,
     "priceType": "PP",
-    "rPrice": 500
+    "rPrice": 600
   },
   {
     "sr": 412,
@@ -2895,21 +2895,21 @@
     "productName": "Serving Spoon (Sheet) (J) (Small)",
     "wPrice": 1600,
     "priceType": "PP",
-    "rPrice": 300
+    "rPrice": 350
   },
   {
     "sr": 415,
     "productName": "Serving Spoon (Sheet) (J) (Medium)",
     "wPrice": 1600,
     "priceType": "PP",
-    "rPrice": 350
+    "rPrice": 400
   },
   {
     "sr": 416,
     "productName": "Serving Spoon (Sheet) (J) (Large)",
     "wPrice": 1600,
     "priceType": "PP",
-    "rPrice": 400
+    "rPrice": 450
   },
   {
     "sr": 417,
@@ -3084,7 +3084,7 @@
     "productName": "Casting Wati (E/H)",
     "wPrice": 1250,
     "priceType": "KG",
-    "rPrice": 1500
+    "rPrice": 1600
   },
   {
     "sr": 442,
