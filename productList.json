@@ -1488,7 +1488,7 @@
     "productName": "Parampara Lagan Copper",
     "wPrice": 1850,
     "priceType": "KG",
-    "rPrice": 2000
+    "rPrice": 2200
   },
   {
     "sr": 214,
@@ -2774,9 +2774,9 @@
   {
     "sr": 397,
     "productName": "Brass Lota (Lid)",
-    "wPrice": 1000,
+    "wPrice": 900,
     "priceType": "PP",
-    "rPrice": 1200
+    "rPrice": 1100
   },
   {
     "sr": 398,
