@@ -2809,30 +2809,30 @@
   {
     "sr": 402,
     "productName": "Hammered Spoon (coffee)",
-    "wPrice": 60,
+    "wPrice": 50,
     "priceType": "PP",
-    "rPrice": 80
+    "rPrice": 60
   },
   {
     "sr": 403,
     "productName": "Hammered Spoon (Tea)",
-    "wPrice": 90,
+    "wPrice": 60,
     "priceType": "PP",
-    "rPrice": 120
+    "rPrice": 70
   },
   {
     "sr": 404,
     "productName": "Hammered Spoon (Baby)",
-    "wPrice": 100,
+    "wPrice": 70,
     "priceType": "PP",
-    "rPrice": 130
+    "rPrice": 80
   },
   {
     "sr": 405,
     "productName": "Hammered Spoon (Dessert)",
-    "wPrice": 110,
+    "wPrice": 80,
     "priceType": "PP",
-    "rPrice": 150
+    "rPrice": 90
   },
   {
     "sr": 406,
@@ -2928,215 +2928,222 @@
   {
     "sr": 419,
     "productName": "Spoon / Fork (Matte) Coffee",
-    "wPrice": 50,
+    "wPrice": 60,
     "priceType": "PP",
-    "rPrice": 80
+    "rPrice": 70
   },
   {
     "sr": 420,
-    "productName": "Spoon / Fork (Matte) Baby",
-    "wPrice": 130,
+    "productName": "Spoon / Fork (Matte) Tea",
+    "wPrice": 80,
     "priceType": "PP",
-    "rPrice": 150
+    "rPrice": 100
   },
   {
     "sr": 421,
-    "productName": "Spoon / Fork (Matte) Dessert",
-    "wPrice": 150,
+    "productName": "Spoon / Fork (Matte) Baby",
+    "wPrice": 100,
     "priceType": "PP",
-    "rPrice": 200
+    "rPrice": 120
   },
   {
     "sr": 422,
+    "productName": "Spoon / Fork (Matte) Dessert",
+    "wPrice": 120,
+    "priceType": "PP",
+    "rPrice": 140
+  },
+  {
+    "sr": 423,
     "productName": "Handmade Spoon Set",
     "wPrice": 4500,
     "priceType": "PP",
     "rPrice": 5000
   },
   {
-    "sr": 423,
+    "sr": 424,
     "productName": "Wooden Handle S.S. Palta (1) (15”)",
     "wPrice": 160,
     "priceType": "PP",
     "rPrice": 180
   },
   {
-    "sr": 424,
+    "sr": 425,
     "productName": "Wooden Handle S.S. Palta (2) (20”)",
     "wPrice": 180,
     "priceType": "PP",
     "rPrice": 200
   },
   {
-    "sr": 425,
+    "sr": 426,
     "productName": "Wooden Handle S.S. Palta (3) (25”)",
     "wPrice": 200,
     "priceType": "PP",
     "rPrice": 220
   },
   {
-    "sr": 426,
+    "sr": 427,
     "productName": "Wooden Handle S.S. Palta (4) (30”)",
     "wPrice": 220,
     "priceType": "PP",
     "rPrice": 250
   },
   {
-    "sr": 427,
+    "sr": 428,
     "productName": "Wooden Handle S.S. Palta (5) (35”)",
     "wPrice": 250,
     "priceType": "PP",
     "rPrice": 300
   },
   {
-    "sr": 428,
+    "sr": 429,
     "productName": "S.S. Palta (30”x60”)",
     "wPrice": 400,
     "priceType": "PP",
     "rPrice": 500
   },
   {
-    "sr": 429,
+    "sr": 430,
     "productName": "S.S. Dabbu (4”)",
     "wPrice": 160,
     "priceType": "PP",
     "rPrice": 180
   },
   {
-    "sr": 430,
+    "sr": 431,
     "productName": "S.S. Dabbu (4.5”)",
     "wPrice": 170,
     "priceType": "PP",
     "rPrice": 200
   },
   {
-    "sr": 431,
+    "sr": 432,
     "productName": "S.S. Dabbu (5”)",
     "wPrice": 180,
     "priceType": "PP",
     "rPrice": 220
   },
   {
-    "sr": 432,
+    "sr": 433,
     "productName": "S.S. Dabbu (6”)",
     "wPrice": 250,
     "priceType": "PP",
     "rPrice": 300
   },
   {
-    "sr": 433,
+    "sr": 434,
     "productName": "Brass Donga Deep (E) (Hammered)",
     "wPrice": 1800,
     "priceType": "PP",
     "rPrice": 2200
   },
   {
-    "sr": 434,
+    "sr": 435,
     "productName": "Brass Donga Flat (E) (Hammered)",
     "wPrice": 1800,
     "priceType": "PP",
     "rPrice": 2200
   },
   {
-    "sr": 435,
+    "sr": 436,
     "productName": "Copper Donga (1)",
     "wPrice": 1800,
     "priceType": "PP",
     "rPrice": 2200
   },
   {
-    "sr": 436,
+    "sr": 437,
     "productName": "Copper Donga (2)",
     "wPrice": 2000,
     "priceType": "PP",
     "rPrice": 2400
   },
   {
-    "sr": 437,
+    "sr": 438,
     "productName": "Copper Donga (3)",
     "wPrice": 2200,
     "priceType": "PP",
     "rPrice": 2600
   },
   {
-    "sr": 438,
+    "sr": 439,
     "productName": "Copper Donga (4)",
     "wPrice": 2400,
     "priceType": "PP",
     "rPrice": 3000
   },
   {
-    "sr": 439,
+    "sr": 440,
     "productName": "Dessert Donga",
     "wPrice": 1500,
     "priceType": "KG",
     "rPrice": 1700
   },
   {
-    "sr": 440,
+    "sr": 441,
     "productName": "Casting Wati (E/H)",
     "wPrice": 1250,
     "priceType": "KG",
     "rPrice": 1600
   },
   {
-    "sr": 441,
+    "sr": 442,
     "productName": "Sheet Wati (E/H)",
     "wPrice": 1700,
     "priceType": "KG",
     "rPrice": 2000
   },
   {
-    "sr": 442,
+    "sr": 443,
     "productName": "Arabi Katora (1)",
     "wPrice": 260,
     "priceType": "PP",
     "rPrice": 300
   },
   {
-    "sr": 443,
+    "sr": 444,
     "productName": "Arabi Katora (2)",
     "wPrice": 300,
     "priceType": "PP",
     "rPrice": 350
   },
   {
-    "sr": 444,
+    "sr": 445,
     "productName": "Arabi Katora (3)",
     "wPrice": 350,
     "priceType": "PP",
     "rPrice": 400
   },
   {
-    "sr": 445,
+    "sr": 446,
     "productName": "Arabi Katora (4)",
     "wPrice": 400,
     "priceType": "PP",
     "rPrice": 500
   },
   {
-    "sr": 446,
+    "sr": 447,
     "productName": "Arabi Katora (5)",
     "wPrice": 500,
     "priceType": "PP",
     "rPrice": 600
   },
   {
-    "sr": 447,
+    "sr": 448,
     "productName": "Arabi Katora (6)",
     "wPrice": 600,
     "priceType": "PP",
     "rPrice": 700
   },
   {
-    "sr": 448,
+    "sr": 449,
     "productName": "Arabi Katora (7)",
     "wPrice": 700,
     "priceType": "PP",
     "rPrice": 850
   },
   {
-    "sr": 449,
+    "sr": 450,
     "productName": "Copper Katora",
     "wPrice": 2100,
     "priceType": "KG",
