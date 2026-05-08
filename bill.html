@@ -55,8 +55,57 @@
     </div>
 
     <button id="printBtn">
-      Print Invoice
+      Print
     </button>
+
+  </div>
+
+  <!-- PRINT MODAL -->
+  <div id="printModal" class="modal-overlay">
+
+    <div class="modal-card">
+
+      <div class="modal-title">
+        Print Details
+      </div>
+
+      <div class="modal-group">
+        <label>Date</label>
+        <input
+          type="date"
+          id="printDate"
+        >
+      </div>
+
+      <div
+        class="modal-group"
+        id="customerGroup"
+      >
+        <label>Customer Name</label>
+        <input
+          type="text"
+          id="customerName"
+          placeholder="Enter customer name"
+        >
+      </div>
+
+      <div class="modal-actions">
+        <button
+          id="cancelPrint"
+          class="secondary-btn"
+        >
+          Cancel
+        </button>
+
+        <button
+          id="confirmPrint"
+          class="primary-btn"
+        >
+          Print
+        </button>
+      </div>
+
+    </div>
 
   </div>
 
