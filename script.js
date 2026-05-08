@@ -37,7 +37,6 @@ const billsQuery = query(
 let products = [];
 let billItems = [];
 let currentMode = "W";
-let currentAction = "print";
 let incomingBillCache = {};
 
 /* ================================
@@ -79,7 +78,6 @@ function setTodayDate() {
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, "0");
   const dd = String(today.getDate()).padStart(2, "0");
-
   printDate.value = `${yyyy}-${mm}-${dd}`;
 }
 
@@ -98,9 +96,7 @@ function normalize(text) {
 }
 
 function tokenize(text) {
-  return normalize(text)
-    .split(" ")
-    .filter(Boolean);
+  return normalize(text).split(" ").filter(Boolean);
 }
 
 function formatDisplayDate(dateString) {
@@ -158,12 +154,7 @@ const synonyms = {
   hammer: ["mathar"],
   mathar: ["hammer"],
   kansa: ["bronze"],
-  bronze: ["kansa"],
-  katora: ["waati", "wati", "vaati", "vati"],
-  dabba: ["box"],
-  box: ["dabba"],
-  ladle: ["kalchul"],
-  kalchul: ["ladle"]
+  bronze: ["kansa"]
 };
 
 function expandQuery(query) {
@@ -171,9 +162,7 @@ function expandQuery(query) {
   let expanded = [...words];
 
   words.forEach(word => {
-    if (synonyms[word]) {
-      expanded.push(...synonyms[word]);
-    }
+    if (synonyms[word]) expanded.push(...synonyms[word]);
   });
 
   return [...new Set(expanded)];
@@ -208,7 +197,6 @@ function tokenScore(queryToken, productToken) {
   if (queryToken === productToken) return 100;
   if (productToken.startsWith(queryToken)) return 40;
   if (productToken.includes(queryToken)) return 25;
-  if (queryToken.length <= 2) return 0;
 
   const distance = levenshtein(queryToken, productToken);
 
@@ -228,8 +216,8 @@ function scoreProduct(product, queryTokens, rawQuery) {
     let best = 0;
 
     product.searchableTokens.forEach(productToken => {
-      const score = tokenScore(queryToken, productToken);
-      if (score > best) best = score;
+      const s = tokenScore(queryToken, productToken);
+      if (s > best) best = s;
     });
 
     score += best;
@@ -249,66 +237,43 @@ function searchProducts(queryText) {
       product,
       score: scoreProduct(product, queryTokens, clean)
     }))
-    .filter(result => result.score > 0)
+    .filter(r => r.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, 8)
-    .map(result => result.product);
+    .map(r => r.product);
 }
 
 /* ================================
-   TABS
+   UI
 ================================ */
 billingTab.addEventListener("click", () => {
-  billingTab.classList.add("active");
-  receiverTab.classList.remove("active");
   billingView.style.display = "block";
   receiverView.style.display = "none";
+  billingTab.classList.add("active");
+  receiverTab.classList.remove("active");
 });
 
 receiverTab.addEventListener("click", () => {
-  receiverTab.classList.add("active");
-  billingTab.classList.remove("active");
   billingView.style.display = "none";
   receiverView.style.display = "block";
+  receiverTab.classList.add("active");
+  billingTab.classList.remove("active");
 });
 
-/* ================================
-   SEARCH UI
-================================ */
-function renderSuggestions(results) {
-  if (!results.length) {
-    suggestions.innerHTML = "";
-    return;
+modeToggle.addEventListener("click", () => {
+  if (currentMode === "W") {
+    currentMode = "R";
+    modeToggle.innerText = "R";
+    modeToggle.style.background = "#d65353";
+  } else {
+    currentMode = "W";
+    modeToggle.innerText = "W";
+    modeToggle.style.background = "#2f3f64";
   }
-
-  let html = "";
-
-  results.forEach(product => {
-    html += `
-      <div class="suggestion-card" onclick="selectProduct(${product.sr})">
-        <div class="suggestion-top">
-          <div class="suggestion-name">${product.productName}</div>
-          <div class="suggestion-price">₹${getCurrentPrice(product) || "-"}</div>
-        </div>
-
-        <div class="badge-row">
-          <div class="unit">${product.priceType || ""}</div>
-          ${
-            product.material
-              ? `<div class="unit ${getMaterialClass(product.material)}">${product.material}</div>`
-              : ""
-          }
-        </div>
-      </div>
-    `;
-  });
-
-  suggestions.innerHTML = html;
-}
+});
 
 searchBox.addEventListener("input", e => {
   const value = e.target.value;
-
   clearSearch.style.display = value ? "flex" : "none";
 
   if (!value.trim()) {
@@ -323,34 +288,38 @@ clearSearch.addEventListener("click", () => {
   searchBox.value = "";
   suggestions.innerHTML = "";
   clearSearch.style.display = "none";
-  searchBox.focus();
 });
 
 /* ================================
-   BILL ITEMS
+   BILL
 ================================ */
+function renderSuggestions(results) {
+  let html = "";
+
+  results.forEach(product => {
+    html += `
+      <div class="suggestion-card" onclick="selectProduct(${product.sr})">
+        <div class="suggestion-top">
+          <div class="suggestion-name">${product.productName}</div>
+          <div class="suggestion-price">₹${getCurrentPrice(product) || "-"}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  suggestions.innerHTML = html;
+}
+
 window.selectProduct = function(sr) {
   const product = products.find(p => p.sr === sr);
   if (!product) return;
 
-  const existing = billItems.find(
-    item =>
-      item.product.sr === product.sr &&
-      item.mode === currentMode
-  );
-
-  if (existing) {
-    existing.qty += 1;
-    existing.total = existing.qty * existing.price;
-  } else {
-    billItems.push({
-      product,
-      mode: currentMode,
-      price: getCurrentPrice(product) || 0,
-      qty: 1,
-      total: getCurrentPrice(product) || 0
-    });
-  }
+  billItems.push({
+    product,
+    price: getCurrentPrice(product) || 0,
+    qty: 1,
+    total: getCurrentPrice(product) || 0
+  });
 
   renderBill();
   updateGrandTotal();
@@ -361,11 +330,6 @@ window.selectProduct = function(sr) {
 };
 
 function renderBill() {
-  if (!billItems.length) {
-    billItemsDiv.innerHTML = "";
-    return;
-  }
-
   let html = "";
 
   billItems.forEach((item, index) => {
@@ -373,47 +337,14 @@ function renderBill() {
       <div class="bill-card">
         <div class="bill-title">${item.product.productName}</div>
 
-        <div class="badge-row">
-          <div class="unit">${item.product.priceType}</div>
-          ${
-            item.product.material
-              ? `<div class="unit ${getMaterialClass(item.product.material)}">${item.product.material}</div>`
-              : ""
-          }
-        </div>
-
         <div class="input-row">
-          <div class="input-group">
-            <div class="input-label">Price</div>
-            <input
-              class="bill-input"
-              type="number"
-              value="${item.price}"
-              onchange="updatePrice(${index}, this.value)"
-            >
-          </div>
-
-          <div class="input-group">
-            <div class="input-label">Qty</div>
-            <input
-              class="bill-input"
-              type="number"
-              step="0.01"
-              value="${item.qty}"
-              onchange="updateQty(${index}, this.value)"
-            >
-          </div>
+          <input class="bill-input" type="number" value="${item.price}" onchange="updatePrice(${index}, this.value)">
+          <input class="bill-input" type="number" step="0.01" value="${item.qty}" onchange="updateQty(${index}, this.value)">
         </div>
 
         <div class="bill-bottom">
           <div class="line-total">₹${item.total.toFixed(2)}</div>
-
-          <button
-            class="delete-btn"
-            onclick="deleteItem(${index})"
-          >
-            Remove
-          </button>
+          <button class="delete-btn" onclick="deleteItem(${index})">Remove</button>
         </div>
       </div>
     `;
@@ -424,18 +355,14 @@ function renderBill() {
 
 window.updatePrice = function(index, value) {
   billItems[index].price = parseFloat(value) || 0;
-  billItems[index].total =
-    billItems[index].price * billItems[index].qty;
-
+  billItems[index].total = billItems[index].price * billItems[index].qty;
   renderBill();
   updateGrandTotal();
 };
 
 window.updateQty = function(index, value) {
   billItems[index].qty = parseFloat(value) || 0;
-  billItems[index].total =
-    billItems[index].price * billItems[index].qty;
-
+  billItems[index].total = billItems[index].price * billItems[index].qty;
   renderBill();
   updateGrandTotal();
 };
@@ -447,32 +374,100 @@ window.deleteItem = function(index) {
 };
 
 function updateGrandTotal() {
-  const total = billItems.reduce(
-    (sum, item) => sum + item.total,
-    0
-  );
-
+  const total = billItems.reduce((sum, item) => sum + item.total, 0);
   grandTotalEl.innerText = `₹${total.toFixed(2)}`;
 }
 
 /* ================================
-   MODE
+   PRINT ENGINE
 ================================ */
-modeToggle.addEventListener("click", () => {
-  if (currentMode === "W") {
-    currentMode = "R";
-    modeToggle.innerText = "R";
-    modeToggle.style.background = "#d65353";
-  } else {
-    currentMode = "W";
-    modeToggle.innerText = "W";
-    modeToggle.style.background = "#2f3f64";
+function buildSingleCopy(billData, label) {
+  let rows = "";
+
+  billData.items.forEach(item => {
+    rows += `
+      <tr>
+        <td>${item.productName}</td>
+        <td>${item.material || "-"}</td>
+        <td>${item.qty}</td>
+        <td>${item.price}</td>
+        <td>${item.total.toFixed(2)}</td>
+      </tr>
+    `;
+  });
+
+  const title =
+    billData.mode === "W"
+      ? billData.customerName
+      : "RETAIL BILL";
+
+  const wholesaleExtras =
+    billData.mode === "W"
+      ? `
+        <div class="print-balance">Balance HV</div>
+        <div class="receiver-name-box">
+          <div class="receiver-line"></div>
+          <div class="receiver-label">Receiver’s Name</div>
+        </div>
+      `
+      : "";
+
+  return `
+    <div class="print-copy">
+      <div class="copy-label">${label}</div>
+
+      <div class="print-header-row">
+        <div class="print-customer">${title}</div>
+        <div class="print-serial">${billData.serialNumber}</div>
+      </div>
+
+      <div class="print-date">${formatDisplayDate(billData.date)}</div>
+
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Mat</th>
+            <th>Qty</th>
+            <th>Rate</th>
+            <th>Amt</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+
+      <div class="print-total">
+        Grand Total: ₹${billData.grandTotal.toFixed(2)}
+      </div>
+
+      ${wholesaleExtras}
+    </div>
+  `;
+}
+
+function buildPrintHTML(billData) {
+  if (billData.items.length <= 10) {
+    return `
+      <div class="print-wrapper">
+        ${buildSingleCopy(billData, "CUSTOMER COPY")}
+        <div class="cut-line">CUT HERE</div>
+        ${buildSingleCopy(billData, "OFFICE COPY")}
+      </div>
+    `;
   }
 
-  if (searchBox.value.trim()) {
-    renderSuggestions(searchProducts(searchBox.value));
-  }
-});
+  return `
+    <div class="print-wrapper full-copy-page">
+      ${buildSingleCopy(billData, "CUSTOMER COPY")}
+    </div>
+
+    <div class="print-wrapper">
+      ${buildSingleCopy(billData, "OFFICE COPY")}
+    </div>
+  `;
+}
 
 /* ================================
    MODAL
@@ -494,15 +489,10 @@ function validateBillInputs() {
 function openModal(action) {
   if (!billItems.length) return;
 
-  currentAction = action;
   setTodayDate();
 
   customerGroup.style.display =
     currentMode === "W" ? "block" : "none";
-
-  if (currentMode === "R") {
-    customerName.value = "";
-  }
 
   modalTitle.innerText =
     action === "print"
@@ -520,85 +510,15 @@ cancelPrint.addEventListener("click", () => {
 });
 
 /* ================================
-   PRINT HTML
+   BILL DATA
 ================================ */
-function buildPrintHTML(billData) {
-  let rows = "";
-
-  billData.items.forEach(item => {
-    rows += `
-      <tr>
-        <td>${item.productName}</td>
-        <td>${item.material || "-"}</td>
-        <td>${item.qty}</td>
-        <td>₹${item.price}</td>
-        <td>₹${item.total.toFixed(2)}</td>
-      </tr>
-    `;
-  });
-
-  const customerHeading =
-    billData.mode === "W"
-      ? `<div class="print-customer">${billData.customerName}</div>`
-      : "";
-
-  const wholesaleExtras =
-    billData.mode === "W"
-      ? `
-        <div class="print-balance">Balance HV</div>
-        <div class="receiver-name-box">
-          <div class="receiver-line"></div>
-          <div class="receiver-label">Receiver’s Name</div>
-        </div>
-      `
-      : "";
-
-  return `
-    <div class="print-wrapper">
-      <div class="print-top">
-        <div>${formatDisplayDate(billData.date)}</div>
-        <div>${billData.serialNumber}</div>
-      </div>
-
-      ${customerHeading}
-
-      <table class="print-table">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Material</th>
-            <th>Qty</th>
-            <th>Rate</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          ${rows}
-        </tbody>
-      </table>
-
-      <div class="print-total">
-        Grand Total: ₹${billData.grandTotal.toFixed(2)}
-      </div>
-
-      ${wholesaleExtras}
-    </div>
-  `;
-}
-
-/* ================================
-   LOCAL PRINT
-================================ */
-confirmPrint.addEventListener("click", () => {
-  if (!validateBillInputs()) return;
-
+function createBillData() {
   const grandTotal = billItems.reduce(
     (sum, item) => sum + item.total,
     0
   );
 
-  const billData = {
+  return {
     mode: currentMode,
     date: printDate.value,
     customerName: customerName.value.trim(),
@@ -612,6 +532,15 @@ confirmPrint.addEventListener("click", () => {
       total: item.total
     }))
   };
+}
+
+/* ================================
+   PRINT
+================================ */
+confirmPrint.addEventListener("click", () => {
+  if (!validateBillInputs()) return;
+
+  const billData = createBillData();
 
   printInvoice.innerHTML = buildPrintHTML(billData);
   printModal.style.display = "none";
@@ -624,26 +553,8 @@ confirmPrint.addEventListener("click", () => {
 confirmSend.addEventListener("click", async () => {
   if (!validateBillInputs()) return;
 
-  const grandTotal = billItems.reduce(
-    (sum, item) => sum + item.total,
-    0
-  );
-
-  const billData = {
-    mode: currentMode,
-    date: printDate.value,
-    customerName: customerName.value.trim(),
-    serialNumber: serialNumber.value.trim(),
-    grandTotal,
-    items: billItems.map(item => ({
-      productName: item.product.productName,
-      material: item.product.material || "",
-      qty: item.qty,
-      price: item.price,
-      total: item.total
-    })),
-    createdAt: serverTimestamp()
-  };
+  const billData = createBillData();
+  billData.createdAt = serverTimestamp();
 
   try {
     await addDoc(billsCollection, billData);
@@ -653,13 +564,9 @@ confirmSend.addEventListener("click", async () => {
     updateGrandTotal();
 
     printModal.style.display = "none";
-
-    customerName.value = "";
-    serialNumber.value = "";
-
     alert("Bill sent successfully.");
   } catch (err) {
-    alert("Failed to send bill. Check internet.");
+    alert("Failed to send bill.");
     console.error(err);
   }
 });
@@ -671,11 +578,7 @@ function renderIncomingBills() {
   const ids = Object.keys(incomingBillCache);
 
   if (!ids.length) {
-    incomingBills.innerHTML = `
-      <div class="receiver-subtitle">
-        No incoming bills
-      </div>
-    `;
+    incomingBills.innerHTML = `<div class="receiver-subtitle">No incoming bills</div>`;
     return;
   }
 
@@ -686,9 +589,7 @@ function renderIncomingBills() {
 
     html += `
       <div class="bill-card">
-        <div class="bill-title">
-          ${bill.mode === "W" ? bill.customerName : "Retail Bill"}
-        </div>
+        <div class="bill-title">${bill.mode === "W" ? bill.customerName : "Retail Bill"}</div>
 
         <div class="badge-row">
           <div class="unit">${formatDisplayDate(bill.date)}</div>
@@ -700,19 +601,8 @@ function renderIncomingBills() {
         </div>
 
         <div class="action-buttons" style="margin-top:14px;">
-          <button
-            class="primary-btn"
-            onclick="printReceivedBill('${id}')"
-          >
-            Print
-          </button>
-
-          <button
-            class="send-btn"
-            onclick="deleteReceivedBill('${id}')"
-          >
-            Done
-          </button>
+          <button class="primary-btn" onclick="printReceivedBill('${id}')">Print</button>
+          <button class="send-btn" onclick="deleteReceivedBill('${id}')">Done</button>
         </div>
       </div>
     `;
@@ -740,10 +630,5 @@ window.printReceivedBill = function(docId) {
 };
 
 window.deleteReceivedBill = async function(docId) {
-  try {
-    await deleteDoc(doc(db, "bills", docId));
-  } catch (err) {
-    alert("Delete failed");
-    console.error(err);
-  }
+  await deleteDoc(doc(db, "bills", docId));
 };
