@@ -62,7 +62,6 @@ const modalTitle = document.getElementById("modalTitle");
 const printDate = document.getElementById("printDate");
 const customerName = document.getElementById("customerName");
 const customerGroup = document.getElementById("customerGroup");
-const serialNumber = document.getElementById("serialNumber");
 const cancelPrint = document.getElementById("cancelPrint");
 const confirmPrint = document.getElementById("confirmPrint");
 const confirmSend = document.getElementById("confirmSend");
