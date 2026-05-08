@@ -11,62 +11,110 @@
 </head>
 <body>
 
-  <!-- HEADER -->
-  <div class="search-container">
+  <!-- APP MODE TABS -->
+  <div class="app-tabs">
+    <button
+      id="billingTab"
+      class="tab-btn active"
+    >
+      Billing
+    </button>
 
-    <div class="header-row">
-      <h1>Billing App</h1>
+    <button
+      id="receiverTab"
+      class="tab-btn"
+    >
+      Receiver
+    </button>
+  </div>
 
-      <button id="modeToggle">
-        W
-      </button>
+  <!-- BILLING VIEW -->
+  <div id="billingView">
+
+    <!-- HEADER -->
+    <div class="search-container">
+
+      <div class="header-row">
+        <h1>Billing App</h1>
+
+        <button id="modeToggle">
+          W
+        </button>
+      </div>
+
+      <!-- SEARCH -->
+      <div class="search-wrapper">
+
+        <input
+          type="text"
+          id="searchBox"
+          placeholder="Search product..."
+          autocomplete="off"
+        >
+
+        <div id="clearSearch">
+          <span class="clear-x">✕</span>
+        </div>
+
+      </div>
+
+      <!-- SEARCH RESULTS -->
+      <div id="suggestions"></div>
+
     </div>
 
-    <!-- SEARCH -->
-    <div class="search-wrapper">
+    <!-- BILL ITEMS -->
+    <div id="billItems"></div>
 
-      <input
-        type="text"
-        id="searchBox"
-        placeholder="Search product..."
-        autocomplete="off"
-      >
+    <!-- TOTAL BAR -->
+    <div class="total-card">
 
-      <div id="clearSearch">
-        <span class="clear-x">✕</span>
+      <div class="total-row">
+        <span>Total</span>
+        <span id="grandTotal">₹0</span>
+      </div>
+
+      <div class="action-buttons">
+        <button id="printBtn">
+          Print
+        </button>
+
+        <button id="sendBtn">
+          Send
+        </button>
       </div>
 
     </div>
 
-    <!-- SEARCH RESULTS -->
-    <div id="suggestions"></div>
-
   </div>
 
-  <!-- BILL ITEMS -->
-  <div id="billItems"></div>
+  <!-- RECEIVER VIEW -->
+  <div id="receiverView">
 
-  <!-- TOTAL BAR -->
-  <div class="total-card">
+    <div class="receiver-card">
+      <div class="receiver-title">
+        Receiver Mode
+      </div>
 
-    <div class="total-row">
-      <span>Total</span>
-      <span id="grandTotal">₹0</span>
+      <div class="receiver-subtitle">
+        Waiting for incoming bills...
+      </div>
+
+      <div id="incomingBills"></div>
     </div>
 
-    <button id="printBtn">
-      Print
-    </button>
-
   </div>
 
-  <!-- PRINT MODAL -->
+  <!-- SHARED MODAL -->
   <div id="printModal" class="modal-overlay">
 
     <div class="modal-card">
 
-      <div class="modal-title">
-        Print Details
+      <div
+        class="modal-title"
+        id="modalTitle"
+      >
+        Bill Details
       </div>
 
       <div class="modal-group">
@@ -89,7 +137,17 @@
         >
       </div>
 
+      <div class="modal-group">
+        <label>Serial Number</label>
+        <input
+          type="text"
+          id="serialNumber"
+          placeholder="Enter serial number"
+        >
+      </div>
+
       <div class="modal-actions">
+
         <button
           id="cancelPrint"
           class="secondary-btn"
@@ -103,6 +161,14 @@
         >
           Print
         </button>
+
+        <button
+          id="confirmSend"
+          class="send-btn"
+        >
+          Send
+        </button>
+
       </div>
 
     </div>
