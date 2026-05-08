@@ -246,10 +246,14 @@ h1 {
 
 .action-buttons {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-#printBtn,
+.action-buttons button {
+  flex: 1 1 120px;
+}
+
 #sendBtn {
   flex: 1;
   border: none;
@@ -259,13 +263,6 @@ h1 {
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-}
-
-#printBtn {
-  background: #2a73d9;
-}
-
-#sendBtn {
   background: #2f3f64;
 }
 
@@ -375,7 +372,7 @@ h1 {
   padding: 6mm;
   font-family: Arial, sans-serif;
   color: #000;
-  page-break-after: always;
+  page-break-after: auto;
 }
 
 .copy-label {
