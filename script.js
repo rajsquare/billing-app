@@ -9,8 +9,7 @@ import {
   serverTimestamp,
   query,
   orderBy,
-  runTransaction,
-  getDoc
+  runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* ================================
@@ -48,6 +47,8 @@ let products = [];
 let billItems = [];
 let currentMode = "W";
 let incomingBillCache = {};
+let isReceiverPrinting = false;
+let isSendingBill = false;
 
 /* ================================
    DOM
@@ -630,32 +631,33 @@ function buildPrintHTML(billData, serialNumber) {
 /* ================================
    LOCAL PRINT
 ================================ */
-confirmPrint.addEventListener("click", async () => {
+confirmPrint.addEventListener("click", () => {
   if (!validateBillInputs()) return;
 
-  try {
-    const billData = createBillData();
-    const serialNumber = await getNextSerial(currentMode);
+  const billData = createBillData();
 
-    printInvoice.innerHTML = buildPrintHTML(
-      billData,
-      serialNumber
-    );
+  printInvoice.innerHTML = buildPrintHTML(
+    billData,
+    ""
+  );
 
-    printModal.style.display = "none";
+  printModal.style.display = "none";
 
-    window.print();
-  } catch (err) {
-    console.error(err);
-    alert("Failed to generate serial number.");
-  }
+  customerName.value = "";
+  billItems = [];
+  renderBill();
+  updateGrandTotal();
+
+  window.print();
 });
-
 /* ================================
    SEND
 ================================ */
 confirmSend.addEventListener("click", async () => {
+  if (isSendingBill) return;
   if (!validateBillInputs()) return;
+
+  isSendingBill = true;
 
   const billData = createBillData();
   billData.createdAt = serverTimestamp();
@@ -675,6 +677,8 @@ confirmSend.addEventListener("click", async () => {
   } catch (err) {
     console.error(err);
     alert("Failed to send bill.");
+  } finally {
+    isSendingBill = false;
   }
 });
 
@@ -761,23 +765,32 @@ onSnapshot(billsQuery, snapshot => {
    RECEIVER PRINT
 ================================ */
 window.printReceivedBill = async function(docId) {
+  if (isReceiverPrinting) return;
+
+  isReceiverPrinting = true;
+
   try {
-    const bill = incomingBillCache[docId];
-    if (!bill) return;
+ const bill = incomingBillCache[docId];
+if (!bill) return;
 
-    const serialNumber = await getNextSerial(bill.mode);
+const serialNumber = await getNextSerial(bill.mode);
 
-    printInvoice.innerHTML = buildPrintHTML(
-      bill,
-      serialNumber
-    );
+delete incomingBillCache[docId];
+renderIncomingBills();
 
-    window.print();
+printInvoice.innerHTML = buildPrintHTML(
+  bill,
+  serialNumber
+);
 
-    await deleteDoc(doc(db, "bills", docId));
+window.print();
+
+await deleteDoc(doc(db, "bills", docId));
   } catch (err) {
     console.error(err);
     alert("Failed to print bill.");
+  } finally {
+    isReceiverPrinting = false;
   }
 };
 
@@ -785,6 +798,8 @@ window.printReceivedBill = async function(docId) {
    RECEIVER DELETE
 ================================ */
 window.deleteReceivedBill = async function(docId) {
+  if (isReceiverPrinting) return;
+
   try {
     await deleteDoc(doc(db, "bills", docId));
   } catch (err) {
