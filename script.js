@@ -1,10 +1,36 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+  deleteDoc,
+  doc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ================================
+   FIREBASE
+================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyCthUdAwAP0h67p3MfkanelAPdPzZMmPRo",
+  authDomain: "billing-app-73ac8.firebaseapp.com",
+  projectId: "billing-app-73ac8",
+  storageBucket: "billing-app-73ac8.firebasestorage.app",
+  messagingSenderId: "637437936055",
+  appId: "1:637437936055:web:f83da0ab2d3e994e96e832"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const billsCollection = collection(db, "bills");
+
 /* ================================
    GLOBAL STATE
 ================================ */
 let products = [];
 let billItems = [];
 let currentMode = "W";
-let currentAction = "print";
 
 /* ================================
    DOM
@@ -24,35 +50,36 @@ const clearSearch = document.getElementById("clearSearch");
 const printBtn = document.getElementById("printBtn");
 const sendBtn = document.getElementById("sendBtn");
 
-const printInvoice = document.getElementById("printInvoice");
-
 const printModal = document.getElementById("printModal");
 const modalTitle = document.getElementById("modalTitle");
 const printDate = document.getElementById("printDate");
 const customerName = document.getElementById("customerName");
 const customerGroup = document.getElementById("customerGroup");
 const serialNumber = document.getElementById("serialNumber");
-
 const cancelPrint = document.getElementById("cancelPrint");
 const confirmPrint = document.getElementById("confirmPrint");
 const confirmSend = document.getElementById("confirmSend");
 
-/* ================================
-   INIT DATE
-================================ */
-setTodayDate();
+const printInvoice = document.getElementById("printInvoice");
+const incomingBills = document.getElementById("incomingBills");
 
+let currentAction = "print";
+
+/* ================================
+   DATE
+================================ */
 function setTodayDate() {
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, "0");
   const dd = String(today.getDate()).padStart(2, "0");
-
   printDate.value = `${yyyy}-${mm}-${dd}`;
 }
 
+setTodayDate();
+
 /* ================================
-   NORMALIZE
+   HELPERS
 ================================ */
 function normalize(text) {
   return text
@@ -64,9 +91,30 @@ function normalize(text) {
 }
 
 function tokenize(text) {
-  return normalize(text)
-    .split(" ")
-    .filter(Boolean);
+  return normalize(text).split(" ").filter(Boolean);
+}
+
+function formatDisplayDate(dateString) {
+  const date = new Date(dateString);
+
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric"
+  });
+}
+
+function getCurrentPrice(product) {
+  return currentMode === "W"
+    ? product.wPrice
+    : product.rPrice;
+}
+
+function getMaterialClass(material) {
+  if (material === "Brass") return "material-brass";
+  if (material === "Copper") return "material-copper";
+  if (material === "Kansa") return "material-kansa";
+  return "";
 }
 
 /* ================================
@@ -89,33 +137,22 @@ fetch("productList.json")
   });
 
 /* ================================
-   SYNONYMS
+   SEARCH ENGINE
 ================================ */
 const synonyms = {
   bucket: ["balti", "baldi"],
   balti: ["bucket"],
   baldi: ["bucket"],
-
   thal: ["thaal", "thali", "thaali"],
-  thaal: ["thal", "thali", "thaali"],
-  thali: ["thal", "thaal", "thaali"],
-  thaali: ["thal", "thaal", "thali"],
-
+  thaal: ["thal", "thali"],
+  thali: ["thal", "thaal"],
   hammer: ["mathar"],
   mathar: ["hammer"],
-
   kansa: ["bronze"],
   bronze: ["kansa"],
-
   katora: ["waati", "wati", "vaati", "vati"],
-  waati: ["katora"],
-  wati: ["katora"],
-  vaati: ["katora"],
-  vati: ["katora"],
-
   dabba: ["box"],
   box: ["dabba"],
-
   ladle: ["kalchul"],
   kalchul: ["ladle"]
 };
@@ -131,9 +168,6 @@ function expandQuery(query) {
   return [...new Set(expanded)];
 }
 
-/* ================================
-   LEVENSHTEIN
-================================ */
 function levenshtein(a, b) {
   if (a === b) return 0;
 
@@ -175,7 +209,6 @@ function tokenScore(queryToken, productToken) {
 
 function scoreProduct(product, queryTokens, rawQuery) {
   let score = 0;
-  const productTokens = product.searchableTokens;
 
   if (product.searchableText === rawQuery) score += 500;
   if (product.searchableText.includes(rawQuery)) score += 120;
@@ -183,20 +216,13 @@ function scoreProduct(product, queryTokens, rawQuery) {
   queryTokens.forEach(queryToken => {
     let best = 0;
 
-    productTokens.forEach(productToken => {
+    product.searchableTokens.forEach(productToken => {
       const s = tokenScore(queryToken, productToken);
       if (s > best) best = s;
     });
 
     score += best;
   });
-
-  if (
-    product.material &&
-    queryTokens.includes(normalize(product.material))
-  ) {
-    score += 35;
-  }
 
   return score;
 }
@@ -219,32 +245,6 @@ function searchProducts(query) {
 }
 
 /* ================================
-   HELPERS
-================================ */
-function getCurrentPrice(product) {
-  return currentMode === "W"
-    ? product.wPrice
-    : product.rPrice;
-}
-
-function getMaterialClass(material) {
-  if (material === "Brass") return "material-brass";
-  if (material === "Copper") return "material-copper";
-  if (material === "Kansa") return "material-kansa";
-  return "";
-}
-
-function formatDisplayDate(dateString) {
-  const date = new Date(dateString);
-
-  return date.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric"
-  });
-}
-
-/* ================================
    TABS
 ================================ */
 billingTab.addEventListener("click", () => {
@@ -262,7 +262,7 @@ receiverTab.addEventListener("click", () => {
 });
 
 /* ================================
-   SEARCH
+   SEARCH UI
 ================================ */
 function renderSuggestions(results) {
   if (!results.length) {
@@ -273,8 +273,6 @@ function renderSuggestions(results) {
   let html = "";
 
   results.forEach(product => {
-    const materialClass = getMaterialClass(product.material);
-
     html += `
       <div class="suggestion-card" onclick="selectProduct(${product.sr})">
         <div class="suggestion-top">
@@ -283,13 +281,10 @@ function renderSuggestions(results) {
         </div>
 
         <div class="badge-row">
-          <div class="unit ${product.priceType === "PP" ? "unit-pp" : ""}">
-            ${product.priceType || ""}
-          </div>
-
+          <div class="unit">${product.priceType || ""}</div>
           ${
             product.material
-              ? `<div class="unit ${materialClass}">${product.material}</div>`
+              ? `<div class="unit ${getMaterialClass(product.material)}">${product.material}</div>`
               : ""
           }
         </div>
@@ -302,7 +297,6 @@ function renderSuggestions(results) {
 
 searchBox.addEventListener("input", e => {
   const val = e.target.value;
-
   clearSearch.style.display = val ? "flex" : "none";
 
   if (!val.trim()) {
@@ -317,11 +311,10 @@ clearSearch.addEventListener("click", () => {
   searchBox.value = "";
   suggestions.innerHTML = "";
   clearSearch.style.display = "none";
-  searchBox.focus();
 });
 
 /* ================================
-   SELECT PRODUCT
+   BILL ITEMS
 ================================ */
 window.selectProduct = function(sr) {
   const product = products.find(p => p.sr === sr);
@@ -354,9 +347,6 @@ window.selectProduct = function(sr) {
   clearSearch.style.display = "none";
 };
 
-/* ================================
-   BILL
-================================ */
 function renderBill() {
   if (!billItems.length) {
     billItemsDiv.innerHTML = "";
@@ -366,21 +356,15 @@ function renderBill() {
   let html = "";
 
   billItems.forEach((item, index) => {
-    const materialClass = getMaterialClass(item.product.material);
-
     html += `
       <div class="bill-card">
-
-        <div class="bill-title">
-          ${item.product.productName}
-        </div>
+        <div class="bill-title">${item.product.productName}</div>
 
         <div class="badge-row">
-          <div class="unit">${item.product.priceType || ""}</div>
-
+          <div class="unit">${item.product.priceType}</div>
           ${
             item.product.material
-              ? `<div class="unit ${materialClass}">${item.product.material}</div>`
+              ? `<div class="unit ${getMaterialClass(item.product.material)}">${item.product.material}</div>`
               : ""
           }
         </div>
@@ -410,7 +394,6 @@ function renderBill() {
 
         <div class="bill-bottom">
           <div class="line-total">₹${item.total.toFixed(2)}</div>
-
           <button
             class="delete-btn"
             onclick="deleteItem(${index})"
@@ -418,7 +401,6 @@ function renderBill() {
             Remove
           </button>
         </div>
-
       </div>
     `;
   });
@@ -430,7 +412,6 @@ window.updatePrice = function(index, value) {
   billItems[index].price = parseFloat(value) || 0;
   billItems[index].total =
     billItems[index].price * billItems[index].qty;
-
   renderBill();
   updateGrandTotal();
 };
@@ -439,7 +420,6 @@ window.updateQty = function(index, value) {
   billItems[index].qty = parseFloat(value) || 0;
   billItems[index].total =
     billItems[index].price * billItems[index].qty;
-
   renderBill();
   updateGrandTotal();
 };
@@ -472,10 +452,6 @@ modeToggle.addEventListener("click", () => {
     modeToggle.innerText = "W";
     modeToggle.style.background = "#2f3f64";
   }
-
-  if (searchBox.value.trim()) {
-    renderSuggestions(searchProducts(searchBox.value));
-  }
 });
 
 /* ================================
@@ -490,10 +466,6 @@ function openModal(action) {
   customerGroup.style.display =
     currentMode === "W" ? "block" : "none";
 
-  if (currentMode === "R") {
-    customerName.value = "";
-  }
-
   modalTitle.innerText =
     action === "print"
       ? "Print Details"
@@ -502,44 +474,24 @@ function openModal(action) {
   printModal.style.display = "flex";
 }
 
-printBtn.addEventListener("click", () => {
-  openModal("print");
-});
-
-sendBtn.addEventListener("click", () => {
-  openModal("send");
-});
+printBtn.addEventListener("click", () => openModal("print"));
+sendBtn.addEventListener("click", () => openModal("send"));
 
 cancelPrint.addEventListener("click", () => {
   printModal.style.display = "none";
 });
 
 /* ================================
-   PRINT
+   PRINT HTML
 ================================ */
-confirmPrint.addEventListener("click", () => {
-  if (currentMode === "W" && !customerName.value.trim()) {
-    alert("Please enter customer name");
-    return;
-  }
-
-  generatePrint();
-});
-
-function generatePrint() {
-  const displayDate =
-    formatDisplayDate(printDate.value);
-
+function buildPrintHTML(billData) {
   let rows = "";
-  let grandTotal = 0;
 
-  billItems.forEach(item => {
-    grandTotal += item.total;
-
+  billData.items.forEach(item => {
     rows += `
       <tr>
-        <td>${item.product.productName}</td>
-        <td>${item.product.material || "-"}</td>
+        <td>${item.productName}</td>
+        <td>${item.material || "-"}</td>
         <td>${item.qty}</td>
         <td>₹${item.price}</td>
         <td>₹${item.total.toFixed(2)}</td>
@@ -548,12 +500,12 @@ function generatePrint() {
   });
 
   const customerHeading =
-    currentMode === "W"
-      ? `<div class="print-customer">${customerName.value.trim()}</div>`
+    billData.mode === "W"
+      ? `<div class="print-customer">${billData.customerName}</div>`
       : "";
 
   const wholesaleExtras =
-    currentMode === "W"
+    billData.mode === "W"
       ? `
         <div class="print-balance">Balance HV</div>
 
@@ -564,12 +516,12 @@ function generatePrint() {
       `
       : "";
 
-  printInvoice.innerHTML = `
+  return `
     <div class="print-wrapper">
 
       <div class="print-top">
-        <div>${displayDate}</div>
-        <div>${serialNumber.value.trim()}</div>
+        <div>${formatDisplayDate(billData.date)}</div>
+        <div>${billData.serialNumber}</div>
       </div>
 
       ${customerHeading}
@@ -591,26 +543,168 @@ function generatePrint() {
       </table>
 
       <div class="print-total">
-        Grand Total: ₹${grandTotal.toFixed(2)}
+        Grand Total: ₹${billData.grandTotal.toFixed(2)}
       </div>
 
       ${wholesaleExtras}
 
     </div>
   `;
-
-  printModal.style.display = "none";
-  window.print();
 }
 
 /* ================================
-   SEND PLACEHOLDER
+   LOCAL PRINT
 ================================ */
-confirmSend.addEventListener("click", () => {
+confirmPrint.addEventListener("click", () => {
   if (currentMode === "W" && !customerName.value.trim()) {
-    alert("Please enter customer name");
+    alert("Enter customer name");
     return;
   }
 
-  alert("Firebase send integration coming next.");
+  const grandTotal = billItems.reduce(
+    (sum, item) => sum + item.total,
+    0
+  );
+
+  const billData = {
+    mode: currentMode,
+    date: printDate.value,
+    customerName: customerName.value.trim(),
+    serialNumber: serialNumber.value.trim(),
+    grandTotal,
+    items: billItems.map(item => ({
+      productName: item.product.productName,
+      material: item.product.material || "",
+      qty: item.qty,
+      price: item.price,
+      total: item.total
+    }))
+  };
+
+  printInvoice.innerHTML = buildPrintHTML(billData);
+  printModal.style.display = "none";
+  window.print();
 });
+
+/* ================================
+   SEND TO FIREBASE
+================================ */
+confirmSend.addEventListener("click", async () => {
+  if (currentMode === "W" && !customerName.value.trim()) {
+    alert("Enter customer name");
+    return;
+  }
+
+  const grandTotal = billItems.reduce(
+    (sum, item) => sum + item.total,
+    0
+  );
+
+  const billData = {
+    mode: currentMode,
+    date: printDate.value,
+    customerName: customerName.value.trim(),
+    serialNumber: serialNumber.value.trim(),
+    grandTotal,
+    items: billItems.map(item => ({
+      productName: item.product.productName,
+      material: item.product.material || "",
+      qty: item.qty,
+      price: item.price,
+      total: item.total
+    })),
+    createdAt: serverTimestamp()
+  };
+
+  try {
+    await addDoc(billsCollection, billData);
+
+    printModal.style.display = "none";
+    alert("Bill sent successfully.");
+
+  } catch (err) {
+    alert("Failed to send bill. Check internet.");
+    console.error(err);
+  }
+});
+
+/* ================================
+   RECEIVER LISTENER
+================================ */
+onSnapshot(billsCollection, snapshot => {
+  if (snapshot.empty) {
+    incomingBills.innerHTML = "";
+    return;
+  }
+
+  let html = "";
+
+  snapshot.forEach(docSnap => {
+    const bill = docSnap.data();
+
+    html += `
+      <div class="bill-card">
+        <div class="bill-title">
+          ${bill.mode === "W" ? bill.customerName : "Retail Bill"}
+        </div>
+
+        <div class="badge-row">
+          <div class="unit">${formatDisplayDate(bill.date)}</div>
+          <div class="unit">${bill.serialNumber}</div>
+        </div>
+
+        <div style="margin-top:12px;font-weight:700;font-size:20px;">
+          ₹${bill.grandTotal.toFixed(2)}
+        </div>
+
+        <div class="action-buttons" style="margin-top:14px;">
+          <button
+            class="primary-btn"
+            onclick="printReceivedBill('${docSnap.id}')"
+          >
+            Print
+          </button>
+
+          <button
+            class="send-btn"
+            onclick="deleteReceivedBill('${docSnap.id}')"
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  incomingBills.innerHTML = html;
+});
+
+/* ================================
+   RECEIVER ACTIONS
+================================ */
+window.printReceivedBill = async function(docId) {
+  const snapshotListener = await fetch();
+
+  const billCard = [...document.querySelectorAll(".bill-card")];
+
+  // print directly from firestore listener cache
+  onSnapshot(billsCollection, snap => {
+    snap.forEach(docSnap => {
+      if (docSnap.id === docId) {
+        printInvoice.innerHTML =
+          buildPrintHTML(docSnap.data());
+
+        window.print();
+      }
+    });
+  });
+};
+
+window.deleteReceivedBill = async function(docId) {
+  try {
+    await deleteDoc(doc(db, "bills", docId));
+  } catch (err) {
+    alert("Delete failed");
+    console.error(err);
+  }
+};
