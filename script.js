@@ -665,7 +665,6 @@ function buildSingleCopy(billData, label) {
       : "";
 
   return `
-   return `
   <div class="print-wrapper receipt-copy">
       <div class="copy-label">${label}</div>
 
