@@ -412,23 +412,23 @@ function renderBill() {
           }
         </div>
 
-        <div class="input-row">
-          <input
-            class="bill-input"
-            type="number"
-            value="${item.price}"
-            onchange="updatePrice(${index}, this.value)"
-          >
+   <div class="input-row">
+  <input
+    class="bill-input"
+    type="text"
+    inputmode="decimal"
+    value="${item.price}"
+    onchange="updatePrice(${index}, this.value)"
+  >
 
-          <input
-            class="bill-input"
-            type="number"
-            step="0.01"
-            value="${item.qty}"
-            onchange="updateQty(${index}, this.value)"
-          >
-        </div>
-
+  <input
+    class="bill-input"
+    type="text"
+    inputmode="decimal"
+    value="${item.qty}"
+    onchange="updateQty(${index}, this.value)"
+  >
+</div>
         <div class="bill-bottom">
           <div class="line-total">₹${item.total.toFixed(2)}</div>
 
