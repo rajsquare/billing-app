@@ -4,28 +4,41 @@
 let products = [];
 let billItems = [];
 let currentMode = "W";
+let currentAction = "print";
 
 /* ================================
    DOM
 ================================ */
+const billingTab = document.getElementById("billingTab");
+const receiverTab = document.getElementById("receiverTab");
+const billingView = document.getElementById("billingView");
+const receiverView = document.getElementById("receiverView");
+
 const searchBox = document.getElementById("searchBox");
 const suggestions = document.getElementById("suggestions");
 const billItemsDiv = document.getElementById("billItems");
 const grandTotalEl = document.getElementById("grandTotal");
 const modeToggle = document.getElementById("modeToggle");
 const clearSearch = document.getElementById("clearSearch");
+
 const printBtn = document.getElementById("printBtn");
+const sendBtn = document.getElementById("sendBtn");
+
 const printInvoice = document.getElementById("printInvoice");
 
 const printModal = document.getElementById("printModal");
+const modalTitle = document.getElementById("modalTitle");
 const printDate = document.getElementById("printDate");
 const customerName = document.getElementById("customerName");
 const customerGroup = document.getElementById("customerGroup");
+const serialNumber = document.getElementById("serialNumber");
+
 const cancelPrint = document.getElementById("cancelPrint");
 const confirmPrint = document.getElementById("confirmPrint");
+const confirmSend = document.getElementById("confirmSend");
 
 /* ================================
-   TODAY DEFAULT
+   INIT DATE
 ================================ */
 setTodayDate();
 
@@ -50,9 +63,6 @@ function normalize(text) {
     .trim();
 }
 
-/* ================================
-   TOKENIZE
-================================ */
 function tokenize(text) {
   return normalize(text)
     .split(" ")
@@ -60,16 +70,14 @@ function tokenize(text) {
 }
 
 /* ================================
-   LOAD DATA
+   LOAD PRODUCTS
 ================================ */
 fetch("productList.json")
   .then(res => res.json())
   .then(data => {
     products = data.map(product => {
       const searchableText = normalize(
-        product.productName +
-        " " +
-        (product.material || "")
+        product.productName + " " + (product.material || "")
       );
 
       return {
@@ -94,42 +102,30 @@ const synonyms = {
   thaali: ["thal", "thaal", "thali"],
 
   hammer: ["mathar"],
-  hammered: ["mathar"],
   mathar: ["hammer"],
-
-  rice: ["biryani"],
-  biryani: ["rice"],
 
   kansa: ["bronze"],
   bronze: ["kansa"],
 
   katora: ["waati", "wati", "vaati", "vati"],
-  waati: ["katora", "wati", "vaati", "vati"],
-  wati: ["katora", "waati", "vaati", "vati"],
-  vaati: ["katora", "waati", "wati", "vati"],
-  vati: ["katora", "waati", "wati", "vaati"],
+  waati: ["katora"],
+  wati: ["katora"],
+  vaati: ["katora"],
+  vati: ["katora"],
 
-  box: ["dabba"],
   dabba: ["box"],
+  box: ["dabba"],
 
-  masala: ["spice"],
-  spice: ["masala"],
-
-  kalchul: ["ladle"],
-  ladle: ["kalchul"]
+  ladle: ["kalchul"],
+  kalchul: ["ladle"]
 };
 
-/* ================================
-   EXPAND QUERY
-================================ */
 function expandQuery(query) {
   const words = tokenize(query);
   let expanded = [...words];
 
   words.forEach(w => {
-    if (synonyms[w]) {
-      expanded.push(...synonyms[w]);
-    }
+    if (synonyms[w]) expanded.push(...synonyms[w]);
   });
 
   return [...new Set(expanded)];
@@ -143,17 +139,12 @@ function levenshtein(a, b) {
 
   const matrix = [];
 
-  for (let i = 0; i <= b.length; i++) {
-    matrix[i] = [i];
-  }
-
-  for (let j = 0; j <= a.length; j++) {
-    matrix[0][j] = j;
-  }
+  for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
 
   for (let i = 1; i <= b.length; i++) {
     for (let j = 1; j <= a.length; j++) {
-      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+      if (b[i - 1] === a[j - 1]) {
         matrix[i][j] = matrix[i - 1][j - 1];
       } else {
         matrix[i][j] = Math.min(
@@ -168,9 +159,6 @@ function levenshtein(a, b) {
   return matrix[b.length][a.length];
 }
 
-/* ================================
-   TOKEN SCORE
-================================ */
 function tokenScore(queryToken, productToken) {
   if (queryToken === productToken) return 100;
   if (productToken.startsWith(queryToken)) return 40;
@@ -185,9 +173,6 @@ function tokenScore(queryToken, productToken) {
   return 0;
 }
 
-/* ================================
-   SCORE PRODUCT
-================================ */
 function scoreProduct(product, queryTokens, rawQuery) {
   let score = 0;
   const productTokens = product.searchableTokens;
@@ -199,8 +184,8 @@ function scoreProduct(product, queryTokens, rawQuery) {
     let best = 0;
 
     productTokens.forEach(productToken => {
-      const score = tokenScore(queryToken, productToken);
-      if (score > best) best = score;
+      const s = tokenScore(queryToken, productToken);
+      if (s > best) best = s;
     });
 
     score += best;
@@ -216,9 +201,6 @@ function scoreProduct(product, queryTokens, rawQuery) {
   return score;
 }
 
-/* ================================
-   SEARCH
-================================ */
 function searchProducts(query) {
   const clean = normalize(query);
   if (!clean) return [];
@@ -230,26 +212,26 @@ function searchProducts(query) {
       product,
       score: scoreProduct(product, queryTokens, clean)
     }))
-    .filter(result => result.score > 0)
+    .filter(r => r.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, 8)
-    .map(result => result.product);
+    .map(r => r.product);
 }
 
 /* ================================
    HELPERS
 ================================ */
+function getCurrentPrice(product) {
+  return currentMode === "W"
+    ? product.wPrice
+    : product.rPrice;
+}
+
 function getMaterialClass(material) {
   if (material === "Brass") return "material-brass";
   if (material === "Copper") return "material-copper";
   if (material === "Kansa") return "material-kansa";
   return "";
-}
-
-function getCurrentPrice(product) {
-  return currentMode === "W"
-    ? product.wPrice
-    : product.rPrice;
 }
 
 function formatDisplayDate(dateString) {
@@ -263,7 +245,24 @@ function formatDisplayDate(dateString) {
 }
 
 /* ================================
-   RENDER SUGGESTIONS
+   TABS
+================================ */
+billingTab.addEventListener("click", () => {
+  billingTab.classList.add("active");
+  receiverTab.classList.remove("active");
+  billingView.style.display = "block";
+  receiverView.style.display = "none";
+});
+
+receiverTab.addEventListener("click", () => {
+  receiverTab.classList.add("active");
+  billingTab.classList.remove("active");
+  billingView.style.display = "none";
+  receiverView.style.display = "block";
+});
+
+/* ================================
+   SEARCH
 ================================ */
 function renderSuggestions(results) {
   if (!results.length) {
@@ -274,8 +273,7 @@ function renderSuggestions(results) {
   let html = "";
 
   results.forEach(product => {
-    const materialClass =
-      getMaterialClass(product.material);
+    const materialClass = getMaterialClass(product.material);
 
     html += `
       <div class="suggestion-card" onclick="selectProduct(${product.sr})">
@@ -291,11 +289,7 @@ function renderSuggestions(results) {
 
           ${
             product.material
-              ? `
-              <div class="unit material-badge ${materialClass}">
-                ${product.material}
-              </div>
-            `
+              ? `<div class="unit ${materialClass}">${product.material}</div>`
               : ""
           }
         </div>
@@ -305,6 +299,26 @@ function renderSuggestions(results) {
 
   suggestions.innerHTML = html;
 }
+
+searchBox.addEventListener("input", e => {
+  const val = e.target.value;
+
+  clearSearch.style.display = val ? "flex" : "none";
+
+  if (!val.trim()) {
+    suggestions.innerHTML = "";
+    return;
+  }
+
+  renderSuggestions(searchProducts(val));
+});
+
+clearSearch.addEventListener("click", () => {
+  searchBox.value = "";
+  suggestions.innerHTML = "";
+  clearSearch.style.display = "none";
+  searchBox.focus();
+});
 
 /* ================================
    SELECT PRODUCT
@@ -338,11 +352,10 @@ window.selectProduct = function(sr) {
   searchBox.value = "";
   suggestions.innerHTML = "";
   clearSearch.style.display = "none";
-  searchBox.focus();
 };
 
 /* ================================
-   RENDER BILL
+   BILL
 ================================ */
 function renderBill() {
   if (!billItems.length) {
@@ -353,8 +366,7 @@ function renderBill() {
   let html = "";
 
   billItems.forEach((item, index) => {
-    const materialClass =
-      getMaterialClass(item.product.material);
+    const materialClass = getMaterialClass(item.product.material);
 
     html += `
       <div class="bill-card">
@@ -364,28 +376,21 @@ function renderBill() {
         </div>
 
         <div class="badge-row">
-          <div class="unit ${item.product.priceType === "PP" ? "unit-pp" : ""}">
-            ${item.product.priceType || ""}
-          </div>
+          <div class="unit">${item.product.priceType || ""}</div>
 
           ${
             item.product.material
-              ? `
-              <div class="unit material-badge ${materialClass}">
-                ${item.product.material}
-              </div>
-            `
+              ? `<div class="unit ${materialClass}">${item.product.material}</div>`
               : ""
           }
         </div>
 
         <div class="input-row">
-
           <div class="input-group">
             <div class="input-label">Price</div>
             <input
-              type="number"
               class="bill-input"
+              type="number"
               value="${item.price}"
               onchange="updatePrice(${index}, this.value)"
             >
@@ -394,20 +399,17 @@ function renderBill() {
           <div class="input-group">
             <div class="input-label">Qty</div>
             <input
+              class="bill-input"
               type="number"
               step="0.01"
-              class="bill-input"
               value="${item.qty}"
               onchange="updateQty(${index}, this.value)"
             >
           </div>
-
         </div>
 
         <div class="bill-bottom">
-          <div class="line-total">
-            ₹${item.total.toFixed(2)}
-          </div>
+          <div class="line-total">₹${item.total.toFixed(2)}</div>
 
           <button
             class="delete-btn"
@@ -448,17 +450,13 @@ window.deleteItem = function(index) {
   updateGrandTotal();
 };
 
-/* ================================
-   TOTAL
-================================ */
 function updateGrandTotal() {
   const total = billItems.reduce(
     (sum, item) => sum + item.total,
     0
   );
 
-  grandTotalEl.innerText =
-    `₹${total.toFixed(2)}`;
+  grandTotalEl.innerText = `₹${total.toFixed(2)}`;
 }
 
 /* ================================
@@ -475,61 +473,50 @@ modeToggle.addEventListener("click", () => {
     modeToggle.style.background = "#2f3f64";
   }
 
-  suggestions.innerHTML = "";
-
   if (searchBox.value.trim()) {
-    renderSuggestions(
-      searchProducts(searchBox.value)
-    );
+    renderSuggestions(searchProducts(searchBox.value));
   }
 });
 
 /* ================================
-   SEARCH
+   MODAL
 ================================ */
-searchBox.addEventListener("input", e => {
-  const val = e.target.value;
-
-  clearSearch.style.display =
-    val ? "flex" : "none";
-
-  if (!val.trim()) {
-    suggestions.innerHTML = "";
-    return;
-  }
-
-  renderSuggestions(searchProducts(val));
-});
-
-clearSearch.addEventListener("click", () => {
-  searchBox.value = "";
-  suggestions.innerHTML = "";
-  clearSearch.style.display = "none";
-  searchBox.focus();
-});
-
-/* ================================
-   PRINT MODAL
-================================ */
-printBtn.addEventListener("click", () => {
+function openModal(action) {
   if (!billItems.length) return;
 
+  currentAction = action;
   setTodayDate();
 
-  if (currentMode === "W") {
-    customerGroup.style.display = "block";
-  } else {
-    customerGroup.style.display = "none";
+  customerGroup.style.display =
+    currentMode === "W" ? "block" : "none";
+
+  if (currentMode === "R") {
     customerName.value = "";
   }
 
+  modalTitle.innerText =
+    action === "print"
+      ? "Print Details"
+      : "Send Details";
+
   printModal.style.display = "flex";
+}
+
+printBtn.addEventListener("click", () => {
+  openModal("print");
+});
+
+sendBtn.addEventListener("click", () => {
+  openModal("send");
 });
 
 cancelPrint.addEventListener("click", () => {
   printModal.style.display = "none";
 });
 
+/* ================================
+   PRINT
+================================ */
 confirmPrint.addEventListener("click", () => {
   if (currentMode === "W" && !customerName.value.trim()) {
     alert("Please enter customer name");
@@ -539,9 +526,6 @@ confirmPrint.addEventListener("click", () => {
   generatePrint();
 });
 
-/* ================================
-   GENERATE PRINT
-================================ */
 function generatePrint() {
   const displayDate =
     formatDisplayDate(printDate.value);
@@ -563,27 +547,19 @@ function generatePrint() {
     `;
   });
 
+  const customerHeading =
+    currentMode === "W"
+      ? `<div class="print-customer">${customerName.value.trim()}</div>`
+      : "";
+
   const wholesaleExtras =
     currentMode === "W"
       ? `
-        <div class="print-balance">
-          Balance HV
-        </div>
+        <div class="print-balance">Balance HV</div>
 
-        <div class="signature-box">
-          <div class="signature-line"></div>
-          <div class="signature-label">
-            Receiver Signature
-          </div>
-        </div>
-      `
-      : "";
-
-  const customerHeading =
-    currentMode === "W"
-      ? `
-        <div class="print-customer">
-          ${customerName.value.trim()}
+        <div class="receiver-name-box">
+          <div class="receiver-line"></div>
+          <div class="receiver-label">Receiver’s Name</div>
         </div>
       `
       : "";
@@ -591,8 +567,9 @@ function generatePrint() {
   printInvoice.innerHTML = `
     <div class="print-wrapper">
 
-      <div class="print-date">
-        ${displayDate}
+      <div class="print-top">
+        <div>${displayDate}</div>
+        <div>${serialNumber.value.trim()}</div>
       </div>
 
       ${customerHeading}
@@ -623,6 +600,17 @@ function generatePrint() {
   `;
 
   printModal.style.display = "none";
-
   window.print();
 }
+
+/* ================================
+   SEND PLACEHOLDER
+================================ */
+confirmSend.addEventListener("click", () => {
+  if (currentMode === "W" && !customerName.value.trim()) {
+    alert("Please enter customer name");
+    return;
+  }
+
+  alert("Firebase send integration coming next.");
+});
