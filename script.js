@@ -6,7 +6,9 @@ import {
   onSnapshot,
   deleteDoc,
   doc,
-  serverTimestamp
+  serverTimestamp,
+  query,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* ================================
@@ -24,13 +26,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const billsCollection = collection(db, "bills");
+const billsQuery = query(
+  billsCollection,
+  orderBy("createdAt", "asc")
+);
 
 /* ================================
-   GLOBAL STATE
+   STATE
 ================================ */
 let products = [];
 let billItems = [];
 let currentMode = "W";
+let currentAction = "print";
+let incomingBillCache = {};
 
 /* ================================
    DOM
@@ -63,8 +71,6 @@ const confirmSend = document.getElementById("confirmSend");
 const printInvoice = document.getElementById("printInvoice");
 const incomingBills = document.getElementById("incomingBills");
 
-let currentAction = "print";
-
 /* ================================
    DATE
 ================================ */
@@ -73,6 +79,7 @@ function setTodayDate() {
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, "0");
   const dd = String(today.getDate()).padStart(2, "0");
+
   printDate.value = `${yyyy}-${mm}-${dd}`;
 }
 
@@ -91,7 +98,9 @@ function normalize(text) {
 }
 
 function tokenize(text) {
-  return normalize(text).split(" ").filter(Boolean);
+  return normalize(text)
+    .split(" ")
+    .filter(Boolean);
 }
 
 function formatDisplayDate(dateString) {
@@ -137,7 +146,7 @@ fetch("productList.json")
   });
 
 /* ================================
-   SEARCH ENGINE
+   SEARCH
 ================================ */
 const synonyms = {
   bucket: ["balti", "baldi"],
@@ -161,8 +170,10 @@ function expandQuery(query) {
   const words = tokenize(query);
   let expanded = [...words];
 
-  words.forEach(w => {
-    if (synonyms[w]) expanded.push(...synonyms[w]);
+  words.forEach(word => {
+    if (synonyms[word]) {
+      expanded.push(...synonyms[word]);
+    }
   });
 
   return [...new Set(expanded)];
@@ -217,8 +228,8 @@ function scoreProduct(product, queryTokens, rawQuery) {
     let best = 0;
 
     product.searchableTokens.forEach(productToken => {
-      const s = tokenScore(queryToken, productToken);
-      if (s > best) best = s;
+      const score = tokenScore(queryToken, productToken);
+      if (score > best) best = score;
     });
 
     score += best;
@@ -227,8 +238,8 @@ function scoreProduct(product, queryTokens, rawQuery) {
   return score;
 }
 
-function searchProducts(query) {
-  const clean = normalize(query);
+function searchProducts(queryText) {
+  const clean = normalize(queryText);
   if (!clean) return [];
 
   const queryTokens = expandQuery(clean);
@@ -238,10 +249,10 @@ function searchProducts(query) {
       product,
       score: scoreProduct(product, queryTokens, clean)
     }))
-    .filter(r => r.score > 0)
+    .filter(result => result.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, 8)
-    .map(r => r.product);
+    .map(result => result.product);
 }
 
 /* ================================
@@ -296,21 +307,23 @@ function renderSuggestions(results) {
 }
 
 searchBox.addEventListener("input", e => {
-  const val = e.target.value;
-  clearSearch.style.display = val ? "flex" : "none";
+  const value = e.target.value;
 
-  if (!val.trim()) {
+  clearSearch.style.display = value ? "flex" : "none";
+
+  if (!value.trim()) {
     suggestions.innerHTML = "";
     return;
   }
 
-  renderSuggestions(searchProducts(val));
+  renderSuggestions(searchProducts(value));
 });
 
 clearSearch.addEventListener("click", () => {
   searchBox.value = "";
   suggestions.innerHTML = "";
   clearSearch.style.display = "none";
+  searchBox.focus();
 });
 
 /* ================================
@@ -394,6 +407,7 @@ function renderBill() {
 
         <div class="bill-bottom">
           <div class="line-total">₹${item.total.toFixed(2)}</div>
+
           <button
             class="delete-btn"
             onclick="deleteItem(${index})"
@@ -412,6 +426,7 @@ window.updatePrice = function(index, value) {
   billItems[index].price = parseFloat(value) || 0;
   billItems[index].total =
     billItems[index].price * billItems[index].qty;
+
   renderBill();
   updateGrandTotal();
 };
@@ -420,6 +435,7 @@ window.updateQty = function(index, value) {
   billItems[index].qty = parseFloat(value) || 0;
   billItems[index].total =
     billItems[index].price * billItems[index].qty;
+
   renderBill();
   updateGrandTotal();
 };
@@ -440,7 +456,7 @@ function updateGrandTotal() {
 }
 
 /* ================================
-   MODE TOGGLE
+   MODE
 ================================ */
 modeToggle.addEventListener("click", () => {
   if (currentMode === "W") {
@@ -452,11 +468,29 @@ modeToggle.addEventListener("click", () => {
     modeToggle.innerText = "W";
     modeToggle.style.background = "#2f3f64";
   }
+
+  if (searchBox.value.trim()) {
+    renderSuggestions(searchProducts(searchBox.value));
+  }
 });
 
 /* ================================
    MODAL
 ================================ */
+function validateBillInputs() {
+  if (!serialNumber.value.trim()) {
+    alert("Enter serial number");
+    return false;
+  }
+
+  if (currentMode === "W" && !customerName.value.trim()) {
+    alert("Enter customer name");
+    return false;
+  }
+
+  return true;
+}
+
 function openModal(action) {
   if (!billItems.length) return;
 
@@ -465,6 +499,10 @@ function openModal(action) {
 
   customerGroup.style.display =
     currentMode === "W" ? "block" : "none";
+
+  if (currentMode === "R") {
+    customerName.value = "";
+  }
 
   modalTitle.innerText =
     action === "print"
@@ -508,7 +546,6 @@ function buildPrintHTML(billData) {
     billData.mode === "W"
       ? `
         <div class="print-balance">Balance HV</div>
-
         <div class="receiver-name-box">
           <div class="receiver-line"></div>
           <div class="receiver-label">Receiver’s Name</div>
@@ -518,7 +555,6 @@ function buildPrintHTML(billData) {
 
   return `
     <div class="print-wrapper">
-
       <div class="print-top">
         <div>${formatDisplayDate(billData.date)}</div>
         <div>${billData.serialNumber}</div>
@@ -547,7 +583,6 @@ function buildPrintHTML(billData) {
       </div>
 
       ${wholesaleExtras}
-
     </div>
   `;
 }
@@ -556,10 +591,7 @@ function buildPrintHTML(billData) {
    LOCAL PRINT
 ================================ */
 confirmPrint.addEventListener("click", () => {
-  if (currentMode === "W" && !customerName.value.trim()) {
-    alert("Enter customer name");
-    return;
-  }
+  if (!validateBillInputs()) return;
 
   const grandTotal = billItems.reduce(
     (sum, item) => sum + item.total,
@@ -587,13 +619,10 @@ confirmPrint.addEventListener("click", () => {
 });
 
 /* ================================
-   SEND TO FIREBASE
+   SEND
 ================================ */
 confirmSend.addEventListener("click", async () => {
-  if (currentMode === "W" && !customerName.value.trim()) {
-    alert("Enter customer name");
-    return;
-  }
+  if (!validateBillInputs()) return;
 
   const grandTotal = billItems.reduce(
     (sum, item) => sum + item.total,
@@ -619,9 +648,16 @@ confirmSend.addEventListener("click", async () => {
   try {
     await addDoc(billsCollection, billData);
 
-    printModal.style.display = "none";
-    alert("Bill sent successfully.");
+    billItems = [];
+    renderBill();
+    updateGrandTotal();
 
+    printModal.style.display = "none";
+
+    customerName.value = "";
+    serialNumber.value = "";
+
+    alert("Bill sent successfully.");
   } catch (err) {
     alert("Failed to send bill. Check internet.");
     console.error(err);
@@ -629,18 +665,24 @@ confirmSend.addEventListener("click", async () => {
 });
 
 /* ================================
-   RECEIVER LISTENER
+   RECEIVER
 ================================ */
-onSnapshot(billsCollection, snapshot => {
-  if (snapshot.empty) {
-    incomingBills.innerHTML = "";
+function renderIncomingBills() {
+  const ids = Object.keys(incomingBillCache);
+
+  if (!ids.length) {
+    incomingBills.innerHTML = `
+      <div class="receiver-subtitle">
+        No incoming bills
+      </div>
+    `;
     return;
   }
 
   let html = "";
 
-  snapshot.forEach(docSnap => {
-    const bill = docSnap.data();
+  ids.forEach(id => {
+    const bill = incomingBillCache[id];
 
     html += `
       <div class="bill-card">
@@ -660,14 +702,14 @@ onSnapshot(billsCollection, snapshot => {
         <div class="action-buttons" style="margin-top:14px;">
           <button
             class="primary-btn"
-            onclick="printReceivedBill('${docSnap.id}')"
+            onclick="printReceivedBill('${id}')"
           >
             Print
           </button>
 
           <button
             class="send-btn"
-            onclick="deleteReceivedBill('${docSnap.id}')"
+            onclick="deleteReceivedBill('${id}')"
           >
             Done
           </button>
@@ -677,27 +719,24 @@ onSnapshot(billsCollection, snapshot => {
   });
 
   incomingBills.innerHTML = html;
+}
+
+onSnapshot(billsQuery, snapshot => {
+  incomingBillCache = {};
+
+  snapshot.forEach(docSnap => {
+    incomingBillCache[docSnap.id] = docSnap.data();
+  });
+
+  renderIncomingBills();
 });
 
-/* ================================
-   RECEIVER ACTIONS
-================================ */
-window.printReceivedBill = async function(docId) {
-  const snapshotListener = await fetch();
+window.printReceivedBill = function(docId) {
+  const bill = incomingBillCache[docId];
+  if (!bill) return;
 
-  const billCard = [...document.querySelectorAll(".bill-card")];
-
-  // print directly from firestore listener cache
-  onSnapshot(billsCollection, snap => {
-    snap.forEach(docSnap => {
-      if (docSnap.id === docId) {
-        printInvoice.innerHTML =
-          buildPrintHTML(docSnap.data());
-
-        window.print();
-      }
-    });
-  });
+  printInvoice.innerHTML = buildPrintHTML(bill);
+  window.print();
 };
 
 window.deleteReceivedBill = async function(docId) {
