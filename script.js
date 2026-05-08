@@ -476,7 +476,7 @@ function updateGrandTotal() {
     0
   );
 
-  grandTotalEl.innerText = `₹${total.toFixed(2)}`;
+  grandTotalEl.innerText = `₹${Math.round(total)}`;
 }
 
 /* ================================
@@ -524,11 +524,11 @@ function createBillData() {
     0
   );
 
-  return {
-    mode: currentMode,
-    date: printDate.value,
-    customerName: customerName.value.trim(),
-    grandTotal,
+ return {
+  mode: currentMode,
+  date: printDate.value,
+  customerName: customerName.value.trim(),
+  grandTotal: Math.round(grandTotal),
     status: "pending",
     serialNumber: null,
     items: billItems.map(item => ({
