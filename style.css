@@ -430,6 +430,9 @@ h1 {
   padding: 6mm;
   font-family: Arial, sans-serif;
   color: #000;
+}
+
+.receipt-copy {
   page-break-after: always;
 }
 
