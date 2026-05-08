@@ -1,10 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-  getFirestore,
+ getFirestore,
   collection,
   addDoc,
   onSnapshot,
-  deleteDoc,
   doc,
   serverTimestamp,
   query,
@@ -34,11 +33,12 @@ const billsQuery = query(
   orderBy("createdAt", "asc")
 );
 
-const serialDocRef = doc(
-  db,
-  "serialCounters",
-  "serials"
-);
+const serialDocRef = doc(db, "serialCounters", "serials");
+
+/* ================================
+   CONSTANTS
+================================ */
+const ADMIN_PASSWORD = "1110";
 
 /* ================================
    STATE
@@ -47,7 +47,8 @@ let products = [];
 let billItems = [];
 let currentMode = "W";
 let incomingBillCache = {};
-let isReceiverPrinting = false;
+
+let isReceiverBusy = false;
 let isSendingBill = false;
 
 /* ================================
@@ -65,7 +66,6 @@ const grandTotalEl = document.getElementById("grandTotal");
 const modeToggle = document.getElementById("modeToggle");
 const clearSearch = document.getElementById("clearSearch");
 
-const printBtn = document.getElementById("printBtn");
 const sendBtn = document.getElementById("sendBtn");
 
 const printModal = document.getElementById("printModal");
@@ -74,7 +74,6 @@ const printDate = document.getElementById("printDate");
 const customerName = document.getElementById("customerName");
 const customerGroup = document.getElementById("customerGroup");
 const cancelPrint = document.getElementById("cancelPrint");
-const confirmPrint = document.getElementById("confirmPrint");
 const confirmSend = document.getElementById("confirmSend");
 
 const printInvoice = document.getElementById("printInvoice");
@@ -133,6 +132,21 @@ function getMaterialClass(material) {
   if (material === "Copper") return "material-copper";
   if (material === "Kansa") return "material-kansa";
   return "";
+}
+
+function requireAdminPassword() {
+  const entered = prompt("Enter admin password");
+
+  if (entered === null) {
+    return false;
+  }
+
+  if (entered !== ADMIN_PASSWORD) {
+    alert("Incorrect password.");
+    return false;
+  }
+
+  return true;
 }
 
 /* ================================
@@ -335,7 +349,6 @@ function renderSuggestions(results) {
 
         <div class="badge-row">
           <div class="unit">${product.priceType || ""}</div>
-
           ${
             product.material
               ? `<div class="unit ${getMaterialClass(product.material)}">${product.material}</div>`
@@ -363,12 +376,14 @@ window.selectProduct = function(sr) {
     existing.qty += 1;
     existing.total = existing.qty * existing.price;
   } else {
+    const price = getCurrentPrice(product) || 0;
+
     billItems.push({
       product,
       mode: currentMode,
-      price: getCurrentPrice(product) || 0,
+      price,
       qty: 1,
-      total: getCurrentPrice(product) || 0
+      total: price
     });
   }
 
@@ -390,7 +405,6 @@ function renderBill() {
 
         <div class="badge-row">
           <div class="unit">${item.product.priceType || ""}</div>
-
           ${
             item.product.material
               ? `<div class="unit ${getMaterialClass(item.product.material)}">${item.product.material}</div>`
@@ -469,15 +483,20 @@ function updateGrandTotal() {
    MODAL
 ================================ */
 function validateBillInputs() {
+  if (!billItems.length) {
+    alert("Add at least one item.");
+    return false;
+  }
+
   if (currentMode === "W" && !customerName.value.trim()) {
-    alert("Enter customer name");
+    alert("Enter customer name.");
     return false;
   }
 
   return true;
 }
 
-function openModal(action) {
+function openSendModal() {
   if (!billItems.length) return;
 
   setTodayDate();
@@ -485,16 +504,12 @@ function openModal(action) {
   customerGroup.style.display =
     currentMode === "W" ? "block" : "none";
 
-  modalTitle.innerText =
-    action === "print"
-      ? "Print Details"
-      : "Send Details";
+  modalTitle.innerText = "Send Details";
 
   printModal.style.display = "flex";
 }
 
-printBtn.addEventListener("click", () => openModal("print"));
-sendBtn.addEventListener("click", () => openModal("send"));
+sendBtn.addEventListener("click", openSendModal);
 
 cancelPrint.addEventListener("click", () => {
   printModal.style.display = "none";
@@ -514,6 +529,8 @@ function createBillData() {
     date: printDate.value,
     customerName: customerName.value.trim(),
     grandTotal,
+    status: "pending",
+    serialNumber: null,
     items: billItems.map(item => ({
       productName: item.product.productName,
       material: item.product.material || "",
@@ -523,38 +540,76 @@ function createBillData() {
     }))
   };
 }
+
 /* ================================
-   SERIAL SYSTEM
+   SEND
 ================================ */
-async function getNextSerial(mode) {
-  return await runTransaction(db, async transaction => {
-    const snap = await transaction.get(serialDocRef);
+confirmSend.addEventListener("click", async () => {
+  if (isSendingBill) return;
+  if (!validateBillInputs()) return;
 
-    if (!snap.exists()) {
-      throw new Error("Serial counter document missing");
+  isSendingBill = true;
+
+  try {
+    const billData = createBillData();
+    billData.createdAt = serverTimestamp();
+
+    await addDoc(billsCollection, billData);
+
+    billItems = [];
+    renderBill();
+    updateGrandTotal();
+
+    customerName.value = "";
+    printModal.style.display = "none";
+
+    alert("Bill sent successfully.");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to send bill: " + err.message);
+  } finally {
+    isSendingBill = false;
+  }
+});
+/* ================================
+   SERIAL HELPERS
+================================ */
+function getModeKeys(mode) {
+  return {
+    counterKey: mode,
+    reusableKey: mode + "Reusable",
+    activeKey: mode + "Active"
+  };
+}
+
+function getLowestAvailableSerial(counter, reusable, active) {
+  const reusableSorted = [...reusable].sort((a, b) => a - b);
+
+  if (reusableSorted.length > 0) {
+    return {
+      serial: reusableSorted[0],
+      source: "reusable"
+    };
+  }
+
+  for (let i = 1; i <= 100; i++) {
+    const candidate = ((counter + i - 1) % 100) + 1;
+
+    if (!active.includes(candidate)) {
+      return {
+        serial: candidate,
+        source: "new"
+      };
     }
+  }
 
-    const data = snap.data();
-    let current = data[mode] || 0;
-
-    let next = current + 1;
-
-    if (next > 100) {
-      next = 1;
-    }
-
-    transaction.update(serialDocRef, {
-      [mode]: next
-    });
-
-    return next;
-  });
+  return null;
 }
 
 /* ================================
    PRINT ENGINE
 ================================ */
-function buildSingleCopy(billData, label, serialNumber) {
+function buildSingleCopy(billData, label) {
   let rows = "";
 
   billData.items.forEach(item => {
@@ -591,7 +646,7 @@ function buildSingleCopy(billData, label, serialNumber) {
 
       <div class="print-header-row">
         <div class="print-customer">${title}</div>
-        <div class="print-serial">${serialNumber}</div>
+        <div class="print-serial">#${billData.serialNumber}</div>
       </div>
 
       <div class="print-date">${formatDisplayDate(billData.date)}</div>
@@ -606,7 +661,6 @@ function buildSingleCopy(billData, label, serialNumber) {
             <th>Amt</th>
           </tr>
         </thead>
-
         <tbody>
           ${rows}
         </tbody>
@@ -621,66 +675,17 @@ function buildSingleCopy(billData, label, serialNumber) {
   `;
 }
 
-function buildPrintHTML(billData, serialNumber) {
+function buildPrintHTML(billData) {
   return `
-    ${buildSingleCopy(billData, "CUSTOMER COPY", serialNumber)}
-    ${buildSingleCopy(billData, "OFFICE COPY", serialNumber)}
+    ${buildSingleCopy(billData, "CUSTOMER COPY")}
+    ${buildSingleCopy(billData, "OFFICE COPY")}
   `;
 }
 
-/* ================================
-   LOCAL PRINT
-================================ */
-confirmPrint.addEventListener("click", () => {
-  if (!validateBillInputs()) return;
-
-  const billData = createBillData();
-
-  printInvoice.innerHTML = buildPrintHTML(
-    billData,
-    ""
-  );
-
-  printModal.style.display = "none";
-
-  customerName.value = "";
-  billItems = [];
-  renderBill();
-  updateGrandTotal();
-
+function printBillData(billData) {
+  printInvoice.innerHTML = buildPrintHTML(billData);
   window.print();
-});
-/* ================================
-   SEND
-================================ */
-confirmSend.addEventListener("click", async () => {
-  if (isSendingBill) return;
-  if (!validateBillInputs()) return;
-
-  isSendingBill = true;
-
-  const billData = createBillData();
-  billData.createdAt = serverTimestamp();
-
-  try {
-    await addDoc(billsCollection, billData);
-
-    billItems = [];
-    renderBill();
-    updateGrandTotal();
-
-    customerName.value = "";
-
-    printModal.style.display = "none";
-
-    alert("Bill sent successfully.");
-  } catch (err) {
-    console.error(err);
-    alert("Failed to send bill.");
-  } finally {
-    isSendingBill = false;
-  }
-});
+}
 
 /* ================================
    RECEIVER UI
@@ -702,6 +707,49 @@ function renderIncomingBills() {
   ids.forEach(id => {
     const bill = incomingBillCache[id];
 
+    let buttons = "";
+
+    if (bill.status === "pending") {
+      buttons = `
+        <button
+          class="primary-btn"
+          onclick="printReceivedBill('${id}')"
+        >
+          Print
+        </button>
+
+        <button
+          class="delete-btn"
+          onclick="deleteReceivedBill('${id}')"
+        >
+          Delete
+        </button>
+      `;
+    } else {
+      buttons = `
+        <button
+          class="primary-btn"
+          onclick="reprintReceivedBill('${id}')"
+        >
+          Reprint
+        </button>
+
+        <button
+          class="send-btn"
+          onclick="doneReceivedBill('${id}')"
+        >
+          Done
+        </button>
+
+        <button
+          class="delete-btn"
+          onclick="deleteReceivedBill('${id}')"
+        >
+          Delete
+        </button>
+      `;
+    }
+
     html += `
       <div class="bill-card">
         <div class="bill-title">
@@ -720,6 +768,12 @@ function renderIncomingBills() {
           <div class="unit">
             ${bill.mode}
           </div>
+
+          ${
+            bill.serialNumber
+              ? `<div class="unit">#${bill.serialNumber}</div>`
+              : ""
+          }
         </div>
 
         <div style="margin-top:12px;font-weight:700;font-size:20px;">
@@ -727,19 +781,7 @@ function renderIncomingBills() {
         </div>
 
         <div class="action-buttons" style="margin-top:14px;">
-          <button
-            class="primary-btn"
-            onclick="printReceivedBill('${id}')"
-          >
-            Print
-          </button>
-
-          <button
-            class="delete-btn"
-            onclick="deleteReceivedBill('${id}')"
-          >
-            Delete
-          </button>
+          ${buttons}
         </div>
       </div>
     `;
@@ -762,48 +804,243 @@ onSnapshot(billsQuery, snapshot => {
 });
 
 /* ================================
-   RECEIVER PRINT
+   RECEIVER ACTIONS
 ================================ */
 window.printReceivedBill = async function(docId) {
-  if (isReceiverPrinting) return;
-
-  isReceiverPrinting = true;
+  if (isReceiverBusy) return;
+  isReceiverBusy = true;
 
   try {
- const bill = incomingBillCache[docId];
-if (!bill) return;
+    const billRef = doc(db, "bills", docId);
 
-const serialNumber = await getNextSerial(bill.mode);
+    const finalBill = await runTransaction(db, async transaction => {
+      const billSnap = await transaction.get(billRef);
 
-delete incomingBillCache[docId];
-renderIncomingBills();
+      if (!billSnap.exists()) {
+        throw new Error("Bill not found.");
+      }
 
-printInvoice.innerHTML = buildPrintHTML(
-  bill,
-  serialNumber
+      const bill = billSnap.data();
+
+      if (bill.status !== "pending") {
+        throw new Error("Bill already processed.");
+      }
+
+      const serialSnap = await transaction.get(serialDocRef);
+
+      if (!serialSnap.exists()) {
+        throw new Error("Serial document missing.");
+      }
+
+    const serialData = serialSnap.data();
+const keys = getModeKeys(bill.mode);
+
+const counter = serialData[keys.counterKey] || 0;
+
+const active = [
+  ...new Set(serialData[keys.activeKey] || [])
+];
+
+let reusable = [
+  ...new Set(serialData[keys.reusableKey] || [])
+];
+
+reusable = reusable.filter(
+  s => !active.includes(s)
 );
+      const allocation = getLowestAvailableSerial(
+        counter,
+        reusable,
+        active
+      );
 
-window.print();
+      if (!allocation) {
+        throw new Error("No serials available.");
+      }
 
-await deleteDoc(doc(db, "bills", docId));
+      let nextReusable = [...reusable];
+      let nextActive = [...active, allocation.serial];
+      let updates = {
+        [keys.activeKey]: nextActive
+      };
+
+      if (allocation.source === "reusable") {
+        nextReusable = reusable.filter(
+          s => s !== allocation.serial
+        );
+
+        updates[keys.reusableKey] = nextReusable;
+      } else {
+        updates[keys.counterKey] = allocation.serial;
+      }
+
+      transaction.update(serialDocRef, updates);
+
+      transaction.update(billRef, {
+        status: "printed",
+        serialNumber: allocation.serial
+      });
+
+      return {
+        ...bill,
+        status: "printed",
+        serialNumber: allocation.serial
+      };
+    });
+
+    printBillData(finalBill);
   } catch (err) {
     console.error(err);
-  alert("Failed to print: " + err.message);
+    alert("Failed to print: " + err.message);
   } finally {
-    isReceiverPrinting = false;
+    isReceiverBusy = false;
   }
 };
 
-/* ================================
-   RECEIVER DELETE
-================================ */
-window.deleteReceivedBill = async function(docId) {
-  if (isReceiverPrinting) return;
+window.reprintReceivedBill = async function(docId) {
+  if (isReceiverBusy) return;
+  isReceiverBusy = true;
 
   try {
-    await deleteDoc(doc(db, "bills", docId));
+    const bill = incomingBillCache[docId];
+
+    if (!bill) {
+      throw new Error("Bill not found.");
+    }
+
+    if (bill.status !== "printed") {
+      throw new Error("Bill not printed yet.");
+    }
+
+    printBillData(bill);
   } catch (err) {
     console.error(err);
-    alert("Failed to delete bill.");
+    alert("Failed to reprint: " + err.message);
+  } finally {
+    isReceiverBusy = false;
+  }
+};
+
+window.doneReceivedBill = async function(docId) {
+  if (isReceiverBusy) return;
+  if (!requireAdminPassword()) return;
+
+  isReceiverBusy = true;
+
+  try {
+    const billRef = doc(db, "bills", docId);
+
+    await runTransaction(db, async transaction => {
+      const billSnap = await transaction.get(billRef);
+
+      if (!billSnap.exists()) {
+        throw new Error("Bill not found.");
+      }
+
+      const bill = billSnap.data();
+
+      if (bill.status !== "printed" || !bill.serialNumber) {
+        throw new Error("Bill not eligible for completion.");
+      }
+
+      const serialSnap = await transaction.get(serialDocRef);
+
+      if (!serialSnap.exists()) {
+        throw new Error("Serial document missing.");
+      }
+
+      const serialData = serialSnap.data();
+      const keys = getModeKeys(bill.mode);
+
+     let active = [
+  ...new Set(serialData[keys.activeKey] || [])
+];
+      active = active.filter(
+        s => s !== bill.serialNumber
+      );
+
+      transaction.update(serialDocRef, {
+        [keys.activeKey]: active
+      });
+
+      transaction.delete(billRef);
+    });
+  } catch (err) {
+    console.error(err);
+    alert("Failed to complete bill: " + err.message);
+  } finally {
+    isReceiverBusy = false;
+  }
+};
+
+window.deleteReceivedBill = async function(docId) {
+  if (isReceiverBusy) return;
+  if (!requireAdminPassword()) return;
+
+  isReceiverBusy = true;
+
+  try {
+    const billRef = doc(db, "bills", docId);
+
+    await runTransaction(db, async transaction => {
+      const billSnap = await transaction.get(billRef);
+
+      if (!billSnap.exists()) {
+        throw new Error("Bill not found.");
+      }
+
+      const bill = billSnap.data();
+
+      if (bill.status === "pending") {
+        transaction.delete(billRef);
+        return;
+      }
+
+      if (!bill.serialNumber) {
+        throw new Error("Invalid printed bill.");
+      }
+
+      const serialSnap = await transaction.get(serialDocRef);
+
+      if (!serialSnap.exists()) {
+        throw new Error("Serial document missing.");
+      }
+
+      const serialData = serialSnap.data();
+      const keys = getModeKeys(bill.mode);
+
+     let active = [
+  ...new Set(serialData[keys.activeKey] || [])
+];
+
+let reusable = [
+  ...new Set(serialData[keys.reusableKey] || [])
+];
+
+reusable = reusable.filter(
+  s => !active.includes(s)
+);
+
+      active = active.filter(
+        s => s !== bill.serialNumber
+      );
+
+      if (!reusable.includes(bill.serialNumber)) {
+        reusable.push(bill.serialNumber);
+        reusable.sort((a, b) => a - b);
+      }
+
+      transaction.update(serialDocRef, {
+        [keys.activeKey]: active,
+        [keys.reusableKey]: reusable
+      });
+
+      transaction.delete(billRef);
+    });
+  } catch (err) {
+    console.error(err);
+    alert("Failed to delete bill: " + err.message);
+  } finally {
+    isReceiverBusy = false;
   }
 };
