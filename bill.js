@@ -1,195 +1,578 @@
+/* ================================
+   GLOBAL STATE
+================================ */
 let products = [];
 let billItems = [];
-let customerType = "";
+let currentMode = "W";
 
-// ELEMENTS
-const btnW = document.getElementById("btnW");
-const btnR = document.getElementById("btnR");
-const printBtn = document.getElementById("printBtn");
-const productSearch = document.getElementById("productSearch");
-const searchResults = document.getElementById("searchResults");
-const billItemsContainer = document.getElementById("billItems");
+/* ================================
+   DOM
+================================ */
+const searchBox = document.getElementById("searchBox");
+const suggestions = document.getElementById("suggestions");
+const billItemsDiv = document.getElementById("billItems");
 const grandTotalEl = document.getElementById("grandTotal");
+const modeToggle = document.getElementById("modeToggle");
+const clearSearch = document.getElementById("clearSearch");
+const printBtn = document.getElementById("printBtn");
+const printInvoice = document.getElementById("printInvoice");
 
-const billNumber = document.getElementById("billNumber");
-const customerName = document.getElementById("customerName");
-const billDate = document.getElementById("billDate");
-const billNotes = document.getElementById("billNotes");
-
-// AUTO DATE
-billDate.valueAsDate = new Date();
-
-// LOAD PRODUCTS
-fetch("productList.json")
-  .then(r => r.json())
-  .then(d => products = d);
-
-// CUSTOMER TYPE
-btnW.onclick = () => setType("W");
-btnR.onclick = () => setType("R");
-
-function setType(t) {
-  customerType = t;
-  btnW.classList.toggle("active", t === "W");
-  btnR.classList.toggle("active", t === "R");
-  productSearch.disabled = false;
-  productSearch.focus();
+/* ================================
+   NORMALIZE
+================================ */
+function normalize(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
-// SEARCH
-productSearch.oninput = () => {
-  const q = productSearch.value.toLowerCase();
-  searchResults.innerHTML = "";
-  if (!q) return;
+/* ================================
+   TOKENIZE
+================================ */
+function tokenize(text) {
+  return normalize(text)
+    .split(" ")
+    .filter(Boolean);
+}
 
-  products
-    .filter(p => p.productName.toLowerCase().includes(q))
-    .slice(0, 10)
-    .forEach(p => {
-      const d = document.createElement("div");
-      d.textContent = p.productName;
-      d.className = "search-item";
-      d.onclick = () => addItem(p);
-      searchResults.appendChild(d);
+/* ================================
+   LOAD DATA
+================================ */
+fetch("productList.json")
+  .then(res => res.json())
+  .then(data => {
+    products = data.map(product => {
+      const searchableText = normalize(
+        product.productName +
+        " " +
+        (product.material || "")
+      );
+
+      return {
+        ...product,
+        searchableText,
+        searchableTokens: tokenize(searchableText)
+      };
     });
+  });
+
+/* ================================
+   SYNONYMS
+================================ */
+const synonyms = {
+  bucket: ["balti", "baldi"],
+  balti: ["bucket"],
+  baldi: ["bucket"],
+
+  thal: ["thaal", "thali", "thaali"],
+  thaal: ["thal", "thali", "thaali"],
+  thali: ["thal", "thaal", "thaali"],
+  thaali: ["thal", "thaal", "thali"],
+
+  hammer: ["mathar"],
+  hammered: ["mathar"],
+  mathar: ["hammer"],
+
+  rice: ["biryani"],
+  biryani: ["rice"],
+
+  kansa: ["bronze"],
+  bronze: ["kansa"],
+
+  katora: ["waati", "wati", "vaati", "vati"],
+  waati: ["katora", "wati", "vaati", "vati"],
+  wati: ["katora", "waati", "vaati", "vati"],
+  vaati: ["katora", "waati", "wati", "vati"],
+  vati: ["katora", "waati", "wati", "vaati"],
+
+  box: ["dabba"],
+  dabba: ["box"],
+
+  masala: ["spice"],
+  spice: ["masala"],
+
+  kalchul: ["ladle"],
+  ladle: ["kalchul"]
 };
 
-// ADD ITEM
-function addItem(p) {
-  billItems.push({
-    product: p,
-    price: customerType === "W" ? p.wPrice : p.rPrice,
-    qty: "",
-    total: 0
+/* ================================
+   EXPAND QUERY
+================================ */
+function expandQuery(query) {
+  const words = tokenize(query);
+  let expanded = [...words];
+
+  words.forEach(w => {
+    if (synonyms[w]) {
+      expanded.push(...synonyms[w]);
+    }
   });
 
-  productSearch.value = "";
-  searchResults.innerHTML = "";
-  render();
+  return [...new Set(expanded)];
 }
 
-// RENDER BILL
-function render() {
-  billItemsContainer.innerHTML = "";
+/* ================================
+   LEVENSHTEIN
+================================ */
+function levenshtein(a, b) {
+  if (a === b) return 0;
 
-  billItems.forEach((i, idx) => {
-    const row = document.createElement("div");
-    row.className = "bill-row";
+  const matrix = [];
 
-    const isKg = i.product.priceType === "KG";
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
 
-    row.innerHTML = `
-      <div class="bill-row-header">${i.product.productName}</div>
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
 
-      <div class="bill-inputs">
-        <input 
-          type="number"
-          placeholder="Price" 
-          value="${i.price}"
-        />
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
 
-        <input 
-          type="text"
-          placeholder="${isKg ? "Kg" : "Qty"}"
-          inputmode="${isKg ? "decimal" : "numeric"}"
-          pattern="${isKg ? "[0-9]*[.,]?[0-9]*" : "[0-9]*"}"
-          value="${i.qty}"
-        />
+  return matrix[b.length][a.length];
+}
+
+/* ================================
+   TOKEN SCORE
+================================ */
+function tokenScore(queryToken, productToken) {
+  if (queryToken === productToken) return 100;
+
+  if (productToken.startsWith(queryToken)) return 40;
+
+  if (productToken.includes(queryToken)) return 25;
+
+  if (queryToken.length <= 2) return 0;
+
+  const distance = levenshtein(queryToken, productToken);
+
+  if (distance === 1) return 18;
+
+  if (distance === 2 && queryToken.length >= 5) return 10;
+
+  return 0;
+}
+
+/* ================================
+   SCORE PRODUCT
+================================ */
+function scoreProduct(product, queryTokens, rawQuery) {
+  let score = 0;
+  const productTokens = product.searchableTokens;
+
+  if (product.searchableText === rawQuery) {
+    score += 500;
+  }
+
+  if (product.searchableText.includes(rawQuery)) {
+    score += 120;
+  }
+
+  queryTokens.forEach(queryToken => {
+    let bestTokenScore = 0;
+
+    productTokens.forEach(productToken => {
+      const currentScore =
+        tokenScore(queryToken, productToken);
+
+      if (currentScore > bestTokenScore) {
+        bestTokenScore = currentScore;
+      }
+    });
+
+    score += bestTokenScore;
+  });
+
+  if (
+    product.material &&
+    queryTokens.includes(normalize(product.material))
+  ) {
+    score += 35;
+  }
+
+  return score;
+}
+
+/* ================================
+   SEARCH
+================================ */
+function searchProducts(query) {
+  const clean = normalize(query);
+
+  if (!clean) return [];
+
+  const queryTokens = expandQuery(clean);
+
+  return products
+    .map(product => ({
+      product,
+      score: scoreProduct(
+        product,
+        queryTokens,
+        clean
+      )
+    }))
+    .filter(result => result.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 8)
+    .map(result => result.product);
+}
+
+/* ================================
+   MATERIAL BADGE CLASS
+================================ */
+function getMaterialClass(material) {
+  if (material === "Brass") return "material-brass";
+  if (material === "Copper") return "material-copper";
+  if (material === "Kansa") return "material-kansa";
+  return "";
+}
+
+/* ================================
+   CURRENT PRICE
+================================ */
+function getCurrentPrice(product) {
+  return currentMode === "W"
+    ? product.wPrice
+    : product.rPrice;
+}
+
+/* ================================
+   RENDER SUGGESTIONS
+================================ */
+function renderSuggestions(results) {
+  if (!results.length) {
+    suggestions.innerHTML = "";
+    return;
+  }
+
+  let html = "";
+
+  results.forEach(product => {
+    const materialClass =
+      getMaterialClass(product.material);
+
+    html += `
+      <div
+        class="suggestion-card"
+        onclick="selectProduct(${product.sr})"
+      >
+        <div class="suggestion-top">
+          <div class="suggestion-name">
+            ${product.productName}
+          </div>
+
+          <div class="suggestion-price">
+            ₹${getCurrentPrice(product) || "-"}
+          </div>
+        </div>
+
+        <div class="badge-row">
+          <div class="unit ${product.priceType === "PP" ? "unit-pp" : ""}">
+            ${product.priceType || ""}
+          </div>
+
+          ${
+            product.material
+              ? `
+                <div class="unit material-badge ${materialClass}">
+                  ${product.material}
+                </div>
+              `
+              : ""
+          }
+        </div>
       </div>
-
-      <div class="line-total">${i.total}</div>
-      <button class="delete-btn">✕</button>
     `;
-
-    const priceInput = row.querySelectorAll("input")[0];
-    const qtyInput = row.querySelectorAll("input")[1];
-    const lineTotalEl = row.querySelector(".line-total");
-
-    priceInput.oninput = e => {
-      i.price = parseFloat(e.target.value) || 0;
-      updateLine(i, lineTotalEl);
-    };
-
-    qtyInput.oninput = e => {
-      const raw = e.target.value.replace(",", ".");
-      i.qty = raw;
-      updateLine(i, lineTotalEl);
-    };
-
-    row.querySelector("button").onclick = () => {
-      billItems.splice(idx, 1);
-      render();
-    };
-
-    billItemsContainer.appendChild(row);
   });
 
-  updateTotal();
+  suggestions.innerHTML = html;
 }
 
-// UPDATE LINE
-function updateLine(i, lineTotalEl) {
-  const price = parseFloat(i.price) || 0;
-  const qty = parseFloat(i.qty) || 0;
+/* ================================
+   SELECT PRODUCT
+================================ */
+function selectProduct(sr) {
+  const product = products.find(p => p.sr === sr);
 
-  i.total = Math.round(price * qty);
-  lineTotalEl.textContent = i.total;
+  if (!product) return;
 
-  updateTotal();
+  const existing = billItems.find(
+    item =>
+      item.product.sr === product.sr &&
+      item.mode === currentMode
+  );
+
+  if (existing) {
+    existing.qty += 1;
+    existing.total = existing.qty * existing.price;
+  } else {
+    billItems.push({
+      product,
+      mode: currentMode,
+      price: getCurrentPrice(product) || 0,
+      qty: 1,
+      total: getCurrentPrice(product) || 0
+    });
+  }
+
+  renderBill();
+  updateGrandTotal();
+
+  searchBox.value = "";
+  suggestions.innerHTML = "";
+  clearSearch.style.display = "none";
+  searchBox.focus();
 }
 
-// UPDATE GRAND TOTAL
-function updateTotal() {
-  const total = billItems.reduce((s, i) => s + i.total, 0);
-  grandTotalEl.textContent = total;
+/* ================================
+   RENDER BILL
+================================ */
+function renderBill() {
+  if (!billItems.length) {
+    billItemsDiv.innerHTML = "";
+    return;
+  }
+
+  let html = "";
+
+  billItems.forEach((item, index) => {
+    const materialClass =
+      getMaterialClass(item.product.material);
+
+    html += `
+      <div class="bill-card">
+
+        <div class="bill-title">
+          ${item.product.productName}
+        </div>
+
+        <div class="badge-row">
+          <div class="unit ${item.product.priceType === "PP" ? "unit-pp" : ""}">
+            ${item.product.priceType || ""}
+          </div>
+
+          ${
+            item.product.material
+              ? `
+                <div class="unit material-badge ${materialClass}">
+                  ${item.product.material}
+                </div>
+              `
+              : ""
+          }
+        </div>
+
+        <div class="input-row">
+
+          <div class="input-group">
+            <div class="input-label">Price</div>
+            <input
+              type="number"
+              class="bill-input"
+              value="${item.price}"
+              onchange="updatePrice(${index}, this.value)"
+            >
+          </div>
+
+          <div class="input-group">
+            <div class="input-label">Qty</div>
+            <input
+              type="number"
+              step="0.01"
+              class="bill-input"
+              value="${item.qty}"
+              onchange="updateQty(${index}, this.value)"
+            >
+          </div>
+
+        </div>
+
+        <div class="bill-bottom">
+          <div class="line-total">
+            ₹${item.total.toFixed(2)}
+          </div>
+
+          <button
+            class="delete-btn"
+            onclick="deleteItem(${index})"
+          >
+            Remove
+          </button>
+        </div>
+
+      </div>
+    `;
+  });
+
+  billItemsDiv.innerHTML = html;
 }
 
-// ================= PRINT / PDF =================
+/* ================================
+   UPDATE PRICE
+================================ */
+function updatePrice(index, value) {
+  billItems[index].price =
+    parseFloat(value) || 0;
 
-printBtn.onclick = () => {
-  const inv = document.getElementById("printInvoice");
+  billItems[index].total =
+    billItems[index].price *
+    billItems[index].qty;
 
-  const billNo = billNumber.value || "";
-  const cust = customerName.value || "";
-  const date = billDate.value;
-  const notes = billNotes.value;
+  renderBill();
+  updateGrandTotal();
+}
 
-  let rows = billItems.map((i, idx) => `
-    <tr>
-      <td>${idx + 1}</td>
-      <td>${i.product.productName}</td>
-      <td class="num">${i.price}</td>
-      <td class="num">${i.qty}</td>
-      <td class="num">${i.total}</td>
-    </tr>
-  `).join("");
+/* ================================
+   UPDATE QTY
+================================ */
+function updateQty(index, value) {
+  billItems[index].qty =
+    parseFloat(value) || 0;
 
-  inv.innerHTML = `
-    <div class="invoice-title">HV</div>
+  billItems[index].total =
+    billItems[index].price *
+    billItems[index].qty;
 
-    <div class="invoice-header-line">
-      Bill No: ${billNo} &nbsp;&nbsp; | &nbsp;&nbsp;
-      Customer: ${cust} &nbsp;&nbsp; | &nbsp;&nbsp;
-      Date: ${date}
-    </div>
+  renderBill();
+  updateGrandTotal();
+}
 
-    <table>
+/* ================================
+   DELETE
+================================ */
+function deleteItem(index) {
+  billItems.splice(index, 1);
+  renderBill();
+  updateGrandTotal();
+}
+
+/* ================================
+   GRAND TOTAL
+================================ */
+function updateGrandTotal() {
+  const total = billItems.reduce(
+    (sum, item) => sum + item.total,
+    0
+  );
+
+  grandTotalEl.innerText =
+    `₹${total.toFixed(2)}`;
+}
+
+/* ================================
+   MODE TOGGLE
+================================ */
+modeToggle.addEventListener("click", () => {
+  if (currentMode === "W") {
+    currentMode = "R";
+    modeToggle.innerText = "R";
+    modeToggle.style.background = "#d65353";
+  } else {
+    currentMode = "W";
+    modeToggle.innerText = "W";
+    modeToggle.style.background = "#2f3f64";
+  }
+
+  suggestions.innerHTML = "";
+
+  if (searchBox.value.trim()) {
+    renderSuggestions(
+      searchProducts(searchBox.value)
+    );
+  }
+});
+
+/* ================================
+   SEARCH INPUT
+================================ */
+searchBox.addEventListener("input", e => {
+  const val = e.target.value;
+
+  clearSearch.style.display =
+    val ? "flex" : "none";
+
+  if (!val.trim()) {
+    suggestions.innerHTML = "";
+    return;
+  }
+
+  renderSuggestions(
+    searchProducts(val)
+  );
+});
+
+/* ================================
+   CLEAR SEARCH
+================================ */
+clearSearch.addEventListener("click", () => {
+  searchBox.value = "";
+  suggestions.innerHTML = "";
+  clearSearch.style.display = "none";
+  searchBox.focus();
+});
+
+/* ================================
+   PRINT
+================================ */
+printBtn.addEventListener("click", () => {
+  if (!billItems.length) return;
+
+  let rows = "";
+  let grandTotal = 0;
+
+  billItems.forEach(item => {
+    grandTotal += item.total;
+
+    rows += `
       <tr>
-        <th>Sr.</th>
-        <th>Item</th>
-        <th class="num">Rate</th>
-        <th class="num">Qty</th>
-        <th class="num">Amount</th>
+        <td>${item.product.productName}</td>
+        <td>${item.product.material || "-"}</td>
+        <td>${item.qty}</td>
+        <td>₹${item.price}</td>
+        <td>₹${item.total.toFixed(2)}</td>
       </tr>
-      ${rows}
+    `;
+  });
+
+  printInvoice.innerHTML = `
+    <h1>Invoice</h1>
+
+    <table border="1" cellspacing="0" cellpadding="8" width="100%">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Material</th>
+          <th>Qty</th>
+          <th>Rate</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        ${rows}
+      </tbody>
     </table>
 
-    <div class="invoice-total">
-      Total: ${grandTotalEl.textContent}
-    </div>
-
-    ${notes ? `<div class="invoice-notes">Notes: ${notes}</div>` : ""}
+    <h2 style="text-align:right;">
+      Grand Total: ₹${grandTotal.toFixed(2)}
+    </h2>
   `;
 
   window.print();
-};
+});
