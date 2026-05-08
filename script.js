@@ -290,10 +290,12 @@ clearSearch.addEventListener("click", () => {
   clearSearch.style.display = "none";
 });
 
-/* ================================
-   BILL
-================================ */
 function renderSuggestions(results) {
+  if (!results.length) {
+    suggestions.innerHTML = "";
+    return;
+  }
+
   let html = "";
 
   results.forEach(product => {
@@ -302,6 +304,16 @@ function renderSuggestions(results) {
         <div class="suggestion-top">
           <div class="suggestion-name">${product.productName}</div>
           <div class="suggestion-price">₹${getCurrentPrice(product) || "-"}</div>
+        </div>
+
+        <div class="badge-row">
+          <div class="unit">${product.priceType || ""}</div>
+
+          ${
+            product.material
+              ? `<div class="unit ${getMaterialClass(product.material)}">${product.material}</div>`
+              : ""
+          }
         </div>
       </div>
     `;
@@ -314,12 +326,24 @@ window.selectProduct = function(sr) {
   const product = products.find(p => p.sr === sr);
   if (!product) return;
 
-  billItems.push({
-    product,
-    price: getCurrentPrice(product) || 0,
-    qty: 1,
-    total: getCurrentPrice(product) || 0
-  });
+  const existing = billItems.find(
+    item =>
+      item.product.sr === product.sr &&
+      item.mode === currentMode
+  );
+
+  if (existing) {
+    existing.qty += 1;
+    existing.total = existing.qty * existing.price;
+  } else {
+    billItems.push({
+      product,
+      mode: currentMode,
+      price: getCurrentPrice(product) || 0,
+      qty: 1,
+      total: getCurrentPrice(product) || 0
+    });
+  }
 
   renderBill();
   updateGrandTotal();
@@ -337,14 +361,42 @@ function renderBill() {
       <div class="bill-card">
         <div class="bill-title">${item.product.productName}</div>
 
+        <div class="badge-row">
+          <div class="unit">${item.product.priceType || ""}</div>
+
+          ${
+            item.product.material
+              ? `<div class="unit ${getMaterialClass(item.product.material)}">${item.product.material}</div>`
+              : ""
+          }
+        </div>
+
         <div class="input-row">
-          <input class="bill-input" type="number" value="${item.price}" onchange="updatePrice(${index}, this.value)">
-          <input class="bill-input" type="number" step="0.01" value="${item.qty}" onchange="updateQty(${index}, this.value)">
+          <input
+            class="bill-input"
+            type="number"
+            value="${item.price}"
+            onchange="updatePrice(${index}, this.value)"
+          >
+
+          <input
+            class="bill-input"
+            type="number"
+            step="0.01"
+            value="${item.qty}"
+            onchange="updateQty(${index}, this.value)"
+          >
         </div>
 
         <div class="bill-bottom">
           <div class="line-total">₹${item.total.toFixed(2)}</div>
-          <button class="delete-btn" onclick="deleteItem(${index})">Remove</button>
+
+          <button
+            class="delete-btn"
+            onclick="deleteItem(${index})"
+          >
+            Remove
+          </button>
         </div>
       </div>
     `;
@@ -355,14 +407,18 @@ function renderBill() {
 
 window.updatePrice = function(index, value) {
   billItems[index].price = parseFloat(value) || 0;
-  billItems[index].total = billItems[index].price * billItems[index].qty;
+  billItems[index].total =
+    billItems[index].price * billItems[index].qty;
+
   renderBill();
   updateGrandTotal();
 };
 
 window.updateQty = function(index, value) {
   billItems[index].qty = parseFloat(value) || 0;
-  billItems[index].total = billItems[index].price * billItems[index].qty;
+  billItems[index].total =
+    billItems[index].price * billItems[index].qty;
+
   renderBill();
   updateGrandTotal();
 };
@@ -374,7 +430,11 @@ window.deleteItem = function(index) {
 };
 
 function updateGrandTotal() {
-  const total = billItems.reduce((sum, item) => sum + item.total, 0);
+  const total = billItems.reduce(
+    (sum, item) => sum + item.total,
+    0
+  );
+
   grandTotalEl.innerText = `₹${total.toFixed(2)}`;
 }
 
