@@ -430,7 +430,7 @@ h1 {
   padding: 6mm;
   font-family: Arial, sans-serif;
   color: #000;
-  page-break-after: auto;
+  page-break-after: always;
 }
 
 .copy-label {
