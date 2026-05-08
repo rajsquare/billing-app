@@ -715,13 +715,14 @@ function buildDaybookPrintHTML() {
   entries.forEach(entry => {
     total += entry.amount;
 
-    rows += `
-      <tr>
-        <td>${entry.date}</td>
-        <td>${entry.customerName}</td>
-        <td>₹${entry.amount}</td>
-      </tr>
-    `;
+   rows += `
+  <tr>
+    <td>${entry.date}</td>
+    <td>#${entry.serialNumber}</td>
+    <td>${entry.customerName}</td>
+    <td>₹${entry.amount}</td>
+  </tr>
+`;
   });
 
   return `
@@ -731,8 +732,9 @@ function buildDaybookPrintHTML() {
       <table class="daybook-print-table">
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Customer</th>
+           <th>Date</th>
+  <th>Sr No</th>
+  <th>Customer</th>
             <th>Amount</th>
           </tr>
         </thead>
@@ -896,13 +898,21 @@ function renderDaybook() {
   let html = "";
 
   entries.forEach(entry => {
-    html += `
-      <div class="daybook-entry">
-        <div class="daybook-date">${entry.date}</div>
-        <div class="daybook-name">${entry.customerName}</div>
-        <div class="daybook-amount">₹${entry.amount}</div>
-      </div>
-    `;
+   html += `
+  <div class="daybook-entry">
+    <div class="daybook-date">
+      ${entry.date} | #${entry.serialNumber}
+    </div>
+
+    <div class="daybook-name">
+      ${entry.customerName}
+    </div>
+
+    <div class="daybook-amount">
+      ₹${entry.amount}
+    </div>
+  </div>
+`;
   });
 
   daybookEntries.innerHTML = html;
@@ -1103,13 +1113,13 @@ window.doneReceivedBill = async function(docId) {
         [keys.activeKey]: active
       });
 
-      transaction.set(doc(daybookCollection), {
-        date: bill.date,
-        customerName: bill.customerName,
-        amount: bill.grandTotal,
-        createdAt: serverTimestamp()
-      });
-
+    transaction.set(doc(daybookCollection), {
+  date: bill.date,
+  serialNumber: bill.serialNumber,
+  customerName: bill.customerName,
+  amount: bill.grandTotal,
+  createdAt: serverTimestamp()
+});
       transaction.delete(billRef);
     });
   } catch (err) {
