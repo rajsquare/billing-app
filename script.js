@@ -8,7 +8,9 @@ import {
   doc,
   serverTimestamp,
   query,
-  orderBy
+  orderBy,
+  runTransaction,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* ================================
@@ -25,10 +27,18 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
 const billsCollection = collection(db, "bills");
+
 const billsQuery = query(
   billsCollection,
   orderBy("createdAt", "asc")
+);
+
+const serialDocRef = doc(
+  db,
+  "serialCounters",
+  "serials"
 );
 
 /* ================================
@@ -77,6 +87,7 @@ function setTodayDate() {
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, "0");
   const dd = String(today.getDate()).padStart(2, "0");
+
   printDate.value = `${yyyy}-${mm}-${dd}`;
 }
 
@@ -95,7 +106,9 @@ function normalize(text) {
 }
 
 function tokenize(text) {
-  return normalize(text).split(" ").filter(Boolean);
+  return normalize(text)
+    .split(" ")
+    .filter(Boolean);
 }
 
 function formatDisplayDate(dateString) {
@@ -122,7 +135,7 @@ function getMaterialClass(material) {
 }
 
 /* ================================
-   LOAD PRODUCTS
+   PRODUCTS
 ================================ */
 fetch("productList.json")
   .then(res => res.json())
@@ -161,7 +174,9 @@ function expandQuery(query) {
   let expanded = [...words];
 
   words.forEach(word => {
-    if (synonyms[word]) expanded.push(...synonyms[word]);
+    if (synonyms[word]) {
+      expanded.push(...synonyms[word]);
+    }
   });
 
   return [...new Set(expanded)];
@@ -172,8 +187,13 @@ function levenshtein(a, b) {
 
   const matrix = [];
 
-  for (let i = 0; i <= b.length; i++) matrix[i] = [i];
-  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
 
   for (let i = 1; i <= b.length; i++) {
     for (let j = 1; j <= a.length; j++) {
@@ -241,7 +261,6 @@ function searchProducts(queryText) {
     .slice(0, 8)
     .map(r => r.product);
 }
-
 /* ================================
    UI
 ================================ */
@@ -269,6 +288,10 @@ modeToggle.addEventListener("click", () => {
     modeToggle.innerText = "W";
     modeToggle.style.background = "#2f3f64";
   }
+
+  if (searchBox.value.trim()) {
+    renderSuggestions(searchProducts(searchBox.value));
+  }
 });
 
 searchBox.addEventListener("input", e => {
@@ -287,8 +310,12 @@ clearSearch.addEventListener("click", () => {
   searchBox.value = "";
   suggestions.innerHTML = "";
   clearSearch.style.display = "none";
+  searchBox.focus();
 });
 
+/* ================================
+   BILL UI
+================================ */
 function renderSuggestions(results) {
   if (!results.length) {
     suggestions.innerHTML = "";
@@ -438,105 +465,9 @@ function updateGrandTotal() {
 }
 
 /* ================================
-   PRINT ENGINE
-================================ */
-function buildSingleCopy(billData, label) {
-  let rows = "";
-
-  billData.items.forEach(item => {
-    rows += `
-      <tr>
-        <td>${item.productName}</td>
-        <td>${item.material || "-"}</td>
-        <td>${item.qty}</td>
-        <td>${item.price}</td>
-        <td>${item.total.toFixed(2)}</td>
-      </tr>
-    `;
-  });
-
-  const title =
-    billData.mode === "W"
-      ? billData.customerName
-      : "RETAIL BILL";
-
-  const wholesaleExtras =
-    billData.mode === "W"
-      ? `
-        <div class="print-balance">Balance HV</div>
-        <div class="receiver-name-box">
-          <div class="receiver-line"></div>
-          <div class="receiver-label">Receiver’s Name</div>
-        </div>
-      `
-      : "";
-
-  return `
-    <div class="print-copy">
-      <div class="copy-label">${label}</div>
-
-      <div class="print-header-row">
-        <div class="print-customer">${title}</div>
-        <div class="print-serial">${billData.serialNumber}</div>
-      </div>
-
-      <div class="print-date">${formatDisplayDate(billData.date)}</div>
-
-      <table class="print-table">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Mat</th>
-            <th>Qty</th>
-            <th>Rate</th>
-            <th>Amt</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows}
-        </tbody>
-      </table>
-
-      <div class="print-total">
-        Grand Total: ₹${billData.grandTotal.toFixed(2)}
-      </div>
-
-      ${wholesaleExtras}
-    </div>
-  `;
-}
-
-function buildPrintHTML(billData) {
-  if (billData.items.length <= 10) {
-    return `
-      <div class="print-wrapper">
-        ${buildSingleCopy(billData, "CUSTOMER COPY")}
-        <div class="cut-line">CUT HERE</div>
-        ${buildSingleCopy(billData, "OFFICE COPY")}
-      </div>
-    `;
-  }
-
-  return `
-    <div class="print-wrapper full-copy-page">
-      ${buildSingleCopy(billData, "CUSTOMER COPY")}
-    </div>
-
-    <div class="print-wrapper">
-      ${buildSingleCopy(billData, "OFFICE COPY")}
-    </div>
-  `;
-}
-
-/* ================================
    MODAL
 ================================ */
 function validateBillInputs() {
-  if (!serialNumber.value.trim()) {
-    alert("Enter serial number");
-    return false;
-  }
-
   if (currentMode === "W" && !customerName.value.trim()) {
     alert("Enter customer name");
     return false;
@@ -581,7 +512,6 @@ function createBillData() {
     mode: currentMode,
     date: printDate.value,
     customerName: customerName.value.trim(),
-    serialNumber: serialNumber.value.trim(),
     grandTotal,
     items: billItems.map(item => ({
       productName: item.product.productName,
@@ -592,18 +522,133 @@ function createBillData() {
     }))
   };
 }
+/* ================================
+   SERIAL SYSTEM
+================================ */
+async function getNextSerial(mode) {
+  return await runTransaction(db, async transaction => {
+    const snap = await transaction.get(serialDocRef);
+
+    if (!snap.exists()) {
+      throw new Error("Serial counter document missing");
+    }
+
+    const data = snap.data();
+    let current = data[mode] || 0;
+
+    let next = current + 1;
+
+    if (next > 100) {
+      next = 1;
+    }
+
+    transaction.update(serialDocRef, {
+      [mode]: next
+    });
+
+    return next;
+  });
+}
 
 /* ================================
-   PRINT
+   PRINT ENGINE
 ================================ */
-confirmPrint.addEventListener("click", () => {
+function buildSingleCopy(billData, label, serialNumber) {
+  let rows = "";
+
+  billData.items.forEach(item => {
+    rows += `
+      <tr>
+        <td>${item.productName}</td>
+        <td>${item.material || "-"}</td>
+        <td>${item.qty}</td>
+        <td>${item.price}</td>
+        <td>${item.total.toFixed(2)}</td>
+      </tr>
+    `;
+  });
+
+  const title =
+    billData.mode === "W"
+      ? billData.customerName
+      : "RETAIL BILL";
+
+  const wholesaleExtras =
+    billData.mode === "W"
+      ? `
+        <div class="print-balance">Balance HV</div>
+        <div class="receiver-name-box">
+          <div class="receiver-line"></div>
+          <div class="receiver-label">Receiver’s Name</div>
+        </div>
+      `
+      : "";
+
+  return `
+    <div class="print-wrapper">
+      <div class="copy-label">${label}</div>
+
+      <div class="print-header-row">
+        <div class="print-customer">${title}</div>
+        <div class="print-serial">${serialNumber}</div>
+      </div>
+
+      <div class="print-date">${formatDisplayDate(billData.date)}</div>
+
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Mat</th>
+            <th>Qty</th>
+            <th>Rate</th>
+            <th>Amt</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+
+      <div class="print-total">
+        Grand Total: ₹${billData.grandTotal.toFixed(2)}
+      </div>
+
+      ${wholesaleExtras}
+    </div>
+  `;
+}
+
+function buildPrintHTML(billData, serialNumber) {
+  return `
+    ${buildSingleCopy(billData, "CUSTOMER COPY", serialNumber)}
+    ${buildSingleCopy(billData, "OFFICE COPY", serialNumber)}
+  `;
+}
+
+/* ================================
+   LOCAL PRINT
+================================ */
+confirmPrint.addEventListener("click", async () => {
   if (!validateBillInputs()) return;
 
-  const billData = createBillData();
+  try {
+    const billData = createBillData();
+    const serialNumber = await getNextSerial(currentMode);
 
-  printInvoice.innerHTML = buildPrintHTML(billData);
-  printModal.style.display = "none";
-  window.print();
+    printInvoice.innerHTML = buildPrintHTML(
+      billData,
+      serialNumber
+    );
+
+    printModal.style.display = "none";
+
+    window.print();
+  } catch (err) {
+    console.error(err);
+    alert("Failed to generate serial number.");
+  }
 });
 
 /* ================================
@@ -622,22 +667,29 @@ confirmSend.addEventListener("click", async () => {
     renderBill();
     updateGrandTotal();
 
+    customerName.value = "";
+
     printModal.style.display = "none";
+
     alert("Bill sent successfully.");
   } catch (err) {
-    alert("Failed to send bill.");
     console.error(err);
+    alert("Failed to send bill.");
   }
 });
 
 /* ================================
-   RECEIVER
+   RECEIVER UI
 ================================ */
 function renderIncomingBills() {
   const ids = Object.keys(incomingBillCache);
 
   if (!ids.length) {
-    incomingBills.innerHTML = `<div class="receiver-subtitle">No incoming bills</div>`;
+    incomingBills.innerHTML = `
+      <div class="receiver-subtitle">
+        No incoming bills
+      </div>
+    `;
     return;
   }
 
@@ -648,11 +700,22 @@ function renderIncomingBills() {
 
     html += `
       <div class="bill-card">
-        <div class="bill-title">${bill.mode === "W" ? bill.customerName : "Retail Bill"}</div>
+        <div class="bill-title">
+          ${
+            bill.mode === "W"
+              ? bill.customerName
+              : "Retail Bill"
+          }
+        </div>
 
         <div class="badge-row">
-          <div class="unit">${formatDisplayDate(bill.date)}</div>
-          <div class="unit">${bill.serialNumber}</div>
+          <div class="unit">
+            ${formatDisplayDate(bill.date)}
+          </div>
+
+          <div class="unit">
+            ${bill.mode}
+          </div>
         </div>
 
         <div style="margin-top:12px;font-weight:700;font-size:20px;">
@@ -660,8 +723,19 @@ function renderIncomingBills() {
         </div>
 
         <div class="action-buttons" style="margin-top:14px;">
-          <button class="primary-btn" onclick="printReceivedBill('${id}')">Print</button>
-          <button class="send-btn" onclick="deleteReceivedBill('${id}')">Done</button>
+          <button
+            class="primary-btn"
+            onclick="printReceivedBill('${id}')"
+          >
+            Print
+          </button>
+
+          <button
+            class="delete-btn"
+            onclick="deleteReceivedBill('${id}')"
+          >
+            Delete
+          </button>
         </div>
       </div>
     `;
@@ -670,6 +744,9 @@ function renderIncomingBills() {
   incomingBills.innerHTML = html;
 }
 
+/* ================================
+   FIREBASE LISTENER
+================================ */
 onSnapshot(billsQuery, snapshot => {
   incomingBillCache = {};
 
@@ -680,14 +757,38 @@ onSnapshot(billsQuery, snapshot => {
   renderIncomingBills();
 });
 
-window.printReceivedBill = function(docId) {
-  const bill = incomingBillCache[docId];
-  if (!bill) return;
+/* ================================
+   RECEIVER PRINT
+================================ */
+window.printReceivedBill = async function(docId) {
+  try {
+    const bill = incomingBillCache[docId];
+    if (!bill) return;
 
-  printInvoice.innerHTML = buildPrintHTML(bill);
-  window.print();
+    const serialNumber = await getNextSerial(bill.mode);
+
+    printInvoice.innerHTML = buildPrintHTML(
+      bill,
+      serialNumber
+    );
+
+    window.print();
+
+    await deleteDoc(doc(db, "bills", docId));
+  } catch (err) {
+    console.error(err);
+    alert("Failed to print bill.");
+  }
 };
 
+/* ================================
+   RECEIVER DELETE
+================================ */
 window.deleteReceivedBill = async function(docId) {
-  await deleteDoc(doc(db, "bills", docId));
+  try {
+    await deleteDoc(doc(db, "bills", docId));
+  } catch (err) {
+    console.error(err);
+    alert("Failed to delete bill.");
+  }
 };
