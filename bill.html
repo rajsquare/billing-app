@@ -11,7 +11,7 @@
 </head>
 <body>
 
-  <!-- APP MODE TABS -->
+  <!-- APP TABS -->
   <div class="app-tabs">
     <button
       id="billingTab"
@@ -31,7 +31,6 @@
   <!-- BILLING VIEW -->
   <div id="billingView">
 
-    <!-- HEADER -->
     <div class="search-container">
 
       <div class="header-row">
@@ -42,7 +41,6 @@
         </button>
       </div>
 
-      <!-- SEARCH -->
       <div class="search-wrapper">
 
         <input
@@ -58,15 +56,12 @@
 
       </div>
 
-      <!-- SEARCH RESULTS -->
       <div id="suggestions"></div>
 
     </div>
 
-    <!-- BILL ITEMS -->
     <div id="billItems"></div>
 
-    <!-- TOTAL BAR -->
     <div class="total-card">
 
       <div class="total-row">
@@ -105,7 +100,7 @@
 
   </div>
 
-  <!-- SHARED MODAL -->
+  <!-- MODAL -->
   <div id="printModal" class="modal-overlay">
 
     <div class="modal-card">
@@ -178,7 +173,27 @@
   <!-- PRINT AREA -->
   <div id="printInvoice"></div>
 
-  <script src="script.js"></script>
+  <!-- FIREBASE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCthUdAwAP0h67p3MfkanelAPdPzZMmPRo",
+      authDomain: "billing-app-73ac8.firebaseapp.com",
+      projectId: "billing-app-73ac8",
+      storageBucket: "billing-app-73ac8.firebasestorage.app",
+      messagingSenderId: "637437936055",
+      appId: "1:637437936055:web:f83da0ab2d3e994e96e832"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.db = db;
+  </script>
+
+  <script type="module" src="script.js"></script>
 
 </body>
 </html>
