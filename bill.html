@@ -13,6 +13,7 @@
 
   <!-- APP TABS -->
   <div class="app-tabs">
+
     <button
       id="billingTab"
       class="tab-btn active"
@@ -26,6 +27,7 @@
     >
       Receiver
     </button>
+
   </div>
 
   <!-- BILLING VIEW -->
@@ -34,13 +36,16 @@
     <div class="search-container">
 
       <div class="header-row">
+
         <h1>Billing App</h1>
 
         <button id="modeToggle">
           W
         </button>
+
       </div>
 
+      <!-- SEARCH -->
       <div class="search-wrapper">
 
         <input
@@ -56,12 +61,15 @@
 
       </div>
 
+      <!-- SEARCH RESULTS -->
       <div id="suggestions"></div>
 
     </div>
 
+    <!-- BILL ITEMS -->
     <div id="billItems"></div>
 
+    <!-- TOTAL -->
     <div class="total-card">
 
       <div class="total-row">
@@ -70,6 +78,7 @@
       </div>
 
       <div class="action-buttons">
+
         <button id="printBtn">
           Print
         </button>
@@ -77,6 +86,7 @@
         <button id="sendBtn">
           Send
         </button>
+
       </div>
 
     </div>
@@ -87,6 +97,7 @@
   <div id="receiverView">
 
     <div class="receiver-card">
+
       <div class="receiver-title">
         Receiver Mode
       </div>
@@ -96,11 +107,12 @@
       </div>
 
       <div id="incomingBills"></div>
+
     </div>
 
   </div>
 
-  <!-- MODAL -->
+  <!-- SHARED MODAL -->
   <div id="printModal" class="modal-overlay">
 
     <div class="modal-card">
@@ -113,32 +125,41 @@
       </div>
 
       <div class="modal-group">
+
         <label>Date</label>
+
         <input
           type="date"
           id="printDate"
         >
+
       </div>
 
       <div
         class="modal-group"
         id="customerGroup"
       >
+
         <label>Customer Name</label>
+
         <input
           type="text"
           id="customerName"
           placeholder="Enter customer name"
         >
+
       </div>
 
       <div class="modal-group">
+
         <label>Serial Number</label>
+
         <input
           type="text"
           id="serialNumber"
           placeholder="Enter serial number"
         >
+
       </div>
 
       <div class="modal-actions">
@@ -172,26 +193,6 @@
 
   <!-- PRINT AREA -->
   <div id="printInvoice"></div>
-
-  <!-- FIREBASE -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCthUdAwAP0h67p3MfkanelAPdPzZMmPRo",
-      authDomain: "billing-app-73ac8.firebaseapp.com",
-      projectId: "billing-app-73ac8",
-      storageBucket: "billing-app-73ac8.firebasestorage.app",
-      messagingSenderId: "637437936055",
-      appId: "1:637437936055:web:f83da0ab2d3e994e96e832"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    window.db = db;
-  </script>
 
   <script type="module" src="script.js"></script>
 
