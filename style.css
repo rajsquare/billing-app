@@ -1,0 +1,309 @@
+/* ---------- GLOBAL ---------- */
+*{
+  box-sizing:border-box;
+}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  margin:0;
+  background:#f1f3f6;
+  max-width:520px;
+  margin:auto;
+  padding:16px;
+  color:#222;
+}
+
+/* ---------- HEADER ---------- */
+.search-container{
+  position:sticky;
+  top:0;
+  background:#f1f3f6;
+  padding-bottom:12px;
+  margin-bottom:14px;
+  z-index:1000;
+}
+
+/* ---------- HEADER ROW ---------- */
+.header-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+/* ---------- TITLE ---------- */
+h1{
+  margin:0;
+  font-size:28px;
+  font-weight:700;
+}
+
+/* ---------- MODE TOGGLE ---------- */
+#modeToggle{
+  padding:8px 14px;
+  border:none;
+  border-radius:10px;
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+  background:#2f3f64;
+  min-width:42px;
+  transition:all 0.15s ease;
+}
+
+#modeToggle:active{
+  transform:scale(0.95);
+}
+
+/* ---------- SEARCH ---------- */
+.search-wrapper{
+  position:relative;
+}
+
+#searchBox{
+  width:100%;
+  padding:14px 44px 14px 14px;
+  border-radius:12px;
+  border:1px solid #ccc;
+  font-size:16px;
+  background:white;
+}
+
+/* ---------- CLEAR BUTTON ---------- */
+#clearSearch{
+  position:absolute;
+  right:8px;
+  top:50%;
+  transform:translateY(-50%);
+  width:36px;
+  height:36px;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.clear-x{
+  font-size:16px;
+  color:#888;
+  line-height:1;
+}
+
+#clearSearch:active .clear-x{
+  color:#444;
+}
+
+/* ---------- SUGGESTIONS ---------- */
+#suggestions{
+  margin-top:10px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.suggestion-card{
+  background:white;
+  border-radius:14px;
+  padding:12px;
+  cursor:pointer;
+  box-shadow:0 2px 6px rgba(0,0,0,.06);
+  transition:all 0.15s ease;
+}
+
+.suggestion-card:active{
+  transform:scale(0.98);
+}
+
+.suggestion-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.suggestion-name{
+  font-weight:600;
+  line-height:1.35;
+}
+
+.suggestion-price{
+  font-weight:700;
+  white-space:nowrap;
+}
+
+/* ---------- BADGES ---------- */
+.badge-row{
+  display:flex;
+  gap:8px;
+  margin-top:8px;
+  flex-wrap:wrap;
+}
+
+.unit{
+  background:#e2e6ea;
+  padding:6px 10px;
+  border-radius:8px;
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.unit-pp{
+  background:#e7f1ff;
+  color:#174ea6;
+}
+
+.material-badge{
+  font-weight:600;
+}
+
+.material-brass{
+  background:#f3e2b3;
+  color:#8a6116;
+}
+
+.material-copper{
+  background:#efd1c3;
+  color:#8a4a2f;
+}
+
+.material-kansa{
+  background:#ddd4ce;
+  color:#5f5149;
+}
+
+/* ---------- BILL ITEMS ---------- */
+#billItems{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-bottom:20px;
+}
+
+/* ---------- BILL CARD ---------- */
+.bill-card{
+  background:white;
+  padding:14px;
+  border-radius:16px;
+  box-shadow:0 2px 6px rgba(0,0,0,.06);
+}
+
+.bill-title{
+  font-weight:600;
+  margin-bottom:10px;
+  line-height:1.35;
+}
+
+/* ---------- INPUT ROW ---------- */
+.input-row{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+
+.input-group{
+  flex:1;
+}
+
+.input-label{
+  font-size:12px;
+  color:#666;
+  margin-bottom:6px;
+}
+
+.bill-input{
+  width:100%;
+  padding:10px;
+  border:1px solid #ccc;
+  border-radius:10px;
+  font-size:15px;
+}
+
+/* ---------- TOTAL ROW ---------- */
+.bill-bottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:14px;
+  gap:10px;
+}
+
+.line-total{
+  font-weight:700;
+  font-size:18px;
+}
+
+/* ---------- DELETE BUTTON ---------- */
+.delete-btn{
+  border:none;
+  background:#fbe4e4;
+  color:#c0392b;
+  padding:10px 14px;
+  border-radius:10px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+/* ---------- TOTAL CARD ---------- */
+.total-card{
+  position:sticky;
+  bottom:0;
+  background:white;
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 -2px 12px rgba(0,0,0,.08);
+  margin-top:20px;
+}
+
+.total-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:20px;
+  font-weight:700;
+  margin-bottom:14px;
+}
+
+/* ---------- PRINT BUTTON ---------- */
+#printBtn{
+  width:100%;
+  border:none;
+  background:#2a73d9;
+  color:white;
+  padding:14px;
+  border-radius:12px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+#printBtn:active{
+  transform:scale(0.98);
+}
+
+/* ---------- PRINT AREA ---------- */
+#printInvoice{
+  display:none;
+}
+
+/* ---------- PRINT MODE ---------- */
+@media print{
+
+  body *{
+    visibility:hidden;
+  }
+
+  #printInvoice,
+  #printInvoice *{
+    visibility:visible;
+  }
+
+  #printInvoice{
+    display:block;
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    padding:20px;
+    background:white;
+  }
+}

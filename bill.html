@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+  <title>Billing App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="search-container">
+
+    <div class="header-row">
+      <h1>Billing App</h1>
+
+      <button id="modeToggle">
+        W
+      </button>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="search-wrapper">
+
+      <input
+        type="text"
+        id="searchBox"
+        placeholder="Search product..."
+        autocomplete="off"
+      >
+
+      <div id="clearSearch">
+        <span class="clear-x">✕</span>
+      </div>
+
+    </div>
+
+    <!-- SEARCH RESULTS -->
+    <div id="suggestions"></div>
+
+  </div>
+
+  <!-- BILL ITEMS -->
+  <div id="billItems"></div>
+
+  <!-- TOTAL BAR -->
+  <div class="total-card">
+
+    <div class="total-row">
+      <span>Total</span>
+      <span id="grandTotal">₹0</span>
+    </div>
+
+    <button id="printBtn">
+      Print Invoice
+    </button>
+
+  </div>
+
+  <!-- PRINT AREA -->
+  <div id="printInvoice"></div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
