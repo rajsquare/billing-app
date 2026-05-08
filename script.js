@@ -788,7 +788,7 @@ window.print();
 await deleteDoc(doc(db, "bills", docId));
   } catch (err) {
     console.error(err);
-    alert("Failed to print bill.");
+  alert("Failed to print: " + err.message);
   } finally {
     isReceiverPrinting = false;
   }
