@@ -13,6 +13,7 @@
 
   <!-- APP TABS -->
   <div class="app-tabs">
+
     <button
       id="billingTab"
       class="tab-btn active"
@@ -26,6 +27,14 @@
     >
       Receiver
     </button>
+
+    <button
+      id="daybookTab"
+      class="tab-btn daybook-tab"
+    >
+      D
+    </button>
+
   </div>
 
   <!-- BILLING VIEW -->
@@ -83,6 +92,7 @@
   <div id="receiverView">
 
     <div class="receiver-card">
+
       <div class="receiver-title">
         Receiver Mode
       </div>
@@ -92,11 +102,35 @@
       </div>
 
       <div id="incomingBills"></div>
+
     </div>
 
   </div>
 
-  <!-- MODAL -->
+  <!-- DAYBOOK VIEW -->
+  <div id="daybookView">
+
+    <div class="receiver-card">
+
+      <div class="receiver-title">
+        Daybook
+      </div>
+
+      <div class="receiver-subtitle">
+        Finalized bills waiting for print / purge
+      </div>
+
+      <div id="daybookSummary"></div>
+
+      <div id="daybookActions"></div>
+
+      <div id="daybookEntries"></div>
+
+    </div>
+
+  </div>
+
+  <!-- SEND MODAL -->
   <div id="printModal" class="modal-overlay">
 
     <div class="modal-card">
@@ -108,19 +142,12 @@
         Send Details
       </div>
 
-      <div class="modal-group">
-        <label for="printDate">Date</label>
-        <input
-          type="date"
-          id="printDate"
-        >
-      </div>
-
       <div
         class="modal-group"
         id="customerGroup"
       >
         <label for="customerName">Customer Name</label>
+
         <input
           type="text"
           id="customerName"
