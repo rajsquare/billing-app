@@ -8,7 +8,7 @@ body {
   margin: 0;
   background: #f1f3f6;
   max-width: 520px;
-  margin: auto;
+  margin-inline: auto;
   padding: 16px;
   color: #222;
 }
@@ -16,7 +16,7 @@ body {
 /* ---------- APP TABS ---------- */
 .app-tabs {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 16px;
 }
 
@@ -29,6 +29,7 @@ body {
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, .06);
+  font-size: 15px;
 }
 
 .tab-btn.active {
@@ -36,8 +37,14 @@ body {
   color: white;
 }
 
+.daybook-tab {
+  flex: 0 0 52px;
+  min-width: 52px;
+}
+
 /* ---------- VIEWS ---------- */
-#receiverView {
+#receiverView,
+#daybookView {
   display: none;
 }
 
@@ -133,10 +140,12 @@ h1 {
 
 .suggestion-name {
   font-weight: 600;
+  word-break: break-word;
 }
 
 .suggestion-price {
   font-weight: 700;
+  white-space: nowrap;
 }
 
 /* ---------- BADGES ---------- */
@@ -186,7 +195,7 @@ h1 {
 
 .bill-title {
   font-weight: 600;
-  margin-bottom: 10px;
+  word-break: break-word;
 }
 
 .input-row {
@@ -197,10 +206,10 @@ h1 {
 
 .bill-input {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border: 1px solid #ccc;
   border-radius: 10px;
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .bill-bottom {
@@ -208,6 +217,7 @@ h1 {
   justify-content: space-between;
   align-items: center;
   margin-top: 14px;
+  gap: 10px;
 }
 
 .line-total {
@@ -266,10 +276,10 @@ h1 {
   background: #2f3f64;
 }
 
-/* ---------- RECEIVER ---------- */
+/* ---------- RECEIVER / DAYBOOK ---------- */
 .receiver-card {
   background: white;
-  padding: 24px;
+  padding: 20px;
   border-radius: 18px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
 }
@@ -282,7 +292,76 @@ h1 {
 
 .receiver-subtitle {
   color: #666;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+/* ---------- DAYBOOK ---------- */
+#daybookSummary {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+#daybookActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+#daybookActions button {
+  flex: 1 1 140px;
+}
+
+.daybook-entry {
+  background: #f7f9fc;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+.daybook-date {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.daybook-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  word-break: break-word;
+}
+
+.daybook-amount {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* ---------- BUTTONS ---------- */
+.primary-btn,
+.secondary-btn,
+.send-btn {
+  border: none;
+  padding: 13px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-btn {
+  background: #2a73d9;
+  color: white;
+}
+
+.secondary-btn {
+  background: #eef1f5;
+}
+
+.send-btn {
+  background: #2f3f64;
+  color: white;
 }
 
 /* ---------- MODAL ---------- */
@@ -336,29 +415,8 @@ h1 {
   margin-top: 12px;
 }
 
-.primary-btn,
-.secondary-btn,
-.send-btn {
+.modal-actions button {
   flex: 1;
-  border: none;
-  padding: 13px;
-  border-radius: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.primary-btn {
-  background: #2a73d9;
-  color: white;
-}
-
-.secondary-btn {
-  background: #eef1f5;
-}
-
-.send-btn {
-  background: #2f3f64;
-  color: white;
 }
 
 /* ---------- PRINT ---------- */
@@ -452,6 +510,53 @@ h1 {
   font-size: 8px;
 }
 
+/* ---------- DAYBOOK PRINT ---------- */
+.daybook-print-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.daybook-print-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.daybook-print-table th,
+.daybook-print-table td {
+  border: 1px solid #000;
+  padding: 6px;
+  font-size: 10px;
+  text-align: left;
+}
+
+.daybook-print-total {
+  margin-top: 14px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ---------- MOBILE ---------- */
+@media (max-width: 420px) {
+  body {
+    padding: 12px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .receiver-title {
+    font-size: 22px;
+  }
+
+  .tab-btn {
+    font-size: 14px;
+    padding: 11px;
+  }
+}
+
+/* ---------- PRINT MEDIA ---------- */
 @media print {
   body * {
     visibility: hidden;
@@ -467,10 +572,11 @@ h1 {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
   }
 
   @page {
-    size: 99mm 210mm;
+    size: auto;
     margin: 0;
   }
 }
