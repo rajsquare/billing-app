@@ -1,49 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Billing</title>
-  <link rel="stylesheet" href="bill.css" />
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+  <title>Billing App</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- APP -->
-  <div id="app">
+  <!-- HEADER -->
+  <div class="search-container">
 
-    <div class="customer-type">
-      <button id="btnW" class="type-btn">W</button>
-      <button id="btnR" class="type-btn">R</button>
-      <button id="printBtn" class="print-btn">Print / PDF</button>
+    <div class="header-row">
+      <h1>Billing App</h1>
+
+      <button id="modeToggle">
+        W
+      </button>
     </div>
 
-    <div class="bill-header compact">
-      <input id="billNumber" type="number" placeholder="Bill #" />
-      <input id="customerName" type="text" placeholder="Customer" />
-      <input id="billDate" type="date" />
+    <!-- SEARCH -->
+    <div class="search-wrapper">
+
+      <input
+        type="text"
+        id="searchBox"
+        placeholder="Search product..."
+        autocomplete="off"
+      >
+
+      <div id="clearSearch">
+        <span class="clear-x">✕</span>
+      </div>
+
     </div>
 
-    <div class="search-section">
-      <input id="productSearch" type="text" placeholder="Search product" disabled />
-      <div id="searchResults" class="search-results"></div>
-    </div>
-
-    <div id="billItems" class="bill-items"></div>
-
-    <div class="notes-section">
-      <textarea id="billNotes" rows="3" placeholder="Additional notes (optional)"></textarea>
-    </div>
-
-    <div class="total-section">
-      <div>TOTAL</div>
-      <div id="grandTotal">0</div>
-    </div>
+    <!-- SEARCH RESULTS -->
+    <div id="suggestions"></div>
 
   </div>
 
-  <!-- PRINT ONLY -->
+  <!-- BILL ITEMS -->
+  <div id="billItems"></div>
+
+  <!-- TOTAL BAR -->
+  <div class="total-card">
+
+    <div class="total-row">
+      <span>Total</span>
+      <span id="grandTotal">₹0</span>
+    </div>
+
+    <button id="printBtn">
+      Print Invoice
+    </button>
+
+  </div>
+
+  <!-- PRINT AREA -->
   <div id="printInvoice"></div>
 
-  <script src="bill.js"></script>
+  <script src="script.js"></script>
+
 </body>
 </html>
