@@ -280,9 +280,140 @@ h1{
   transform:scale(0.98);
 }
 
+/* ---------- MODAL ---------- */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.35);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+  padding:20px;
+}
+
+.modal-card{
+  width:100%;
+  max-width:420px;
+  background:white;
+  border-radius:20px;
+  padding:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,.15);
+}
+
+.modal-title{
+  font-size:22px;
+  font-weight:700;
+  margin-bottom:18px;
+}
+
+.modal-group{
+  margin-bottom:16px;
+}
+
+.modal-group label{
+  display:block;
+  font-size:13px;
+  color:#666;
+  margin-bottom:6px;
+}
+
+.modal-group input{
+  width:100%;
+  padding:12px;
+  border:1px solid #ccc;
+  border-radius:12px;
+  font-size:15px;
+}
+
+.modal-actions{
+  display:flex;
+  gap:10px;
+  margin-top:8px;
+}
+
+.primary-btn,
+.secondary-btn{
+  flex:1;
+  border:none;
+  padding:13px;
+  border-radius:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.primary-btn{
+  background:#2a73d9;
+  color:white;
+}
+
+.secondary-btn{
+  background:#eef1f5;
+  color:#333;
+}
+
 /* ---------- PRINT AREA ---------- */
 #printInvoice{
   display:none;
+}
+
+/* ---------- PRINT DESIGN ---------- */
+.print-wrapper{
+  padding:20px;
+  color:#000;
+  font-family:Arial,sans-serif;
+}
+
+.print-date{
+  font-size:14px;
+  margin-bottom:20px;
+}
+
+.print-customer{
+  font-size:28px;
+  font-weight:700;
+  margin-bottom:24px;
+}
+
+.print-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-bottom:24px;
+}
+
+.print-table th,
+.print-table td{
+  border:1px solid #000;
+  padding:10px;
+  text-align:left;
+  font-size:14px;
+}
+
+.print-total{
+  text-align:right;
+  font-size:22px;
+  font-weight:700;
+  margin-top:20px;
+}
+
+.print-balance{
+  margin-top:24px;
+  font-size:18px;
+  font-weight:600;
+}
+
+.signature-box{
+  margin-top:50px;
+  width:220px;
+}
+
+.signature-line{
+  border-top:1px solid #000;
+  margin-bottom:8px;
+}
+
+.signature-label{
+  font-size:14px;
 }
 
 /* ---------- PRINT MODE ---------- */
@@ -303,7 +434,6 @@ h1{
     top:0;
     left:0;
     width:100%;
-    padding:20px;
     background:white;
   }
 }
