@@ -17,6 +17,27 @@ const clearSearch = document.getElementById("clearSearch");
 const printBtn = document.getElementById("printBtn");
 const printInvoice = document.getElementById("printInvoice");
 
+const printModal = document.getElementById("printModal");
+const printDate = document.getElementById("printDate");
+const customerName = document.getElementById("customerName");
+const customerGroup = document.getElementById("customerGroup");
+const cancelPrint = document.getElementById("cancelPrint");
+const confirmPrint = document.getElementById("confirmPrint");
+
+/* ================================
+   TODAY DEFAULT
+================================ */
+setTodayDate();
+
+function setTodayDate() {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
+
+  printDate.value = `${yyyy}-${mm}-${dd}`;
+}
+
 /* ================================
    NORMALIZE
 ================================ */
@@ -152,17 +173,13 @@ function levenshtein(a, b) {
 ================================ */
 function tokenScore(queryToken, productToken) {
   if (queryToken === productToken) return 100;
-
   if (productToken.startsWith(queryToken)) return 40;
-
   if (productToken.includes(queryToken)) return 25;
-
   if (queryToken.length <= 2) return 0;
 
   const distance = levenshtein(queryToken, productToken);
 
   if (distance === 1) return 18;
-
   if (distance === 2 && queryToken.length >= 5) return 10;
 
   return 0;
@@ -175,27 +192,18 @@ function scoreProduct(product, queryTokens, rawQuery) {
   let score = 0;
   const productTokens = product.searchableTokens;
 
-  if (product.searchableText === rawQuery) {
-    score += 500;
-  }
-
-  if (product.searchableText.includes(rawQuery)) {
-    score += 120;
-  }
+  if (product.searchableText === rawQuery) score += 500;
+  if (product.searchableText.includes(rawQuery)) score += 120;
 
   queryTokens.forEach(queryToken => {
-    let bestTokenScore = 0;
+    let best = 0;
 
     productTokens.forEach(productToken => {
-      const currentScore =
-        tokenScore(queryToken, productToken);
-
-      if (currentScore > bestTokenScore) {
-        bestTokenScore = currentScore;
-      }
+      const score = tokenScore(queryToken, productToken);
+      if (score > best) best = score;
     });
 
-    score += bestTokenScore;
+    score += best;
   });
 
   if (
@@ -213,7 +221,6 @@ function scoreProduct(product, queryTokens, rawQuery) {
 ================================ */
 function searchProducts(query) {
   const clean = normalize(query);
-
   if (!clean) return [];
 
   const queryTokens = expandQuery(clean);
@@ -221,11 +228,7 @@ function searchProducts(query) {
   return products
     .map(product => ({
       product,
-      score: scoreProduct(
-        product,
-        queryTokens,
-        clean
-      )
+      score: scoreProduct(product, queryTokens, clean)
     }))
     .filter(result => result.score > 0)
     .sort((a, b) => b.score - a.score)
@@ -234,7 +237,7 @@ function searchProducts(query) {
 }
 
 /* ================================
-   MATERIAL BADGE CLASS
+   HELPERS
 ================================ */
 function getMaterialClass(material) {
   if (material === "Brass") return "material-brass";
@@ -243,13 +246,20 @@ function getMaterialClass(material) {
   return "";
 }
 
-/* ================================
-   CURRENT PRICE
-================================ */
 function getCurrentPrice(product) {
   return currentMode === "W"
     ? product.wPrice
     : product.rPrice;
+}
+
+function formatDisplayDate(dateString) {
+  const date = new Date(dateString);
+
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric"
+  });
 }
 
 /* ================================
@@ -268,18 +278,10 @@ function renderSuggestions(results) {
       getMaterialClass(product.material);
 
     html += `
-      <div
-        class="suggestion-card"
-        onclick="selectProduct(${product.sr})"
-      >
+      <div class="suggestion-card" onclick="selectProduct(${product.sr})">
         <div class="suggestion-top">
-          <div class="suggestion-name">
-            ${product.productName}
-          </div>
-
-          <div class="suggestion-price">
-            ₹${getCurrentPrice(product) || "-"}
-          </div>
+          <div class="suggestion-name">${product.productName}</div>
+          <div class="suggestion-price">₹${getCurrentPrice(product) || "-"}</div>
         </div>
 
         <div class="badge-row">
@@ -290,10 +292,10 @@ function renderSuggestions(results) {
           ${
             product.material
               ? `
-                <div class="unit material-badge ${materialClass}">
-                  ${product.material}
-                </div>
-              `
+              <div class="unit material-badge ${materialClass}">
+                ${product.material}
+              </div>
+            `
               : ""
           }
         </div>
@@ -307,9 +309,8 @@ function renderSuggestions(results) {
 /* ================================
    SELECT PRODUCT
 ================================ */
-function selectProduct(sr) {
+window.selectProduct = function(sr) {
   const product = products.find(p => p.sr === sr);
-
   if (!product) return;
 
   const existing = billItems.find(
@@ -338,7 +339,7 @@ function selectProduct(sr) {
   suggestions.innerHTML = "";
   clearSearch.style.display = "none";
   searchBox.focus();
-}
+};
 
 /* ================================
    RENDER BILL
@@ -370,10 +371,10 @@ function renderBill() {
           ${
             item.product.material
               ? `
-                <div class="unit material-badge ${materialClass}">
-                  ${item.product.material}
-                </div>
-              `
+              <div class="unit material-badge ${materialClass}">
+                ${item.product.material}
+              </div>
+            `
               : ""
           }
         </div>
@@ -423,47 +424,32 @@ function renderBill() {
   billItemsDiv.innerHTML = html;
 }
 
-/* ================================
-   UPDATE PRICE
-================================ */
-function updatePrice(index, value) {
-  billItems[index].price =
-    parseFloat(value) || 0;
-
+window.updatePrice = function(index, value) {
+  billItems[index].price = parseFloat(value) || 0;
   billItems[index].total =
-    billItems[index].price *
-    billItems[index].qty;
+    billItems[index].price * billItems[index].qty;
 
   renderBill();
   updateGrandTotal();
-}
+};
 
-/* ================================
-   UPDATE QTY
-================================ */
-function updateQty(index, value) {
-  billItems[index].qty =
-    parseFloat(value) || 0;
-
+window.updateQty = function(index, value) {
+  billItems[index].qty = parseFloat(value) || 0;
   billItems[index].total =
-    billItems[index].price *
-    billItems[index].qty;
+    billItems[index].price * billItems[index].qty;
 
   renderBill();
   updateGrandTotal();
-}
+};
 
-/* ================================
-   DELETE
-================================ */
-function deleteItem(index) {
+window.deleteItem = function(index) {
   billItems.splice(index, 1);
   renderBill();
   updateGrandTotal();
-}
+};
 
 /* ================================
-   GRAND TOTAL
+   TOTAL
 ================================ */
 function updateGrandTotal() {
   const total = billItems.reduce(
@@ -499,7 +485,7 @@ modeToggle.addEventListener("click", () => {
 });
 
 /* ================================
-   SEARCH INPUT
+   SEARCH
 ================================ */
 searchBox.addEventListener("input", e => {
   const val = e.target.value;
@@ -512,14 +498,9 @@ searchBox.addEventListener("input", e => {
     return;
   }
 
-  renderSuggestions(
-    searchProducts(val)
-  );
+  renderSuggestions(searchProducts(val));
 });
 
-/* ================================
-   CLEAR SEARCH
-================================ */
 clearSearch.addEventListener("click", () => {
   searchBox.value = "";
   suggestions.innerHTML = "";
@@ -528,10 +509,42 @@ clearSearch.addEventListener("click", () => {
 });
 
 /* ================================
-   PRINT
+   PRINT MODAL
 ================================ */
 printBtn.addEventListener("click", () => {
   if (!billItems.length) return;
+
+  setTodayDate();
+
+  if (currentMode === "W") {
+    customerGroup.style.display = "block";
+  } else {
+    customerGroup.style.display = "none";
+    customerName.value = "";
+  }
+
+  printModal.style.display = "flex";
+});
+
+cancelPrint.addEventListener("click", () => {
+  printModal.style.display = "none";
+});
+
+confirmPrint.addEventListener("click", () => {
+  if (currentMode === "W" && !customerName.value.trim()) {
+    alert("Please enter customer name");
+    return;
+  }
+
+  generatePrint();
+});
+
+/* ================================
+   GENERATE PRINT
+================================ */
+function generatePrint() {
+  const displayDate =
+    formatDisplayDate(printDate.value);
 
   let rows = "";
   let grandTotal = 0;
@@ -550,29 +563,66 @@ printBtn.addEventListener("click", () => {
     `;
   });
 
+  const wholesaleExtras =
+    currentMode === "W"
+      ? `
+        <div class="print-balance">
+          Balance HV
+        </div>
+
+        <div class="signature-box">
+          <div class="signature-line"></div>
+          <div class="signature-label">
+            Receiver Signature
+          </div>
+        </div>
+      `
+      : "";
+
+  const customerHeading =
+    currentMode === "W"
+      ? `
+        <div class="print-customer">
+          ${customerName.value.trim()}
+        </div>
+      `
+      : "";
+
   printInvoice.innerHTML = `
-    <h1>Invoice</h1>
+    <div class="print-wrapper">
 
-    <table border="1" cellspacing="0" cellpadding="8" width="100%">
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th>Material</th>
-          <th>Qty</th>
-          <th>Rate</th>
-          <th>Total</th>
-        </tr>
-      </thead>
+      <div class="print-date">
+        ${displayDate}
+      </div>
 
-      <tbody>
-        ${rows}
-      </tbody>
-    </table>
+      ${customerHeading}
 
-    <h2 style="text-align:right;">
-      Grand Total: ₹${grandTotal.toFixed(2)}
-    </h2>
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Material</th>
+            <th>Qty</th>
+            <th>Rate</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+
+      <div class="print-total">
+        Grand Total: ₹${grandTotal.toFixed(2)}
+      </div>
+
+      ${wholesaleExtras}
+
+    </div>
   `;
 
+  printModal.style.display = "none";
+
   window.print();
-});
+}
