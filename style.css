@@ -1,3 +1,480 @@
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f6fa;
+  color: #111;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+}
+
+/* ================================
+   TABS
+================================ */
+.app-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid #ddd;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  background: #ececec;
+  font-weight: 700;
+  font-size: 15px;
+  color: #1877f2;
+}
+
+.tab-btn.active {
+  background: #2f3f64;
+  color: white;
+}
+
+.daybook-mini {
+  flex: 0 0 52px;
+}
+
+/* ================================
+   MAIN
+================================ */
+#billingView,
+#receiverView,
+#daybookView {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* ================================
+   SEARCH
+================================ */
+.search-container {
+  margin-bottom: 14px;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.header-row h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+#modeToggle {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #2f3f64;
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.search-wrapper {
+  position: relative;
+}
+
+#searchBox {
+  width: 100%;
+  padding: 16px 50px 16px 16px;
+  border-radius: 14px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  background: white;
+}
+
+#clearSearch {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: #ddd;
+  border-radius: 50%;
+}
+
+.clear-x {
+  font-size: 14px;
+}
+
+#suggestions {
+  margin-top: 10px;
+}
+
+/* ================================
+   CARDS
+================================ */
+.suggestion-card,
+.bill-card,
+.receiver-card,
+.daybook-entry {
+  background: white;
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.suggestion-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.suggestion-name,
+.bill-title {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.suggestion-price {
+  font-weight: 700;
+}
+
+.receiver-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.receiver-subtitle {
+  margin-top: 6px;
+  color: #666;
+  font-size: 14px;
+}
+
+/* ================================
+   BADGES
+================================ */
+.badge-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.unit {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #ececec;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.material-brass {
+  background: #ffe7a6;
+}
+
+.material-copper {
+  background: #ffd2c4;
+}
+
+.material-kansa {
+  background: #f2d8ff;
+}
+
+/* ================================
+   BILL INPUTS
+================================ */
+.input-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.bill-input {
+  flex: 1;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  font-size: 18px;
+  min-width: 0;
+}
+
+.bill-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.line-total {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* ================================
+   TOTAL
+================================ */
+.total-card {
+  background: white;
+  border-radius: 18px;
+  padding: 16px;
+  margin-top: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.action-buttons,
+#daybookActions,
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+/* ================================
+   BUTTONS
+================================ */
+#sendBtn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  background: #2f3f64;
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.delete-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #d65353;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.primary-btn,
+.secondary-btn {
+  flex: 1;
+  min-width: 100px;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.primary-btn {
+  background: #2f3f64;
+  color: white;
+}
+
+.send-btn {
+  background: #1f9d55;
+  color: white;
+  flex: 1;
+  min-width: 100px;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.secondary-btn {
+  background: #ddd;
+  color: #111;
+}
+
+/* ================================
+   MODALS
+================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 16px;
+}
+
+.modal-card,
+.preview-card {
+  background: white;
+  width: min(95vw, 420px);
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.modal-group {
+  margin-top: 16px;
+}
+
+.modal-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.modal-group input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+/* ================================
+   PREVIEW
+================================ */
+.preview-card {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-content {
+  overflow-y: auto;
+  max-height: 70vh;
+  margin-top: 12px;
+}
+
+.preview-content .print-wrapper {
+  width: 100%;
+  height: auto;
+  padding: 0;
+  border: none;
+}
+
+.preview-content .copy-label {
+  display: none;
+}
+/* ================================
+   DAYBOOK
+================================ */
+.daybook-date {
+  font-size: 13px;
+  color: #666;
+  font-weight: 700;
+}
+
+.daybook-name {
+  margin-top: 8px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.daybook-amount {
+  margin-top: 8px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* ================================
+   PRINT
+================================ */
+#printInvoice {
+  display: none;
+}
+
+.print-wrapper {
+  width: 148mm;
+  min-height: 210mm;
+  padding: 2mm;
+  border: 1px solid #000;
+  margin: 0;
+  box-sizing: border-box;
+  background: white;
+  color: #000;
+  font-family: Arial, sans-serif;
+  page-break-after: always;
+}
+
+.receipt-copy:last-child {
+  page-break-after: auto;
+}
+
+.copy-label {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1;
+}
+
+.print-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+}
+
+.print-customer,
+.print-serial {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.print-date {
+  font-size: 11px;
+  margin: 0 0 2px 0;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.print-table,
+.daybook-print-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.print-table th,
+.print-table td,
+.daybook-print-table th,
+.daybook-print-table td {
+  border: 1px solid #000;
+  padding: 1px;
+  vertical-align: middle;
+}
+
 /* PRODUCT GETS ALL REMAINING SPACE */
 .col-product,
 .print-table td:first-child,
@@ -40,4 +517,97 @@
   width: 70px;
   text-align: right;
   white-space: nowrap;
+}
+
+.print-total,
+.daybook-print-total {
+  margin-top: 3px;
+  text-align: right;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.print-balance {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.receiver-name-box {
+  margin-top: 5px;
+}
+
+.receiver-line {
+  width: 130px;
+  border-top: 1px solid #000;
+}
+
+.receiver-label {
+  margin-top: 1px;
+  font-size: 9px;
+  line-height: 1;
+}
+
+.daybook-print-title {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+/* ================================
+   DESKTOP
+================================ */
+@media (min-width: 1024px) {
+  .primary-btn,
+  .secondary-btn,
+  .send-btn {
+    flex: unset;
+    min-width: 160px;
+  }
+
+  .receiver-card {
+    padding: 20px;
+  }
+}
+
+/* ================================
+   PRINT MEDIA
+================================ */
+@page {
+  size: A5 portrait;
+  margin: 0;
+}
+
+@media print {
+  html,
+  body {
+    width: 148mm;
+    height: 210mm;
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #printInvoice,
+  #printInvoice * {
+    visibility: visible;
+  }
+
+  #printInvoice {
+    display: block !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 148mm;
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
 }
