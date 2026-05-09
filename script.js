@@ -161,6 +161,13 @@ function getMaterialClass(material) {
   return "";
 }
 
+function shortMaterialName(material) {
+  if (material === "Brass") return "BR";
+  if (material === "Copper") return "CU";
+  if (material === "Kansa") return "BZ";
+  return material || "-";
+}
+
 /* ================================
    PRODUCTS
 ================================ */
@@ -662,7 +669,7 @@ function buildSingleCopyPage(billData, label, itemsChunk, isLastPage) {
     rows += `
       <tr>
         <td>${item.productName}</td>
-        <td>${item.material || "-"}</td>
+      <td>${shortMaterialName(item.material)}</td>
         <td>${item.qty}</td>
         <td>${item.price}</td>
         <td>${item.total.toFixed(2)}</td>
