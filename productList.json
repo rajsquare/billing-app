@@ -865,7 +865,7 @@
   },
   {
     "sr": 97,
-    "productName": "Karwa",
+    "productName": "Discount (Less)",
     "wPrice": null,
     "priceType": "PP",
     "rPrice": null,
@@ -964,11 +964,11 @@
   },
   {
     "sr": 108,
-    "productName": "Kettle 5 L and ",
+    "productName": "Kettle 5 L and Brass and Copper",
     "wPrice": 6000,
     "priceType": "PP",
     "rPrice": 6400,
-    "material": "Copper",
+    "material": null,
     "": null
   },
   {
@@ -2674,20 +2674,20 @@
   },
   {
     "sr": 298,
-    "productName": "Conical 5.25 inch Glass",
+    "productName": "Utensils",
     "wPrice": null,
-    "priceType": "PP",
+    "priceType": "KG",
     "rPrice": null,
-    "material": "Brass",
+    "material": null,
     "": null
   },
   {
     "sr": 299,
-    "productName": "Tea Glass",
-    "wPrice": null,
+    "productName": "Packing + Forwarding",
+    "wPrice": 250,
     "priceType": "PP",
     "rPrice": null,
-    "material": "Brass",
+    "material": null,
     "": null
   },
   {
@@ -3710,7 +3710,7 @@
   {
     "sr": 413,
     "productName": "Spoon Fork Matte Baby",
-    "wPrice": 100,
+    "wPrice": 90,
     "priceType": "PP",
     "rPrice": 120,
     "material": "Brass",
@@ -3719,7 +3719,7 @@
   {
     "sr": 414,
     "productName": "Spoon Fork Matte Dessert",
-    "wPrice": 120,
+    "wPrice": 100,
     "priceType": "PP",
     "rPrice": 140,
     "material": "Brass",
