@@ -545,7 +545,7 @@ button {
 }
 
 .receiver-name-box {
-  margin-top: 65px;
+  margin-top: 40px;
 }
 
 .receiver-line {
@@ -555,7 +555,7 @@ button {
 
 .receiver-label {
   margin-top: 4px;
-  font-size: 20px;
+  font-size: 14px;
   line-height: 1.2;
 }
 
