@@ -619,7 +619,7 @@ function getModeKeys(mode) {
   };
 }
 
-const MAX_ITEMS_PER_DL_PAGE = 20;
+const MAX_ITEMS_PER_A5_PAGE = 20;
 
 function chunkItems(items, size) {
   const chunks = [];
@@ -658,17 +658,17 @@ function getLowestAvailableSerial(counter, reusable, active) {
 function buildSingleCopyPage(billData, label, itemsChunk, isLastPage) {
   let rows = "";
 
-  itemsChunk.forEach(item => {
-    rows += `
-      <tr>
-        <td>${item.productName}</td>
-        <td>${item.material || "-"}</td>
-        <td>${item.qty}</td>
-        <td>${item.price}</td>
-        <td>${item.total.toFixed(2)}</td>
-      </tr>
-    `;
-  });
+ itemsChunk.forEach(item => {
+  rows += `
+    <tr>
+      <td class="col-product">${item.productName}</td>
+      <td class="col-material">${item.material || "-"}</td>
+      <td class="col-qty">${item.qty}</td>
+      <td class="col-rate">${item.price}</td>
+      <td class="col-amount">${item.total.toFixed(2)}</td>
+    </tr>
+  `;
+});
 
   const wholesaleExtras =
     billData.mode === "W" && isLastPage
@@ -697,11 +697,11 @@ function buildSingleCopyPage(billData, label, itemsChunk, isLastPage) {
       <table class="print-table">
         <thead>
           <tr>
-            <th>Product</th>
-            <th>Mat</th>
-            <th>Qty</th>
-            <th>Rate</th>
-            <th>Amt</th>
+         <th class="col-product">Product</th>
+<th class="col-material">Mat</th>
+<th class="col-qty">Qty</th>
+<th class="col-rate">Rate</th>
+<th class="col-amount">Amt</th>
           </tr>
         </thead>
         <tbody>
