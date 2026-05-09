@@ -436,27 +436,23 @@ button {
   line-height: 1.1;
 }
 
+/* UPDATED HEADER */
 .print-header-row {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 4px;
-  margin-bottom: 2px;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  flex-wrap: nowrap;
 }
 
 .print-customer,
-.print-serial {
+.print-serial,
+.print-date {
   font-size: 22px;
   font-weight: 700;
   line-height: 1;
-  word-break: break-word;
-}
-
-.print-date {
-  font-size: 11px;
-  margin: 0 0 6px 0;
-  font-weight: 600;
-  line-height: 1.1;
+  white-space: nowrap;
 }
 
 .print-table,
