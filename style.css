@@ -32,6 +32,9 @@ button {
   top: 0;
   z-index: 50;
   border-bottom: 1px solid #ddd;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
 .tab-btn {
@@ -59,7 +62,10 @@ button {
 #billingView,
 #receiverView,
 #daybookView {
-  padding: 12px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px;
 }
 
 /* ================================
@@ -409,9 +415,11 @@ button {
 .print-wrapper {
   width: 99mm;
   min-height: 210mm;
-  padding: 6mm;
+  padding: 4mm;
   font-family: Arial, sans-serif;
   color: #000;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .receipt-copy {
@@ -496,9 +504,40 @@ button {
 }
 
 /* ================================
+   DESKTOP
+================================ */
+@media (min-width: 1024px) {
+  .primary-btn,
+  .secondary-btn,
+  .send-btn {
+    flex: unset;
+    min-width: 160px;
+  }
+
+  .receiver-card {
+    padding: 20px;
+  }
+}
+
+/* ================================
    PRINT MEDIA
 ================================ */
+@page {
+  size: 99mm 210mm;
+  margin: 0;
+}
+
 @media print {
+  html,
+  body {
+    width: 99mm;
+    height: 210mm;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: white;
+  }
+
   body * {
     visibility: hidden;
   }
@@ -509,14 +548,17 @@ button {
   }
 
   #printInvoice {
-    display: block;
+    display: block !important;
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
+    width: 99mm;
+    margin: 0;
+    padding: 0;
     background: white;
   }
 
-  @page {
-    size: 99mm 210mm;
-    margin: 0;
+  .receipt-copy:last-child {
+    page-break-after: auto;
   }
 }
