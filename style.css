@@ -416,8 +416,8 @@ button {
 
 .print-wrapper {
   width: 148mm;
-  height: 204mm;
-  padding: 3mm;
+  height: 210mm;
+  padding: 1.5mm;
   border: 1px solid #000;
   margin: 0;
   box-sizing: border-box;
@@ -437,37 +437,40 @@ button {
 
 .copy-label {
   text-align: center;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: 0;
+  line-height: 1;
 }
 
 .print-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 0;
 }
 
 .print-customer,
 .print-serial {
   font-size: 16px;
   font-weight: 700;
+  line-height: 1;
 }
 
 .print-date {
-  font-size: 13px;
-  margin-bottom: 5px;
+  font-size: 12px;
+  margin-bottom: 1px;
   font-weight: 600;
+  line-height: 1;
 }
 
 .print-table,
 .daybook-print-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: auto;
-  font-size: 10.5px;
-  line-height: 1.1;
+  table-layout: fixed;
+  font-size: 14px;
+  line-height: 0.9;
 }
 
 .print-table th,
@@ -475,76 +478,79 @@ button {
 .daybook-print-table th,
 .daybook-print-table td {
   border: 1px solid #000;
-  padding: 1.5px;
+  padding: 0.3px 1px;
   vertical-align: middle;
+  overflow: hidden;
 }
 
 .col-product {
-  width: 42%;
+  width: 36%;
   text-align: left;
   white-space: normal;
   word-break: break-word;
 }
 
 .col-material {
-  width: 12%;
+  width: 9%;
   text-align: center;
   white-space: nowrap;
 }
 
 .col-qty {
-  width: 10%;
+  width: 9%;
   text-align: right;
   white-space: nowrap;
 }
 
 .col-rate {
-  width: 14%;
+  width: 18%;
   text-align: right;
   white-space: nowrap;
 }
 
 .col-amount {
-  width: 22%;
+  width: 28%;
   text-align: right;
   white-space: nowrap;
 }
 
 .print-total,
 .daybook-print-total {
-  margin-top: 8px;
+  margin-top: 2px;
   text-align: right;
   font-size: 17px;
   font-weight: 700;
+  line-height: 1;
 }
 
 .print-balance {
-  margin-top: 10px;
-  font-size: 13px;
+  margin-top: 3px;
+  font-size: 12px;
   font-weight: 700;
+  line-height: 1;
 }
 
 .receiver-name-box {
-  margin-top: 14px;
+  margin-top: 5px;
 }
 
 .receiver-line {
-  width: 160px;
+  width: 140px;
   border-top: 1px solid #000;
 }
 
 .receiver-label {
-  margin-top: 4px;
-  font-size: 11px;
+  margin-top: 1px;
+  font-size: 10px;
+  line-height: 1;
 }
 
 .daybook-print-title {
   text-align: center;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 3px;
 }
-
 /* ================================
    DESKTOP
 ================================ */
