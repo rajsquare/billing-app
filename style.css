@@ -1,34 +1,45 @@
-/* ---------- GLOBAL ---------- */
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   margin: 0;
-  background: #f1f3f6;
-  max-width: 520px;
-  margin-inline: auto;
-  padding: 16px;
-  color: #222;
+  font-family: Arial, sans-serif;
+  background: #f5f6fa;
+  color: #111;
 }
 
-/* ---------- APP TABS ---------- */
+button,
+input {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+}
+
+/* ================================
+   TABS
+================================ */
 .app-tabs {
   display: flex;
   gap: 8px;
-  margin-bottom: 16px;
+  padding: 10px;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid #ddd;
 }
 
 .tab-btn {
   flex: 1;
-  border: none;
   padding: 12px;
-  border-radius: 14px;
-  background: white;
+  border-radius: 12px;
+  background: #ececec;
   font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, .06);
   font-size: 15px;
 }
 
@@ -37,61 +48,56 @@ body {
   color: white;
 }
 
-.daybook-tab {
+.daybook-mini {
   flex: 0 0 52px;
-  min-width: 52px;
 }
 
-/* ---------- VIEWS ---------- */
+/* ================================
+   MAIN
+================================ */
+#billingView,
 #receiverView,
 #daybookView {
-  display: none;
+  padding: 12px;
 }
 
-/* ---------- HEADER ---------- */
+/* ================================
+   SEARCH
+================================ */
 .search-container {
-  position: sticky;
-  top: 0;
-  background: #f1f3f6;
-  padding-bottom: 12px;
   margin-bottom: 14px;
-  z-index: 1000;
 }
 
 .header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 
-h1 {
+.header-row h1 {
   margin: 0;
-  font-size: 28px;
+  font-size: 24px;
+}
+
+#modeToggle {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #2f3f64;
+  color: white;
+  font-size: 18px;
   font-weight: 700;
 }
 
-/* ---------- MODE ---------- */
-#modeToggle {
-  padding: 8px 14px;
-  border: none;
-  border-radius: 10px;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  background: #2f3f64;
-  min-width: 42px;
-}
-
-/* ---------- SEARCH ---------- */
 .search-wrapper {
   position: relative;
 }
 
 #searchBox {
   width: 100%;
-  padding: 14px 44px 14px 14px;
-  border-radius: 12px;
+  padding: 16px 50px 16px 16px;
+  border-radius: 14px;
   border: 1px solid #ccc;
   font-size: 16px;
   background: white;
@@ -99,117 +105,113 @@ h1 {
 
 #clearSearch {
   position: absolute;
-  right: 8px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
   display: none;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  background: #ddd;
+  border-radius: 50%;
 }
 
 .clear-x {
-  font-size: 16px;
-  color: #888;
+  font-size: 14px;
 }
 
-/* ---------- SUGGESTIONS ---------- */
 #suggestions {
   margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
 
-.suggestion-card {
+/* ================================
+   CARDS
+================================ */
+.suggestion-card,
+.bill-card,
+.receiver-card,
+.daybook-entry {
   background: white;
-  border-radius: 14px;
-  padding: 12px;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, .06);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .suggestion-top {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   gap: 10px;
 }
 
-.suggestion-name {
-  font-weight: 600;
-  word-break: break-word;
+.suggestion-name,
+.bill-title {
+  font-weight: 700;
+  font-size: 16px;
 }
 
 .suggestion-price {
   font-weight: 700;
-  white-space: nowrap;
 }
 
-/* ---------- BADGES ---------- */
+.receiver-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.receiver-subtitle {
+  margin-top: 6px;
+  color: #666;
+  font-size: 14px;
+}
+
+/* ================================
+   BADGES
+================================ */
 .badge-row {
   display: flex;
   gap: 8px;
-  margin-top: 8px;
   flex-wrap: wrap;
+  margin-top: 10px;
 }
 
 .unit {
-  background: #e2e6ea;
   padding: 6px 10px;
-  border-radius: 8px;
+  border-radius: 999px;
+  background: #ececec;
   font-size: 12px;
+  font-weight: 700;
 }
 
 .material-brass {
-  background: #f3e2b3;
-  color: #8a6116;
+  background: #ffe7a6;
 }
 
 .material-copper {
-  background: #efd1c3;
-  color: #8a4a2f;
+  background: #ffd2c4;
 }
 
 .material-kansa {
-  background: #ddd4ce;
-  color: #5f5149;
+  background: #f2d8ff;
 }
 
-/* ---------- BILL ITEMS ---------- */
-#billItems {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.bill-card {
-  background: white;
-  padding: 14px;
-  border-radius: 16px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, .06);
-}
-
-.bill-title {
-  font-weight: 600;
-  word-break: break-word;
-}
-
+/* ================================
+   BILL INPUTS
+================================ */
 .input-row {
   display: flex;
   gap: 10px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .bill-input {
-  width: 100%;
-  padding: 12px;
+  flex: 1;
+  padding: 14px;
+  border-radius: 12px;
   border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 16px;
+  font-size: 18px;
+  min-width: 0;
 }
 
 .bill-bottom {
@@ -217,209 +219,170 @@ h1 {
   justify-content: space-between;
   align-items: center;
   margin-top: 14px;
-  gap: 10px;
 }
 
 .line-total {
+  font-size: 20px;
   font-weight: 700;
-  font-size: 18px;
 }
 
-.delete-btn {
-  border: none;
-  background: #fbe4e4;
-  color: #c0392b;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* ---------- TOTAL ---------- */
+/* ================================
+   TOTAL
+================================ */
 .total-card {
-  position: sticky;
-  bottom: 0;
   background: white;
   border-radius: 18px;
   padding: 16px;
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, .08);
-  margin-top: 20px;
+  margin-top: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .total-row {
   display: flex;
   justify-content: space-between;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
-  margin-bottom: 14px;
 }
 
-.action-buttons {
+/* ================================
+   BUTTONS
+================================ */
+.action-buttons,
+#daybookActions,
+.modal-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
+  margin-top: 14px;
 }
 
-.action-buttons button {
-  flex: 1 1 120px;
-}
-
-#sendBtn {
-  flex: 1;
-  border: none;
-  color: white;
-  padding: 14px;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  background: #2f3f64;
-}
-
-/* ---------- RECEIVER / DAYBOOK ---------- */
-.receiver-card {
-  background: white;
-  padding: 20px;
-  border-radius: 18px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
-}
-
-.receiver-title {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.receiver-subtitle {
-  color: #666;
-  margin-bottom: 18px;
-  font-size: 14px;
-}
-
-/* ---------- DAYBOOK ---------- */
-#daybookSummary {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 14px;
-}
-
-#daybookActions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-
-#daybookActions button {
-  flex: 1 1 140px;
-}
-
-.daybook-entry {
-  background: #f7f9fc;
-  border-radius: 14px;
-  padding: 14px;
-  margin-bottom: 10px;
-}
-
-.daybook-date {
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 6px;
-}
-
-.daybook-name {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 6px;
-  word-break: break-word;
-}
-
-.daybook-amount {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-/* ---------- BUTTONS ---------- */
 .primary-btn,
-.secondary-btn,
-.send-btn {
-  border: none;
-  padding: 13px;
+.send-btn,
+.delete-btn,
+.secondary-btn {
+  flex: 1;
+  min-width: 100px;
+  padding: 14px;
   border-radius: 12px;
+  font-size: 15px;
   font-weight: 700;
-  cursor: pointer;
 }
 
 .primary-btn {
-  background: #2a73d9;
+  background: #2f3f64;
+  color: white;
+}
+
+.send-btn {
+  background: #1f9d55;
+  color: white;
+}
+
+.delete-btn {
+  background: #d65353;
   color: white;
 }
 
 .secondary-btn {
-  background: #eef1f5;
+  background: #ddd;
+  color: #111;
 }
 
-.send-btn {
-  background: #2f3f64;
-  color: white;
-}
-
-/* ---------- MODAL ---------- */
+/* ================================
+   MODALS
+================================ */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.35);
+  background: rgba(0,0,0,0.45);
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
-  padding: 20px;
+  z-index: 200;
+  padding: 16px;
 }
 
-.modal-card {
-  width: 100%;
-  max-width: 420px;
+.modal-card,
+.preview-card {
   background: white;
-  border-radius: 20px;
-  padding: 20px;
+  width: min(95vw, 420px);
+  border-radius: 18px;
+  padding: 16px;
 }
 
 .modal-title {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
-  margin-bottom: 18px;
 }
 
 .modal-group {
-  margin-bottom: 16px;
+  margin-top: 16px;
 }
 
 .modal-group label {
   display: block;
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  font-weight: 700;
 }
 
 .modal-group input {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
+  padding: 14px;
   border-radius: 12px;
-  font-size: 15px;
+  border: 1px solid #ccc;
+  font-size: 16px;
 }
 
-.modal-actions {
+/* ================================
+   PREVIEW
+================================ */
+.preview-card {
+  max-height: 90vh;
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+}
+
+.preview-content {
+  overflow-y: auto;
+  max-height: 70vh;
   margin-top: 12px;
 }
 
-.modal-actions button {
-  flex: 1;
+.preview-content .print-wrapper {
+  width: 100%;
+  min-height: auto;
+  padding: 0;
+  page-break-after: auto;
 }
 
-/* ---------- PRINT ---------- */
+.preview-content .copy-label {
+  display: none;
+}
+
+/* ================================
+   DAYBOOK
+================================ */
+.daybook-date {
+  font-size: 13px;
+  color: #666;
+  font-weight: 700;
+}
+
+.daybook-name {
+  margin-top: 8px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.daybook-amount {
+  margin-top: 8px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* ================================
+   PRINT
+================================ */
 #printInvoice {
   display: none;
 }
@@ -438,128 +401,84 @@ h1 {
 
 .copy-label {
   text-align: center;
-  font-size: 10px;
   font-weight: 700;
-  margin-bottom: 6px;
-  letter-spacing: .8px;
+  font-size: 16px;
+  margin-bottom: 8px;
 }
 
 .print-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2px;
-}
-
-.print-customer {
-  font-size: 15px;
-  font-weight: 700;
-  max-width: 65%;
-  word-wrap: break-word;
-}
-
-.print-serial {
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.print-date {
-  font-size: 9px;
-  margin-bottom: 6px;
-}
-
-.print-table {
-  width: 100%;
-  border-collapse: collapse;
   margin-bottom: 8px;
 }
 
+.print-customer,
+.print-serial {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.print-date {
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+
+.print-table,
+.daybook-print-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8px;
+}
+
 .print-table th,
-.print-table td {
+.print-table td,
+.daybook-print-table th,
+.daybook-print-table td {
   border: 1px solid #000;
   padding: 3px;
-  font-size: 8px;
-  text-align: left;
-  vertical-align: top;
+  text-align: center;
+  word-break: break-word;
 }
 
-.print-table th {
+.print-total,
+.daybook-print-total {
+  margin-top: 10px;
   font-weight: 700;
-}
-
-.print-total {
-  font-size: 11px;
-  font-weight: 700;
-  margin-top: 6px;
+  font-size: 14px;
+  text-align: right;
 }
 
 .print-balance {
-  margin-top: 8px;
-  font-size: 10px;
-  font-weight: 600;
+  margin-top: 18px;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .receiver-name-box {
-  margin-top: 16px;
-  width: 140px;
+  margin-top: 28px;
 }
 
 .receiver-line {
   border-top: 1px solid #000;
-  margin-bottom: 4px;
+  width: 160px;
 }
 
 .receiver-label {
-  font-size: 8px;
+  margin-top: 6px;
+  font-size: 12px;
 }
 
-/* ---------- DAYBOOK PRINT ---------- */
 .daybook-print-title {
+  text-align: center;
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 14px;
 }
 
-.daybook-print-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.daybook-print-table th,
-.daybook-print-table td {
-  border: 1px solid #000;
-  padding: 6px;
-  font-size: 10px;
-  text-align: left;
-}
-
-.daybook-print-total {
-  margin-top: 14px;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-/* ---------- MOBILE ---------- */
-@media (max-width: 420px) {
-  body {
-    padding: 12px;
-  }
-
-  h1 {
-    font-size: 24px;
-  }
-
-  .receiver-title {
-    font-size: 22px;
-  }
-
-  .tab-btn {
-    font-size: 14px;
-    padding: 11px;
-  }
-}
-
-/* ---------- PRINT MEDIA ---------- */
+/* ================================
+   PRINT MEDIA
+================================ */
 @media print {
   body * {
     visibility: hidden;
@@ -573,13 +492,12 @@ h1 {
   #printInvoice {
     display: block;
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    inset: 0;
+    background: white;
   }
 
   @page {
-    size: auto;
+    size: 99mm 210mm;
     margin: 0;
   }
 }
