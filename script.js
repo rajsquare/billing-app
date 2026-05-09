@@ -168,6 +168,13 @@ function shortMaterialName(material) {
   return material || "-";
 }
 
+function formatIndianMoney(value) {
+  return Number(value || 0).toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
 /* ================================
    PRODUCTS
 ================================ */
@@ -672,7 +679,7 @@ function buildSingleCopyPage(billData, label, itemsChunk, isLastPage) {
       <td>${shortMaterialName(item.material)}</td>
         <td>${item.qty}</td>
         <td>${item.price}</td>
-        <td>${item.total.toFixed(2)}</td>
+       <td>${formatIndianMoney(item.total)}</td>
       </tr>
     `;
   });
