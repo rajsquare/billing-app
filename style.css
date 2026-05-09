@@ -412,9 +412,9 @@ button {
 }
 
 .print-wrapper {
-  width: 148mm;
-  min-height: 210mm;
-  padding: 2mm;
+  width: 140mm;
+  min-height: 202mm;
+  padding: 4mm 1.5mm 2mm 1.5mm;
   border: 1px solid #000;
   margin: 0;
   box-sizing: border-box;
@@ -430,31 +430,31 @@ button {
 
 .copy-label {
   text-align: center;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 700;
-  margin: 0;
-  line-height: 1;
+  margin: 0 0 3px 0;
+  line-height: 1.2;
 }
 
 .print-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0;
+  margin-bottom: 4px;
 }
 
 .print-customer,
 .print-serial {
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.2;
 }
 
 .print-date {
-  font-size: 11px;
-  margin: 0 0 2px 0;
+  font-size: 14px;
+  margin: 0 0 5px 0;
   font-weight: 600;
-  line-height: 1;
+  line-height: 1.2;
 }
 
 .print-table,
@@ -463,7 +463,7 @@ button {
   border-collapse: collapse;
   table-layout: auto;
   font-size: 14px;
-  line-height: 1;
+  line-height: 1.15;
 }
 
 .print-table th,
@@ -471,11 +471,11 @@ button {
 .daybook-print-table th,
 .daybook-print-table td {
   border: 1px solid #000;
-  padding: 1px 3px;
+  padding: 2px 4px;
   vertical-align: middle;
 }
 
-/* PRODUCT GETS MAX SPACE */
+/* PRODUCT GETS MAXIMUM SPACE */
 .col-product,
 .print-table th:nth-child(1),
 .print-table td:nth-child(1),
@@ -530,22 +530,22 @@ button {
 
 .print-total,
 .daybook-print-total {
-  margin-top: 3px;
+  margin-top: 4px;
   text-align: right;
   font-size: 16px;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.2;
 }
 
 .print-balance {
-  margin-top: 4px;
+  margin-top: 5px;
   font-size: 11px;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.2;
 }
 
 .receiver-name-box {
-  margin-top: 5px;
+  margin-top: 6px;
 }
 
 .receiver-line {
@@ -554,16 +554,16 @@ button {
 }
 
 .receiver-label {
-  margin-top: 1px;
+  margin-top: 2px;
   font-size: 9px;
-  line-height: 1;
+  line-height: 1.2;
 }
 
 .daybook-print-title {
   text-align: center;
   font-size: 15px;
   font-weight: 700;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 /* ================================
@@ -587,7 +587,7 @@ button {
 ================================ */
 @page {
   size: A5 portrait;
-  margin: 0;
+  margin: 4mm;
 }
 
 @media print {
@@ -614,7 +614,7 @@ button {
     position: absolute;
     top: 0;
     left: 0;
-    width: 148mm;
+    width: 140mm;
     margin: 0;
     padding: 0;
     background: white;
