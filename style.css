@@ -257,14 +257,20 @@ button {
 }
 
 .primary-btn,
-.send-btn,
-.delete-btn,
 .secondary-btn {
   flex: 1;
   min-width: 100px;
   padding: 14px;
   border-radius: 12px;
   font-size: 15px;
+  font-weight: 700;
+}
+
+.send-btn,
+.delete-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 700;
 }
 
