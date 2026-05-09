@@ -41,6 +41,7 @@ button {
   background: #ececec;
   font-weight: 700;
   font-size: 15px;
+  color: #1877f2;
 }
 
 .tab-btn.active {
@@ -244,9 +245,6 @@ button {
   font-weight: 700;
 }
 
-/* ================================
-   BUTTONS
-================================ */
 .action-buttons,
 #daybookActions,
 .modal-actions {
@@ -254,6 +252,28 @@ button {
   gap: 10px;
   flex-wrap: wrap;
   margin-top: 14px;
+}
+
+/* ================================
+   BUTTONS
+================================ */
+#sendBtn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  background: #2f3f64;
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.delete-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #d65353;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .primary-btn,
@@ -266,14 +286,6 @@ button {
   font-weight: 700;
 }
 
-.send-btn,
-.delete-btn {
-  padding: 10px 16px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 700;
-}
-
 .primary-btn {
   background: #2f3f64;
   color: white;
@@ -282,11 +294,12 @@ button {
 .send-btn {
   background: #1f9d55;
   color: white;
-}
-
-.delete-btn {
-  background: #d65353;
-  color: white;
+  flex: 1;
+  min-width: 100px;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .secondary-btn {
