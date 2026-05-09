@@ -489,7 +489,7 @@ button {
 .col-material,
 .print-table td:nth-child(2),
 .daybook-print-table td:nth-child(2) {
-  width: 22px;
+  width: 12px;
   text-align: center;
   white-space: nowrap;
 }
@@ -497,7 +497,7 @@ button {
 .col-qty,
 .print-table td:nth-child(3),
 .daybook-print-table td:nth-child(3) {
-  width: 11px;
+  width: 5px;
   text-align: right;
   white-space: nowrap;
 }
