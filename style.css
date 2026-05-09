@@ -412,7 +412,7 @@ button {
 }
 
 .print-wrapper {
-  width: 140mm;
+  width: 135mm;
   min-height: 190mm;
   padding: 10mm 1.5mm 10mm 1.5mm;
   border: 1px solid #000;
