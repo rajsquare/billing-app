@@ -450,12 +450,12 @@ button {
 .print-customer,
 .print-serial {
   font-weight: 700;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .print-date {
-  margin-bottom: 6px;
-  font-size: 12px;
+  margin-bottom: 5px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -464,8 +464,8 @@ button {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 10px;
-  line-height: 1.15;
+  font-size: 9px;
+  line-height: 1.1;
 }
 
 .print-table th,
@@ -473,66 +473,77 @@ button {
 .daybook-print-table th,
 .daybook-print-table td {
   border: 1px solid #000;
-  padding: 2px 3px;
+  padding: 2px;
   text-align: center;
-  word-break: break-word;
   vertical-align: middle;
 }
 
-.print-table th:first-child,
-.print-table td:first-child {
-  width: 52%;
+/* 5 COLUMN LAYOUT */
+.print-table th:nth-child(1),
+.print-table td:nth-child(1) {
+  width: 38%;
   text-align: left;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .print-table th:nth-child(2),
 .print-table td:nth-child(2) {
-  width: 10%;
+  width: 14%;
+  white-space: nowrap;
 }
 
 .print-table th:nth-child(3),
 .print-table td:nth-child(3) {
-  width: 16%;
+  width: 12%;
+  white-space: nowrap;
 }
 
 .print-table th:nth-child(4),
 .print-table td:nth-child(4) {
-  width: 22%;
+  width: 16%;
+  white-space: nowrap;
+}
+
+.print-table th:nth-child(5),
+.print-table td:nth-child(5) {
+  width: 20%;
+  white-space: nowrap;
 }
 
 .print-total,
 .daybook-print-total {
-  margin-top: 8px;
+  margin-top: 6px;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 15px;
   text-align: right;
 }
 
 .print-balance {
-  margin-top: 12px;
-  font-size: 12px;
+  margin-top: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 
 .receiver-name-box {
-  margin-top: 18px;
+  margin-top: 14px;
 }
 
 .receiver-line {
   border-top: 1px solid #000;
-  width: 180px;
+  width: 160px;
 }
 
 .receiver-label {
   margin-top: 4px;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .daybook-print-title {
   text-align: center;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 /* ================================
@@ -566,7 +577,6 @@ button {
     height: 210mm;
     margin: 0;
     padding: 0;
-    overflow: visible;
     background: white;
   }
 
