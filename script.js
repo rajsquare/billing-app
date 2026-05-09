@@ -92,6 +92,10 @@ const confirmSend = document.getElementById("confirmSend");
 const printInvoice = document.getElementById("printInvoice");
 const incomingBills = document.getElementById("incomingBills");
 
+const previewModal = document.getElementById("previewModal");
+const previewContent = document.getElementById("previewContent");
+const closePreview = document.getElementById("closePreview");
+
 const daybookSummary = document.getElementById("daybookSummary");
 const daybookActions = document.getElementById("daybookActions");
 const daybookEntries = document.getElementById("daybookEntries");
@@ -540,9 +544,13 @@ function openSendModal() {
 }
 
 sendBtn.addEventListener("click", openSendModal);
-
 cancelPrint.addEventListener("click", () => {
   printModal.style.display = "none";
+});
+
+closePreview.addEventListener("click", () => {
+  previewModal.style.display = "none";
+  previewContent.innerHTML = "";
 });
 
 function createBillData() {
@@ -679,7 +687,9 @@ function buildSingleCopyPage(billData, label, itemsChunk, isLastPage) {
 
       <div class="print-header-row">
         <div class="print-customer">${billData.customerName}</div>
-        <div class="print-serial">#${billData.serialNumber}</div>
+       <div class="print-serial">
+  ${billData.serialNumber ? "#" + billData.serialNumber : ""}
+</div>
       </div>
 
       <div class="print-date">${billData.date}</div>
@@ -780,7 +790,26 @@ function buildDaybookPrintHTML() {
     </div>
   `;
 }
+function previewReceipt(billData) {
+  const chunks = chunkItems(
+    billData.items,
+    MAX_ITEMS_PER_DL_PAGE
+  );
 
+  let html = "";
+
+  chunks.forEach((chunk, index) => {
+    html += buildSingleCopyPage(
+      billData,
+      "VIEW",
+      chunk,
+      index === chunks.length - 1
+    );
+  });
+
+  previewContent.innerHTML = html;
+  previewModal.style.display = "flex";
+}
 function printReceipt(billData) {
   printInvoice.innerHTML = buildReceiptPrintHTML(billData);
   window.print();
@@ -815,8 +844,15 @@ function renderIncomingBills() {
 
     let buttons = "";
 
-   if (bill.status === "pending") {
+ if (bill.status === "pending") {
   buttons = `
+    <button
+      class="secondary-btn"
+      onclick="viewReceivedBill('${id}')"
+    >
+      View
+    </button>
+
     <button
       class="primary-btn"
       onclick="printReceivedBill('${id}')"
@@ -824,8 +860,16 @@ function renderIncomingBills() {
       Print
     </button>
   `;
-    } else {
+}
+ else {
      buttons = `
+  <button
+    class="secondary-btn"
+    onclick="viewReceivedBill('${id}')"
+  >
+    View
+  </button>
+
   <button
     class="primary-btn"
     onclick="reprintReceivedBill('${id}')"
@@ -1080,7 +1124,12 @@ window.printReceivedBill = async function(docId) {
     isReceiverBusy = false;
   }
 };
+window.viewReceivedBill = function(docId) {
+  const bill = incomingBillCache[docId];
+  if (!bill) return;
 
+  previewReceipt(bill);
+};
 window.reprintReceivedBill = function(docId) {
   const bill = incomingBillCache[docId];
   if (!bill) return;
@@ -1142,74 +1191,6 @@ window.doneReceivedBill = async function(docId) {
   } catch (err) {
     console.error(err);
     alert("Failed to complete bill.");
-  } finally {
-    isReceiverBusy = false;
-  }
-};
-
-window.deleteReceivedBill = async function(docId) {
-  if (isReceiverBusy) return;
-  if (!requireAdminPassword()) return;
-
-  isReceiverBusy = true;
-
-  try {
-    const billRef = doc(db, "bills", docId);
-
-    await runTransaction(db, async transaction => {
-      const billSnap = await transaction.get(billRef);
-
-      if (!billSnap.exists()) {
-        throw new Error("Bill not found.");
-      }
-
-      const bill = billSnap.data();
-
-      if (bill.status === "pending") {
-        transaction.delete(billRef);
-        return;
-      }
-
-      const serialSnap = await transaction.get(serialDocRef);
-
-      if (!serialSnap.exists()) {
-        throw new Error("Serial document missing.");
-      }
-
-      const serialData = serialSnap.data();
-      const keys = getModeKeys(bill.mode);
-
-      let active = [
-        ...new Set(serialData[keys.activeKey] || [])
-      ];
-
-      let reusable = [
-        ...new Set(serialData[keys.reusableKey] || [])
-      ];
-
-      reusable = reusable.filter(
-        s => !active.includes(s)
-      );
-
-      active = active.filter(
-        s => s !== bill.serialNumber
-      );
-
-      if (!reusable.includes(bill.serialNumber)) {
-        reusable.push(bill.serialNumber);
-        reusable.sort((a, b) => a - b);
-      }
-
-      transaction.update(serialDocRef, {
-        [keys.activeKey]: active,
-        [keys.reusableKey]: reusable
-      });
-
-      transaction.delete(billRef);
-    });
-  } catch (err) {
-    console.error(err);
-    alert("Failed to delete bill.");
   } finally {
     isReceiverBusy = false;
   }
