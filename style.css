@@ -413,8 +413,8 @@ button {
 
 .print-wrapper {
   width: 140mm;
-  min-height: 202mm;
-  padding: 4mm 1.5mm 2mm 1.5mm;
+  min-height: 190mm;
+  padding: 10mm 1.5mm 10mm 1.5mm;
   border: 1px solid #000;
   margin: 0;
   box-sizing: border-box;
@@ -445,14 +445,14 @@ button {
 
 .print-customer,
 .print-serial {
-  font-size: 18px;
+  font-size: 36px;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 .print-date {
   font-size: 14px;
-  margin: 0 0 5px 0;
+  margin: 0 0 8px 0;
   font-weight: 600;
   line-height: 1.2;
 }
@@ -538,14 +538,14 @@ button {
 }
 
 .print-balance {
-  margin-top: 5px;
-  font-size: 11px;
+  margin-top: 10px;
+  font-size: 36px;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 .receiver-name-box {
-  margin-top: 6px;
+  margin-top: 40px;
 }
 
 .receiver-line {
@@ -554,8 +554,8 @@ button {
 }
 
 .receiver-label {
-  margin-top: 2px;
-  font-size: 9px;
+  margin-top: 4px;
+  font-size: 14px;
   line-height: 1.2;
 }
 
@@ -587,7 +587,7 @@ button {
 ================================ */
 @page {
   size: A5 portrait;
-  margin: 4mm;
+  margin: 10mm 4mm 10mm 4mm;
 }
 
 @media print {
