@@ -611,6 +611,18 @@ function getModeKeys(mode) {
   };
 }
 
+const MAX_ITEMS_PER_DL_PAGE = 10;
+
+function chunkItems(items, size) {
+  const chunks = [];
+
+  for (let i = 0; i < items.length; i += size) {
+    chunks.push(items.slice(i, i + size));
+  }
+
+  return chunks;
+}
+
 function getLowestAvailableSerial(counter, reusable, active) {
   const reusableSorted = [...reusable].sort((a, b) => a - b);
 
@@ -635,13 +647,10 @@ function getLowestAvailableSerial(counter, reusable, active) {
   return null;
 }
 
-/* ================================
-   PRINT HELPERS
-================================ */
-function buildSingleCopy(billData, label) {
+function buildSingleCopyPage(billData, label, itemsChunk, isLastPage) {
   let rows = "";
 
-  billData.items.forEach(item => {
+  itemsChunk.forEach(item => {
     rows += `
       <tr>
         <td>${item.productName}</td>
@@ -654,18 +663,18 @@ function buildSingleCopy(billData, label) {
   });
 
   const wholesaleExtras =
-    billData.mode === "W"
+    billData.mode === "W" && isLastPage
       ? `
-        <div class="print-balance">Balance HV</div>
-        <div class="receiver-name-box">
-          <div class="receiver-line"></div>
-          <div class="receiver-label">Receiver’s Name</div>
-        </div>
-      `
+          <div class="print-balance">Balance HV</div>
+          <div class="receiver-name-box">
+            <div class="receiver-line"></div>
+            <div class="receiver-label">Receiver’s Name</div>
+          </div>
+        `
       : "";
 
   return `
-  <div class="print-wrapper receipt-copy">
+    <div class="print-wrapper receipt-copy">
       <div class="copy-label">${label}</div>
 
       <div class="print-header-row">
@@ -700,10 +709,32 @@ function buildSingleCopy(billData, label) {
 }
 
 function buildReceiptPrintHTML(billData) {
-  return `
-    ${buildSingleCopy(billData, "CUSTOMER COPY")}
-    ${buildSingleCopy(billData, "OFFICE COPY")}
-  `;
+  const chunks = chunkItems(
+    billData.items,
+    MAX_ITEMS_PER_DL_PAGE
+  );
+
+  let html = "";
+
+  chunks.forEach((chunk, index) => {
+    html += buildSingleCopyPage(
+      billData,
+      "CUSTOMER COPY",
+      chunk,
+      index === chunks.length - 1
+    );
+  });
+
+  chunks.forEach((chunk, index) => {
+    html += buildSingleCopyPage(
+      billData,
+      "OFFICE COPY",
+      chunk,
+      index === chunks.length - 1
+    );
+  });
+
+  return html;
 }
 
 function buildDaybookPrintHTML() {
@@ -784,45 +815,31 @@ function renderIncomingBills() {
 
     let buttons = "";
 
-    if (bill.status === "pending") {
-      buttons = `
-        <button
-          class="primary-btn"
-          onclick="printReceivedBill('${id}')"
-        >
-          Print
-        </button>
-
-        <button
-          class="delete-btn"
-          onclick="deleteReceivedBill('${id}')"
-        >
-          Delete
-        </button>
-      `;
+   if (bill.status === "pending") {
+  buttons = `
+    <button
+      class="primary-btn"
+      onclick="printReceivedBill('${id}')"
+    >
+      Print
+    </button>
+  `;
     } else {
-      buttons = `
-        <button
-          class="primary-btn"
-          onclick="reprintReceivedBill('${id}')"
-        >
-          Reprint
-        </button>
+     buttons = `
+  <button
+    class="primary-btn"
+    onclick="reprintReceivedBill('${id}')"
+  >
+    Reprint
+  </button>
 
-        <button
-          class="send-btn"
-          onclick="doneReceivedBill('${id}')"
-        >
-          Done
-        </button>
-
-        <button
-          class="delete-btn"
-          onclick="deleteReceivedBill('${id}')"
-        >
-          Delete
-        </button>
-      `;
+  <button
+    class="send-btn"
+    onclick="doneReceivedBill('${id}')"
+  >
+    Done
+  </button>
+`;
     }
 
     html += `
