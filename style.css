@@ -475,22 +475,21 @@ button {
   vertical-align: middle;
 }
 
-/* PRODUCT GETS ALL REMAINING SPACE */
+/* PRODUCT GETS REMAINING SPACE */
 .col-product,
 .print-table td:first-child,
 .daybook-print-table td:first-child {
   width: auto;
   text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
 }
 
-/* EXACT TIGHT FIT COLUMNS */
+/* YOUR EXACT WIDTHS */
 .col-material,
 .print-table td:nth-child(2),
 .daybook-print-table td:nth-child(2) {
-  width: 44px;
+  width: 22px;
   text-align: center;
   white-space: nowrap;
 }
@@ -498,7 +497,7 @@ button {
 .col-qty,
 .print-table td:nth-child(3),
 .daybook-print-table td:nth-child(3) {
-  width: 32px;
+  width: 11px;
   text-align: right;
   white-space: nowrap;
 }
@@ -506,7 +505,7 @@ button {
 .col-rate,
 .print-table td:nth-child(4),
 .daybook-print-table td:nth-child(4) {
-  width: 56px;
+  width: 28px;
   text-align: right;
   white-space: nowrap;
 }
@@ -514,7 +513,7 @@ button {
 .col-amount,
 .print-table td:nth-child(5),
 .daybook-print-table td:nth-child(5) {
-  width: 70px;
+  width: 50px;
   text-align: right;
   white-space: nowrap;
 }
