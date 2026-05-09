@@ -13,7 +13,6 @@
 
   <!-- APP TABS -->
   <div class="app-tabs">
-
     <button
       id="billingTab"
       class="tab-btn active"
@@ -30,11 +29,10 @@
 
     <button
       id="daybookTab"
-      class="tab-btn daybook-tab"
+      class="tab-btn daybook-mini"
     >
       D
     </button>
-
   </div>
 
   <!-- BILLING VIEW -->
@@ -51,7 +49,6 @@
       </div>
 
       <div class="search-wrapper">
-
         <input
           type="text"
           id="searchBox"
@@ -62,17 +59,14 @@
         <div id="clearSearch">
           <span class="clear-x">✕</span>
         </div>
-
       </div>
 
       <div id="suggestions"></div>
-
     </div>
 
     <div id="billItems"></div>
 
     <div class="total-card">
-
       <div class="total-row">
         <span>Total</span>
         <span id="grandTotal">₹0</span>
@@ -83,16 +77,13 @@
           Send
         </button>
       </div>
-
     </div>
 
   </div>
 
   <!-- RECEIVER VIEW -->
-  <div id="receiverView">
-
+  <div id="receiverView" style="display:none;">
     <div class="receiver-card">
-
       <div class="receiver-title">
         Receiver Mode
       </div>
@@ -102,43 +93,38 @@
       </div>
 
       <div id="incomingBills"></div>
-
     </div>
-
   </div>
 
   <!-- DAYBOOK VIEW -->
-  <div id="daybookView">
-
+  <div id="daybookView" style="display:none;">
     <div class="receiver-card">
-
       <div class="receiver-title">
         Daybook
       </div>
 
-      <div class="receiver-subtitle">
-        Finalized bills waiting for print / purge
+      <div
+        id="daybookSummary"
+        class="receiver-subtitle"
+      >
+        Total: ₹0
       </div>
-
-      <div id="daybookSummary"></div>
 
       <div id="daybookActions"></div>
 
       <div id="daybookEntries"></div>
-
     </div>
-
   </div>
 
   <!-- SEND MODAL -->
-  <div id="printModal" class="modal-overlay">
-
+  <div
+    id="printModal"
+    class="modal-overlay"
+    style="display:none;"
+  >
     <div class="modal-card">
 
-      <div
-        class="modal-title"
-        id="modalTitle"
-      >
+      <div class="modal-title">
         Send Details
       </div>
 
@@ -152,12 +138,10 @@
           type="text"
           id="customerName"
           placeholder="Enter customer name"
-          autocomplete="off"
         >
       </div>
 
       <div class="modal-actions">
-
         <button
           id="cancelPrint"
           class="secondary-btn"
@@ -171,11 +155,38 @@
         >
           Send
         </button>
-
       </div>
 
     </div>
+  </div>
 
+  <!-- PREVIEW MODAL -->
+  <div
+    id="previewModal"
+    class="modal-overlay"
+    style="display:none;"
+  >
+    <div class="preview-card">
+
+      <div class="modal-title">
+        Bill Preview
+      </div>
+
+      <div
+        id="previewContent"
+        class="preview-content"
+      ></div>
+
+      <div class="modal-actions">
+        <button
+          id="closePreview"
+          class="secondary-btn"
+        >
+          Close
+        </button>
+      </div>
+
+    </div>
   </div>
 
   <!-- PRINT AREA -->
