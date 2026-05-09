@@ -678,7 +678,7 @@ function buildSingleCopyPage(billData, label, itemsChunk, isLastPage) {
         <td>${item.productName}</td>
       <td>${shortMaterialName(item.material)}</td>
         <td>${item.qty}</td>
-        <td>${item.price}</td>
+<td>${formatIndianMoney(item.price)}</td>
        <td>${formatIndianMoney(item.total)}</td>
       </tr>
     `;
