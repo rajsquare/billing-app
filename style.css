@@ -379,7 +379,6 @@ button {
   height: auto;
   padding: 0;
   border: none;
-  page-break-after: auto;
 }
 
 .preview-content .copy-label {
@@ -468,7 +467,7 @@ button {
 .daybook-print-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
   font-size: 14px;
   line-height: 0.9;
 }
@@ -484,32 +483,32 @@ button {
 }
 
 .col-product {
-  width: 36%;
+  width: auto;
   text-align: left;
   white-space: normal;
   word-break: break-word;
 }
 
 .col-material {
-  width: 9%;
+  width: 52px;
   text-align: center;
   white-space: nowrap;
 }
 
 .col-qty {
-  width: 9%;
+  width: 42px;
   text-align: right;
   white-space: nowrap;
 }
 
 .col-rate {
-  width: 18%;
+  width: 58px;
   text-align: right;
   white-space: nowrap;
 }
 
 .col-amount {
-  width: 28%;
+  width: 78px;
   text-align: right;
   white-space: nowrap;
 }
@@ -551,6 +550,7 @@ button {
   font-weight: 700;
   margin-bottom: 3px;
 }
+
 /* ================================
    DESKTOP
 ================================ */
