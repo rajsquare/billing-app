@@ -377,6 +377,7 @@ button {
   width: 100%;
   min-height: auto;
   padding: 0;
+  border: none;
   page-break-after: auto;
 }
 
@@ -413,49 +414,57 @@ button {
 }
 
 .print-wrapper {
-  width: 99mm;
+  width: 148mm;
   min-height: 210mm;
-  padding: 4mm;
-  font-family: Arial, sans-serif;
-  color: #000;
+  padding: 6mm;
+  border: 1.5px solid #000;
   margin: 0;
   box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  color: #000;
+  background: white;
 }
 
 .receipt-copy {
   page-break-after: always;
 }
 
+.receipt-copy:last-child {
+  page-break-after: auto;
+}
+
 .copy-label {
   text-align: center;
   font-weight: 700;
   font-size: 16px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .print-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .print-customer,
 .print-serial {
   font-weight: 700;
-  font-size: 14px;
+  font-size: 18px;
 }
 
 .print-date {
-  margin-bottom: 10px;
-  font-size: 12px;
+  margin-bottom: 14px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .print-table,
 .daybook-print-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 8px;
+  table-layout: fixed;
+  font-size: 11px;
 }
 
 .print-table th,
@@ -463,44 +472,66 @@ button {
 .daybook-print-table th,
 .daybook-print-table td {
   border: 1px solid #000;
-  padding: 3px;
+  padding: 5px 4px;
   text-align: center;
   word-break: break-word;
+  vertical-align: middle;
+}
+
+.print-table th:first-child,
+.print-table td:first-child {
+  width: 46%;
+  text-align: left;
+}
+
+.print-table th:nth-child(2),
+.print-table td:nth-child(2) {
+  width: 14%;
+}
+
+.print-table th:nth-child(3),
+.print-table td:nth-child(3) {
+  width: 18%;
+}
+
+.print-table th:nth-child(4),
+.print-table td:nth-child(4) {
+  width: 22%;
 }
 
 .print-total,
 .daybook-print-total {
-  margin-top: 10px;
+  margin-top: 14px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 20px;
   text-align: right;
 }
 
 .print-balance {
-  margin-top: 18px;
+  margin-top: 26px;
   font-size: 14px;
   font-weight: 700;
 }
 
 .receiver-name-box {
-  margin-top: 28px;
+  margin-top: 40px;
 }
 
 .receiver-line {
   border-top: 1px solid #000;
-  width: 160px;
+  width: 220px;
 }
 
 .receiver-label {
-  margin-top: 6px;
-  font-size: 12px;
+  margin-top: 8px;
+  font-size: 13px;
 }
 
 .daybook-print-title {
   text-align: center;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 /* ================================
@@ -523,18 +554,18 @@ button {
    PRINT MEDIA
 ================================ */
 @page {
-  size: 99mm 210mm;
+  size: A5 portrait;
   margin: 0;
 }
 
 @media print {
   html,
   body {
-    width: 99mm;
+    width: 148mm;
     height: 210mm;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    overflow: visible;
     background: white;
   }
 
@@ -552,13 +583,9 @@ button {
     position: absolute;
     top: 0;
     left: 0;
-    width: 99mm;
+    width: 148mm;
     margin: 0;
     padding: 0;
     background: white;
-  }
-
-  .receipt-copy:last-child {
-    page-break-after: auto;
   }
 }
