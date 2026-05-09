@@ -420,9 +420,9 @@ button {
   border: 1px solid #000;
   margin: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
-  color: #000;
   background: white;
+  color: #000;
+  font-family: Arial, sans-serif;
 }
 
 .receipt-copy {
@@ -435,8 +435,8 @@ button {
 
 .copy-label {
   text-align: center;
+  font-size: 12px;
   font-weight: 700;
-  font-size: 13px;
   margin-bottom: 4px;
 }
 
@@ -449,13 +449,13 @@ button {
 
 .print-customer,
 .print-serial {
-  font-weight: 700;
   font-size: 14px;
+  font-weight: 700;
 }
 
 .print-date {
-  margin-bottom: 5px;
   font-size: 11px;
+  margin-bottom: 5px;
   font-weight: 600;
 }
 
@@ -463,9 +463,9 @@ button {
 .daybook-print-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
   font-size: 9px;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .print-table th,
@@ -474,49 +474,47 @@ button {
 .daybook-print-table td {
   border: 1px solid #000;
   padding: 2px;
-  text-align: center;
   vertical-align: middle;
 }
 
-/* 5 COLUMN LAYOUT */
-.print-table th:nth-child(1),
-.print-table td:nth-child(1) {
-  width: 38%;
+/* PRINT COLUMN CONTROL */
+.col-product {
+  width: 42%;
   text-align: left;
   white-space: normal;
   word-break: break-word;
 }
 
-.print-table th:nth-child(2),
-.print-table td:nth-child(2) {
-  width: 14%;
-  white-space: nowrap;
-}
-
-.print-table th:nth-child(3),
-.print-table td:nth-child(3) {
+.col-material {
   width: 12%;
+  text-align: center;
   white-space: nowrap;
 }
 
-.print-table th:nth-child(4),
-.print-table td:nth-child(4) {
-  width: 16%;
+.col-qty {
+  width: 10%;
+  text-align: right;
   white-space: nowrap;
 }
 
-.print-table th:nth-child(5),
-.print-table td:nth-child(5) {
-  width: 20%;
+.col-rate {
+  width: 14%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.col-amount {
+  width: 22%;
+  text-align: right;
   white-space: nowrap;
 }
 
 .print-total,
 .daybook-print-total {
-  margin-top: 6px;
-  font-weight: 700;
-  font-size: 15px;
+  margin-top: 8px;
   text-align: right;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .print-balance {
@@ -530,8 +528,8 @@ button {
 }
 
 .receiver-line {
-  border-top: 1px solid #000;
   width: 160px;
+  border-top: 1px solid #000;
 }
 
 .receiver-label {
