@@ -405,16 +405,16 @@ button {
 }
 
 /* ================================
-   DL PRINT
+   FINAL DL PRINT
 ================================ */
 #printInvoice {
   display: none;
 }
 
 .print-wrapper {
-  width: 89mm;
-  min-height: 194mm;
-  padding: 8mm 2mm 8mm 2mm;
+  width: 85mm;
+  min-height: 180mm;
+  padding: 15mm 2mm 8mm 10mm;
   border: 1px solid #000;
   margin: 0 auto;
   box-sizing: border-box;
@@ -477,7 +477,7 @@ button {
   vertical-align: middle;
 }
 
-/* PRODUCT MAX WIDTH */
+/* PRODUCT GETS EVERYTHING */
 .col-product,
 .print-table th:nth-child(1),
 .print-table td:nth-child(1),
@@ -521,9 +521,9 @@ button {
 .print-table td:nth-child(4),
 .daybook-print-table th:nth-child(4),
 .daybook-print-table td:nth-child(4) {
-  width: 16mm;
-  min-width: 16mm;
-  max-width: 16mm;
+  width: 11mm;
+  min-width: 11mm;
+  max-width: 11mm;
   text-align: right;
   white-space: nowrap;
 }
@@ -533,9 +533,9 @@ button {
 .print-table td:nth-child(5),
 .daybook-print-table th:nth-child(5),
 .daybook-print-table td:nth-child(5) {
-  width: 20mm;
-  min-width: 20mm;
-  max-width: 20mm;
+  width: 15mm;
+  min-width: 15mm;
+  max-width: 15mm;
   text-align: right;
   white-space: nowrap;
 }
@@ -548,32 +548,32 @@ button {
 
 .print-total,
 .daybook-print-total {
-  margin-top: 4px;
+  margin-top: 6px;
   text-align: right;
-  font-size: 13px;
+  font-size: 20px;
   font-weight: 700;
   line-height: 1.1;
 }
 
 .print-balance {
   margin-top: 8px;
-  font-size: 25px;
+  font-size: 60px;
   font-weight: 700;
   line-height: 1;
 }
 
 .receiver-name-box {
-  margin-top: 35px;
+  margin-top: 40px;
 }
 
 .receiver-line {
-  width: 65mm;
+  width: 60mm;
   border-top: 1px solid #000;
 }
 
 .receiver-label {
   margin-top: 4px;
-  font-size: 13px;
+  font-size: 18px;
   line-height: 1.1;
 }
 
@@ -605,7 +605,7 @@ button {
 ================================ */
 @page {
   size: DL portrait;
-  margin: 8mm 4mm 8mm 4mm;
+  margin: 15mm 4mm 8mm 10mm;
 }
 
 @media print {
