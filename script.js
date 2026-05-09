@@ -611,7 +611,7 @@ function getModeKeys(mode) {
   };
 }
 
-const MAX_ITEMS_PER_DL_PAGE = 10;
+const MAX_ITEMS_PER_DL_PAGE = 20;
 
 function chunkItems(items, size) {
   const chunks = [];
