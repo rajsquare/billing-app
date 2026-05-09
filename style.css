@@ -557,13 +557,13 @@ button {
 
 .print-balance {
   margin-top: 8px;
-  font-size: 60px;
+  font-size: 25px;
   font-weight: 700;
   line-height: 1;
 }
 
 .receiver-name-box {
-  margin-top: 40px;
+  margin-top: 35px;
 }
 
 .receiver-line {
@@ -573,7 +573,7 @@ button {
 
 .receiver-label {
   margin-top: 4px;
-  font-size: 18px;
+  font-size: 13px;
   line-height: 1.1;
 }
 
