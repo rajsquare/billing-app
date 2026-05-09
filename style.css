@@ -538,8 +538,8 @@ button {
 }
 
 .print-balance {
-  margin-top: 14px;
-  font-size: 100px;
+  margin-top: 10px;
+  font-size: 36px;
   font-weight: 700;
   line-height: 1.1;
 }
@@ -554,9 +554,9 @@ button {
 }
 
 .receiver-label {
-  margin-top: 6px;
-  font-size: 28px;
-  line-height: 1.1;
+  margin-top: 4px;
+  font-size: 20px;
+  line-height: 1.2;
 }
 
 .daybook-print-title {
