@@ -416,8 +416,8 @@ button {
 .print-wrapper {
   width: 148mm;
   min-height: 210mm;
-  padding: 6mm;
-  border: 1.5px solid #000;
+  padding: 3mm;
+  border: 1px solid #000;
   margin: 0;
   box-sizing: border-box;
   font-family: Arial, sans-serif;
@@ -436,26 +436,26 @@ button {
 .copy-label {
   text-align: center;
   font-weight: 700;
-  font-size: 16px;
-  margin-bottom: 12px;
+  font-size: 13px;
+  margin-bottom: 4px;
 }
 
 .print-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
 }
 
 .print-customer,
 .print-serial {
   font-weight: 700;
-  font-size: 18px;
+  font-size: 15px;
 }
 
 .print-date {
-  margin-bottom: 14px;
-  font-size: 14px;
+  margin-bottom: 6px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -464,7 +464,8 @@ button {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 11px;
+  font-size: 10px;
+  line-height: 1.15;
 }
 
 .print-table th,
@@ -472,7 +473,7 @@ button {
 .daybook-print-table th,
 .daybook-print-table td {
   border: 1px solid #000;
-  padding: 5px 4px;
+  padding: 2px 3px;
   text-align: center;
   word-break: break-word;
   vertical-align: middle;
@@ -480,18 +481,18 @@ button {
 
 .print-table th:first-child,
 .print-table td:first-child {
-  width: 46%;
+  width: 52%;
   text-align: left;
 }
 
 .print-table th:nth-child(2),
 .print-table td:nth-child(2) {
-  width: 14%;
+  width: 10%;
 }
 
 .print-table th:nth-child(3),
 .print-table td:nth-child(3) {
-  width: 18%;
+  width: 16%;
 }
 
 .print-table th:nth-child(4),
@@ -501,37 +502,37 @@ button {
 
 .print-total,
 .daybook-print-total {
-  margin-top: 14px;
+  margin-top: 8px;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 16px;
   text-align: right;
 }
 
 .print-balance {
-  margin-top: 26px;
-  font-size: 14px;
+  margin-top: 12px;
+  font-size: 12px;
   font-weight: 700;
 }
 
 .receiver-name-box {
-  margin-top: 40px;
+  margin-top: 18px;
 }
 
 .receiver-line {
   border-top: 1px solid #000;
-  width: 220px;
+  width: 180px;
 }
 
 .receiver-label {
-  margin-top: 8px;
-  font-size: 13px;
+  margin-top: 4px;
+  font-size: 11px;
 }
 
 .daybook-print-title {
   text-align: center;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 /* ================================
