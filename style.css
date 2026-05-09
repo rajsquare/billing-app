@@ -376,6 +376,7 @@ button {
 .preview-content .print-wrapper {
   width: 100%;
   min-height: auto;
+  height: auto;
   padding: 0;
   border: none;
   page-break-after: auto;
@@ -415,7 +416,7 @@ button {
 
 .print-wrapper {
   width: 148mm;
-  min-height: 210mm;
+  height: 204mm;
   padding: 3mm;
   border: 1px solid #000;
   margin: 0;
@@ -423,6 +424,7 @@ button {
   background: white;
   color: #000;
   font-family: Arial, sans-serif;
+  overflow: hidden;
 }
 
 .receipt-copy {
@@ -435,7 +437,7 @@ button {
 
 .copy-label {
   text-align: center;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   margin-bottom: 4px;
 }
@@ -449,12 +451,12 @@ button {
 
 .print-customer,
 .print-serial {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
 }
 
 .print-date {
-  font-size: 11px;
+  font-size: 13px;
   margin-bottom: 5px;
   font-weight: 600;
 }
@@ -464,8 +466,8 @@ button {
   width: 100%;
   border-collapse: collapse;
   table-layout: auto;
-  font-size: 9px;
-  line-height: 1.15;
+  font-size: 10.5px;
+  line-height: 1.1;
 }
 
 .print-table th,
@@ -473,11 +475,10 @@ button {
 .daybook-print-table th,
 .daybook-print-table td {
   border: 1px solid #000;
-  padding: 2px;
+  padding: 1.5px;
   vertical-align: middle;
 }
 
-/* PRINT COLUMN CONTROL */
 .col-product {
   width: 42%;
   text-align: left;
@@ -513,13 +514,13 @@ button {
 .daybook-print-total {
   margin-top: 8px;
   text-align: right;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
 }
 
 .print-balance {
   margin-top: 10px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -534,12 +535,12 @@ button {
 
 .receiver-label {
   margin-top: 4px;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .daybook-print-title {
   text-align: center;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   margin-bottom: 8px;
 }
