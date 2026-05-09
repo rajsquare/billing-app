@@ -312,9 +312,8 @@ button {
   background: #ddd;
   color: #111;
 }
-
 /* ================================
-   MODALS
+   MODALS CONTINUED
 ================================ */
 .modal-overlay {
   position: fixed;
@@ -383,6 +382,7 @@ button {
 .preview-content .copy-label {
   display: none;
 }
+
 /* ================================
    DAYBOOK
 ================================ */
@@ -405,18 +405,18 @@ button {
 }
 
 /* ================================
-   PRINT
+   DL PRINT
 ================================ */
 #printInvoice {
   display: none;
 }
 
 .print-wrapper {
-  width: 135mm;
-  min-height: 190mm;
-  padding: 10mm 1.5mm 10mm 1.5mm;
+  width: 89mm;
+  min-height: 194mm;
+  padding: 8mm 2mm 8mm 2mm;
   border: 1px solid #000;
-  margin: 0;
+  margin: 0 auto;
   box-sizing: border-box;
   background: white;
   color: #000;
@@ -430,40 +430,42 @@ button {
 
 .copy-label {
   text-align: center;
-  font-size: 16px;
+  font-size: 11px;
   font-weight: 700;
-  margin: 0 0 3px 0;
-  line-height: 1.2;
+  margin: 0 0 2px 0;
+  line-height: 1.1;
 }
 
 .print-header-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 4px;
+  align-items: flex-start;
+  gap: 4px;
+  margin-bottom: 2px;
 }
 
 .print-customer,
 .print-serial {
-  font-size: 36px;
+  font-size: 22px;
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1;
+  word-break: break-word;
 }
 
 .print-date {
-  font-size: 14px;
-  margin: 0 0 8px 0;
+  font-size: 11px;
+  margin: 0 0 6px 0;
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 .print-table,
 .daybook-print-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: auto;
-  font-size: 14px;
-  line-height: 1.15;
+  table-layout: fixed;
+  font-size: 10px;
+  line-height: 1.1;
 }
 
 .print-table th,
@@ -471,11 +473,11 @@ button {
 .daybook-print-table th,
 .daybook-print-table td {
   border: 1px solid #000;
-  padding: 2px 4px;
+  padding: 2px 2px;
   vertical-align: middle;
 }
 
-/* PRODUCT GETS MAXIMUM SPACE */
+/* PRODUCT MAX WIDTH */
 .col-product,
 .print-table th:nth-child(1),
 .print-table td:nth-child(1),
@@ -483,17 +485,21 @@ button {
 .daybook-print-table td:nth-child(1) {
   width: auto;
   text-align: left;
-  white-space: normal;
+  overflow-wrap: break-word;
   word-break: break-word;
+  line-height: 1.1;
+  min-height: 20px;
 }
 
-/* THIN AUTO CONTENT COLUMNS */
+/* FIXED SUPPORT COLUMNS */
 .col-material,
 .print-table th:nth-child(2),
 .print-table td:nth-child(2),
 .daybook-print-table th:nth-child(2),
 .daybook-print-table td:nth-child(2) {
-  width: 1%;
+  width: 8mm;
+  min-width: 8mm;
+  max-width: 8mm;
   text-align: center;
   white-space: nowrap;
 }
@@ -503,7 +509,9 @@ button {
 .print-table td:nth-child(3),
 .daybook-print-table th:nth-child(3),
 .daybook-print-table td:nth-child(3) {
-  width: 1%;
+  width: 8mm;
+  min-width: 8mm;
+  max-width: 8mm;
   text-align: right;
   white-space: nowrap;
 }
@@ -513,7 +521,9 @@ button {
 .print-table td:nth-child(4),
 .daybook-print-table th:nth-child(4),
 .daybook-print-table td:nth-child(4) {
-  width: 1%;
+  width: 16mm;
+  min-width: 16mm;
+  max-width: 16mm;
   text-align: right;
   white-space: nowrap;
 }
@@ -523,25 +533,33 @@ button {
 .print-table td:nth-child(5),
 .daybook-print-table th:nth-child(5),
 .daybook-print-table td:nth-child(5) {
-  width: 1%;
+  width: 20mm;
+  min-width: 20mm;
+  max-width: 20mm;
   text-align: right;
   white-space: nowrap;
+}
+
+/* CONTROLLED ROW HEIGHTS */
+.print-table tr,
+.daybook-print-table tr {
+  height: 20px;
 }
 
 .print-total,
 .daybook-print-total {
   margin-top: 4px;
   text-align: right;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 .print-balance {
-  margin-top: 10px;
-  font-size: 36px;
+  margin-top: 8px;
+  font-size: 60px;
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1;
 }
 
 .receiver-name-box {
@@ -549,19 +567,19 @@ button {
 }
 
 .receiver-line {
-  width: 130px;
+  width: 65mm;
   border-top: 1px solid #000;
 }
 
 .receiver-label {
   margin-top: 4px;
-  font-size: 14px;
-  line-height: 1.2;
+  font-size: 18px;
+  line-height: 1.1;
 }
 
 .daybook-print-title {
   text-align: center;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
   margin-bottom: 3px;
 }
@@ -583,17 +601,17 @@ button {
 }
 
 /* ================================
-   PRINT MEDIA
+   DL PRINT MEDIA
 ================================ */
 @page {
-  size: A5 portrait;
-  margin: 10mm 4mm 10mm 4mm;
+  size: DL portrait;
+  margin: 8mm 4mm 8mm 4mm;
 }
 
 @media print {
   html,
   body {
-    width: 148mm;
+    width: 99mm;
     height: 210mm;
     margin: 0;
     padding: 0;
@@ -614,7 +632,7 @@ button {
     position: absolute;
     top: 0;
     left: 0;
-    width: 140mm;
+    width: 99mm;
     margin: 0;
     padding: 0;
     background: white;
