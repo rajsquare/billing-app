@@ -1104,20 +1104,36 @@ window.updateQty =
       return;
     }
 
-    billItems[index].qty =
-      value;
+    const parsedQty =
+      parseFloat(value);
 
-    const qty =
-      parseFloat(
-        value
-      ) || 0;
+    if (isNaN(parsedQty)) {
+      billItems[index].qty = "";
+      billItems[index].total = 0;
+    } else {
+      const roundedQty =
+        Math.round(parsedQty * 100) / 100;
 
-    billItems[index].total =
-      billItems[index]
-        .price * qty;
+      billItems[index].qty =
+        roundedQty;
+
+      billItems[index].total =
+        billItems[index]
+          .price * roundedQty;
+    }
 
     updateGrandTotal();
     saveDraft();
+
+    const qtyInput =
+      document.querySelector(
+        `[data-qty-index="${index}"]`
+      );
+
+    if (qtyInput) {
+      qtyInput.value =
+        billItems[index].qty || "";
+    }
 
     const totalEl =
       billItemsDiv.querySelectorAll(
