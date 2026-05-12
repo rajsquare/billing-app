@@ -427,12 +427,14 @@ button {
   color: #000;
   font-family: Arial, sans-serif;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+  display: block;
 }
 
 /* only invoice copies force page breaks */
 .receipt-copy {
+  display: flex;
+  flex-direction: column;
+  min-height: 180mm;
   page-break-after: always;
 }
 
