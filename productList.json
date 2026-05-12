@@ -1,4124 +1,2117 @@
-[
-  {
-    "sr": 1,
-    "productName": "Nirmal Saucepan Baby",
-    "wPrice": 1550,
-    "priceType": "KG",
-    "rPrice": 1800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 2,
-    "productName": "Nirmal Saucepan Regular",
-    "wPrice": 1350,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 3,
-    "productName": "Nirmal Kadhai + Lid Mathar",
-    "wPrice": 1450,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 4,
-    "productName": "Nirmal Mathar Saucepan + lid",
-    "wPrice": 1400,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 5,
-    "productName": "Nirmal Deep Frying Pan",
-    "wPrice": 1450,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 6,
-    "productName": "Nirmal Parat",
-    "wPrice": 1400,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 7,
-    "productName": "Nirmal Sipri",
-    "wPrice": 1400,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 8,
-    "productName": "Nirmal Sipri",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 9,
-    "productName": "Chirag Gadu",
-    "wPrice": 1670,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 10,
-    "productName": "Chirag Gangal",
-    "wPrice": 1750,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 11,
-    "productName": "Chirag Navrang",
-    "wPrice": null,
-    "priceType": "KG",
-    "rPrice": null,
-    "material": null,
-    "": null
-  },
-  {
-    "sr": 12,
-    "productName": "Chirag Pawali 1-8",
-    "wPrice": 1600,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 13,
-    "productName": "Chirag Pawali 7-8",
-    "wPrice": 1620,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 14,
-    "productName": "Chirag Kulfi Matka",
-    "wPrice": 1670,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 15,
-    "productName": "Chirag Taman",
-    "wPrice": 1630,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 16,
-    "productName": "Chirag Nashik Kalsi",
-    "wPrice": 1650,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": null,
-    "": null
-  },
-  {
-    "sr": 17,
-    "productName": "Print Tilak Thal up to 24 inch",
-    "wPrice": 980,
-    "priceType": "KG",
-    "rPrice": 1100,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 18,
-    "productName": "Print Tilak Thal 25-26 inch",
-    "wPrice": 1000,
-    "priceType": "KG",
-    "rPrice": 1100,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 19,
-    "productName": "Print Tilak Thal 26 inch and above",
-    "wPrice": 1050,
-    "priceType": "KG",
-    "rPrice": 1150,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 20,
-    "productName": "Jalebi Thal up to 24 inch",
-    "wPrice": 1020,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 21,
-    "productName": "Jalebi Thal 24 inch and above",
-    "wPrice": 1040,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 22,
-    "productName": "Plain Thali (Bhaiya) 10.5 inch",
-    "wPrice": 1080,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 23,
-    "productName": "Plain Thali (Bhaiya)",
-    "wPrice": 1030,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 24,
-    "productName": "Print Thali",
-    "wPrice": 1100,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 25,
-    "productName": "Handa",
-    "wPrice": 1050,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 26,
-    "productName": "Kalsi",
-    "wPrice": 1080,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 27,
-    "productName": "Kalsi up to 1.5 kg",
-    "wPrice": 1120,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 28,
-    "productName": "Nakshi Kalsi",
-    "wPrice": 2200,
-    "priceType": "PP",
-    "rPrice": 2500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 29,
-    "productName": "Katora",
-    "wPrice": 1050,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 30,
-    "productName": "Lota / Glass",
-    "wPrice": 1070,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 31,
-    "productName": "Palta",
-    "wPrice": 1000,
-    "priceType": "KG",
-    "rPrice": 1300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 32,
-    "productName": "Kalchul",
-    "wPrice": 1000,
-    "priceType": "KG",
-    "rPrice": 1300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 33,
-    "productName": "Kajrota Gol Small",
-    "wPrice": 80,
-    "priceType": "PP",
-    "rPrice": 100,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 34,
-    "productName": "Kajrota Gol Big",
-    "wPrice": 100,
-    "priceType": "PP",
-    "rPrice": 150,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 35,
-    "productName": "Kajrota Pan Small",
-    "wPrice": 90,
-    "priceType": "PP",
-    "rPrice": 140,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 36,
-    "productName": "Kajrota Pan Big",
-    "wPrice": 100,
-    "priceType": "PP",
-    "rPrice": 200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 37,
-    "productName": "Batoi",
-    "wPrice": 1000,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 38,
-    "productName": "Batoi Light Weight",
-    "wPrice": 1050,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 39,
-    "productName": "Shubh Vivah Kalsa Set",
-    "wPrice": 2500,
-    "priceType": "PP",
-    "rPrice": 2800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 40,
-    "productName": "Goli",
-    "wPrice": 1400,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 41,
-    "productName": "Kodam Plain",
-    "wPrice": 1750,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 42,
-    "productName": "Kodam Nakshi",
-    "wPrice": 1850,
-    "priceType": "KG",
-    "rPrice": 2100,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 43,
-    "productName": "Supda",
-    "wPrice": 950,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 44,
-    "productName": "Ghamela",
-    "wPrice": 1000,
-    "priceType": "KG",
-    "rPrice": 1300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 45,
-    "productName": "Ghamela Sheet",
-    "wPrice": 1500,
-    "priceType": "KG",
-    "rPrice": 1800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 46,
-    "productName": "Chuna Stick",
-    "wPrice": 100,
-    "priceType": "PP",
-    "rPrice": 150,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 47,
-    "productName": "Masala Box Coloured",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 48,
-    "productName": "Masala Box Light Small",
-    "wPrice": 700,
-    "priceType": "PP",
-    "rPrice": 900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 49,
-    "productName": "Masala Roti Box Small",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 50,
-    "productName": "Masala Roti Box Big",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 51,
-    "productName": "Masala Box Jumbo",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 52,
-    "productName": "Masala Box Square 4",
-    "wPrice": 1700,
-    "priceType": "PP",
-    "rPrice": 2000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 53,
-    "productName": "Masala Box Square 6",
-    "wPrice": 2300,
-    "priceType": "PP",
-    "rPrice": 2500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 54,
-    "productName": "Masala Box Square 9",
-    "wPrice": 2800,
-    "priceType": "PP",
-    "rPrice": 3200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 55,
-    "productName": "Rolex Dabba 1-3",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 56,
-    "productName": "Ubha Dabba Kalai",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 57,
-    "productName": "Ubha Dabba 1-5",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 58,
-    "productName": "Ubha Dabba 6-11",
-    "wPrice": 1600,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 59,
-    "productName": "Antique Peti",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 60,
-    "productName": "Panpeti 0",
-    "wPrice": 2300,
-    "priceType": "PP",
-    "rPrice": 2700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 61,
-    "productName": "Panpeti 1",
-    "wPrice": 2800,
-    "priceType": "PP",
-    "rPrice": 3200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 62,
-    "productName": "Panpeti 2",
-    "wPrice": 3300,
-    "priceType": "PP",
-    "rPrice": 3700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 63,
-    "productName": "Panpeti Jali Small",
-    "wPrice": 1700,
-    "priceType": "PP",
-    "rPrice": 1900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 64,
-    "productName": "Panpeti Jali Big",
-    "wPrice": 1900,
-    "priceType": "PP",
-    "rPrice": 2200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 65,
-    "productName": "Square Ubha Dabba 1",
-    "wPrice": 1000,
-    "priceType": "PP",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 66,
-    "productName": "Square Ubha Dabba 2",
-    "wPrice": 1200,
-    "priceType": "PP",
-    "rPrice": 1400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 67,
-    "productName": "Square Ubha Dabba 3",
-    "wPrice": 1400,
-    "priceType": "PP",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 68,
-    "productName": "Jar 1",
-    "wPrice": 1000,
-    "priceType": "PP",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 69,
-    "productName": "Jar 2",
-    "wPrice": 1200,
-    "priceType": "PP",
-    "rPrice": 1400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 70,
-    "productName": "Jar 3",
-    "wPrice": 1400,
-    "priceType": "PP",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 71,
-    "productName": "Laddoo Box",
-    "wPrice": 1650,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 72,
-    "productName": "Coffee Filter Plain 1",
-    "wPrice": 600,
-    "priceType": "PP",
-    "rPrice": 800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 73,
-    "productName": "Coffee Filter Plain 2",
-    "wPrice": 700,
-    "priceType": "PP",
-    "rPrice": 900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 74,
-    "productName": "Coffee Filter Plain 3",
-    "wPrice": 850,
-    "priceType": "PP",
-    "rPrice": 1000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 75,
-    "productName": "Coffee Filter Plain 4",
-    "wPrice": 950,
-    "priceType": "PP",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 76,
-    "productName": "Coffee Filter Stand Tap Set",
-    "wPrice": 6000,
-    "priceType": "PP",
-    "rPrice": 7000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 77,
-    "productName": "Coffee Filter Hammered 1",
-    "wPrice": 650,
-    "priceType": "PP",
-    "rPrice": 800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 78,
-    "productName": "Coffee Filter Hammered 2",
-    "wPrice": 750,
-    "priceType": "PP",
-    "rPrice": 900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 79,
-    "productName": "Coffee Filter Hammered 3",
-    "wPrice": 850,
-    "priceType": "PP",
-    "rPrice": 1000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 80,
-    "productName": "Coffee Filter Hammered 4",
-    "wPrice": 950,
-    "priceType": "PP",
-    "rPrice": 1100,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 81,
-    "productName": "Coffee Filter Hammered 5",
-    "wPrice": 1050,
-    "priceType": "PP",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 82,
-    "productName": "Tea Coffee Sugar Dabba",
-    "wPrice": 1300,
-    "priceType": "PP",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 83,
-    "productName": "Masala Box Rectangular",
-    "wPrice": 3300,
-    "priceType": "PP",
-    "rPrice": 3700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 84,
-    "productName": "Dry Fruit Box Rectangular",
-    "wPrice": 2800,
-    "priceType": "PP",
-    "rPrice": 3200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 85,
-    "productName": "Chilamchi Badna Big",
-    "wPrice": 5400,
-    "priceType": "PP",
-    "rPrice": 6000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 86,
-    "productName": "Chilamchi Badna Small",
-    "wPrice": 3800,
-    "priceType": "PP",
-    "rPrice": 4300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 87,
-    "productName": "Badna Only",
-    "wPrice": 2100,
-    "priceType": "PP",
-    "rPrice": 2200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 88,
-    "productName": "Chilamchi Only",
-    "wPrice": 1900,
-    "priceType": "PP",
-    "rPrice": 2000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 89,
-    "productName": "Chilamchi Badna Set",
-    "wPrice": 5400,
-    "priceType": "PP",
-    "rPrice": 6000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 90,
-    "productName": "Badna Only",
-    "wPrice": 3000,
-    "priceType": "PP",
-    "rPrice": 3600,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 91,
-    "productName": "Chilamchi Only",
-    "wPrice": 2600,
-    "priceType": "PP",
-    "rPrice": 3000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 92,
-    "productName": "Diamond Badna",
-    "wPrice": 1400,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 93,
-    "productName": "Diamond Badna K2",
-    "wPrice": 700,
-    "priceType": "PP",
-    "rPrice": 800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 94,
-    "productName": "Diamond Badna K3",
-    "wPrice": 800,
-    "priceType": "PP",
-    "rPrice": 900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 95,
-    "productName": "Diamond Badna K4",
-    "wPrice": 900,
-    "priceType": "PP",
-    "rPrice": 1000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 96,
-    "productName": "Diamond Badna K5",
-    "wPrice": 1000,
-    "priceType": "PP",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 97,
-    "productName": "Discount (Less)",
-    "wPrice": null,
-    "priceType": "PP",
-    "rPrice": null,
-    "material": null,
-    "": null
-  },
-  {
-    "sr": 98,
-    "productName": "Kettle 2 Cup",
-    "wPrice": 950,
-    "priceType": "PP",
-    "rPrice": 1100,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 99,
-    "productName": "Kettle 500 ml ",
-    "wPrice": 1200,
-    "priceType": "PP",
-    "rPrice": 1400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 100,
-    "productName": "Kettle 500 ml ",
-    "wPrice": 1400,
-    "priceType": "PP",
-    "rPrice": 1600,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 101,
-    "productName": "Kettle 1 L ",
-    "wPrice": 1650,
-    "priceType": "PP",
-    "rPrice": 1800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 102,
-    "productName": "Kettle 1 L ",
-    "wPrice": 1850,
-    "priceType": "PP",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 103,
-    "productName": "Kettle 1.5 L",
-    "wPrice": 2100,
-    "priceType": "PP",
-    "rPrice": 2400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 104,
-    "productName": "Kettle 2 L ",
-    "wPrice": 2600,
-    "priceType": "PP",
-    "rPrice": 3000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 105,
-    "productName": "Kettle 2 L ",
-    "wPrice": 2900,
-    "priceType": "PP",
-    "rPrice": 3400,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 106,
-    "productName": "Kettle 3 L ",
-    "wPrice": 3200,
-    "priceType": "PP",
-    "rPrice": 3700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 107,
-    "productName": "Kettle 3 L ",
-    "wPrice": 4000,
-    "priceType": "PP",
-    "rPrice": 4700,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 108,
-    "productName": "Kettle 5 L and Brass and Copper",
-    "wPrice": 6000,
-    "priceType": "PP",
-    "rPrice": 6400,
-    "material": null,
-    "": null
-  },
-  {
-    "sr": 109,
-    "productName": "Kettle Round 500 ml ",
-    "wPrice": 1200,
-    "priceType": "PP",
-    "rPrice": 1300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 110,
-    "productName": "Kettle Round 1 L ",
-    "wPrice": 1650,
-    "priceType": "PP",
-    "rPrice": 1800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 111,
-    "productName": "Badna 16",
-    "wPrice": 750,
-    "priceType": "PP",
-    "rPrice": 950,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 112,
-    "productName": "Badna 18",
-    "wPrice": 800,
-    "priceType": "PP",
-    "rPrice": 1050,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 113,
-    "productName": "Badna 20",
-    "wPrice": 850,
-    "priceType": "PP",
-    "rPrice": 1150,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 114,
-    "productName": "Badna 22",
-    "wPrice": 950,
-    "priceType": "PP",
-    "rPrice": 1250,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 115,
-    "productName": "Ring Patiya ",
-    "wPrice": 1500,
-    "priceType": "KG",
-    "rPrice": 1800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 116,
-    "productName": "Ring Patiya ",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 117,
-    "productName": "Joint Degchi",
-    "wPrice": 1650,
-    "priceType": "KG",
-    "rPrice": 1850,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 118,
-    "productName": "Degchi with Lid Set of 4",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 119,
-    "productName": "Sheet Degchi ",
-    "wPrice": 1600,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 120,
-    "productName": "Sheet Degchi ",
-    "wPrice": 1900,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 121,
-    "productName": "Patili Cover ",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 122,
-    "productName": "Patili Cover ",
-    "wPrice": 2000,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 123,
-    "productName": "Hyderabadi ",
-    "wPrice": 1650,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 124,
-    "productName": "Hyderabadi With Handle",
-    "wPrice": 1900,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 125,
-    "productName": "Hyderabadi No Handle",
-    "wPrice": 2000,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 126,
-    "productName": "Coffee Pot 1",
-    "wPrice": 550,
-    "priceType": "PP",
-    "rPrice": 700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 127,
-    "productName": "Coffee Pot 2",
-    "wPrice": 650,
-    "priceType": "PP",
-    "rPrice": 800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 128,
-    "productName": "Coffee Pot 3",
-    "wPrice": 750,
-    "priceType": "PP",
-    "rPrice": 1000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 129,
-    "productName": "Lucknowee Sipri 1-4",
-    "wPrice": 1300,
-    "priceType": "KG",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 130,
-    "productName": "Lucknowee Sipri 5-6",
-    "wPrice": 1320,
-    "priceType": "KG",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 131,
-    "productName": "Lucknowee Sipri 1-4",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 132,
-    "productName": "Lucknowee Sipri 5-6",
-    "wPrice": 1720,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 133,
-    "productName": "Rice Handi ",
-    "wPrice": 1450,
-    "priceType": "KG",
-    "rPrice": 1750,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 134,
-    "productName": "Rice Handi without bidding",
-    "wPrice": 1375,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 135,
-    "productName": "Rice Handi 0 / 4",
-    "wPrice": 1500,
-    "priceType": "KG",
-    "rPrice": 1750,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 136,
-    "productName": "Rice Handi ",
-    "wPrice": 1850,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 137,
-    "productName": "Ring Deg ",
-    "wPrice": 1500,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 138,
-    "productName": "Ring Deg ",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 139,
-    "productName": "Steamer ",
-    "wPrice": 4000,
-    "priceType": "PP",
-    "rPrice": 4500,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 140,
-    "productName": "Acrylic Pot 1",
-    "wPrice": 1200,
-    "priceType": "PP",
-    "rPrice": 1400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 141,
-    "productName": "Acrylic Pot 2",
-    "wPrice": 1400,
-    "priceType": "PP",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 142,
-    "productName": "Acrylic Pot 3",
-    "wPrice": 1600,
-    "priceType": "PP",
-    "rPrice": 1900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 143,
-    "productName": "Acrylic Pot 1",
-    "wPrice": 1400,
-    "priceType": "PP",
-    "rPrice": 1700,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 144,
-    "productName": "Acrylic Pot 2",
-    "wPrice": 1600,
-    "priceType": "PP",
-    "rPrice": 1900,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 145,
-    "productName": "Acrylic Pot 3",
-    "wPrice": 1800,
-    "priceType": "PP",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 146,
-    "productName": "Rice Pot 1",
-    "wPrice": 1000,
-    "priceType": "PP",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 147,
-    "productName": "Rice Pot 2",
-    "wPrice": 1250,
-    "priceType": "PP",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 148,
-    "productName": "Rice Pot 3",
-    "wPrice": 1450,
-    "priceType": "PP",
-    "rPrice": 1800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 149,
-    "productName": "Rice Pot 4",
-    "wPrice": 1650,
-    "priceType": "PP",
-    "rPrice": 2000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 150,
-    "productName": "Ghee Pot New Model",
-    "wPrice": 800,
-    "priceType": "PP",
-    "rPrice": 950,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 151,
-    "productName": "Ghee Pot Small",
-    "wPrice": 600,
-    "priceType": "PP",
-    "rPrice": 700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 152,
-    "productName": "Ghee Pot Big",
-    "wPrice": 750,
-    "priceType": "PP",
-    "rPrice": 950,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 153,
-    "productName": "Urli Standard",
-    "wPrice": 1380,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 154,
-    "productName": "Urli 18-20",
-    "wPrice": 1430,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 155,
-    "productName": "Urli Nakshi",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 156,
-    "productName": "Elephant Urli",
-    "wPrice": 1680,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 157,
-    "productName": "Idli Pot Small",
-    "wPrice": 4700,
-    "priceType": "PP",
-    "rPrice": 5200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 158,
-    "productName": "Idli Pot Big",
-    "wPrice": 6000,
-    "priceType": "PP",
-    "rPrice": 6200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 159,
-    "productName": "Tea Stand 4",
-    "wPrice": 400,
-    "priceType": "PP",
-    "rPrice": 500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 160,
-    "productName": "Tea Stand 6",
-    "wPrice": 500,
-    "priceType": "PP",
-    "rPrice": 700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 161,
-    "productName": "Basket Oval",
-    "wPrice": 1600,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 162,
-    "productName": "Basket Oval Nakshi",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 163,
-    "productName": "Khalbatta Regular",
-    "wPrice": 1130,
-    "priceType": "KG",
-    "rPrice": 1350,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 164,
-    "productName": "Khalbatta Medical",
-    "wPrice": 1230,
-    "priceType": "KG",
-    "rPrice": 1450,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 165,
-    "productName": "Planter ",
-    "wPrice": 1600,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 166,
-    "productName": "Cup and Saucer Hammered ",
-    "wPrice": 400,
-    "priceType": "PP",
-    "rPrice": 500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 167,
-    "productName": "Cup and Saucer Nakshi",
-    "wPrice": 400,
-    "priceType": "PP",
-    "rPrice": 500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 168,
-    "productName": "Cup and Saucer Hammered ",
-    "wPrice": 550,
-    "priceType": "PP",
-    "rPrice": 600,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 169,
-    "productName": "Chakla Belan",
-    "wPrice": 1300,
-    "priceType": "KG",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 170,
-    "productName": "Gangal",
-    "wPrice": 1650,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 171,
-    "productName": "Gangal 20-24",
-    "wPrice": 1600,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 172,
-    "productName": "Gangal 28",
-    "wPrice": 1850,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 173,
-    "productName": "Tiffin Small",
-    "wPrice": 2300,
-    "priceType": "PP",
-    "rPrice": 2500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 174,
-    "productName": "Tiffin Medium",
-    "wPrice": 2500,
-    "priceType": "PP",
-    "rPrice": 2700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 175,
-    "productName": "Tiffin Big",
-    "wPrice": 3000,
-    "priceType": "PP",
-    "rPrice": 3400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 176,
-    "productName": "Tiffin Wire Small",
-    "wPrice": 2200,
-    "priceType": "PP",
-    "rPrice": 2500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 177,
-    "productName": "Tiffin Wire Big",
-    "wPrice": 2400,
-    "priceType": "PP",
-    "rPrice": 2700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 178,
-    "productName": "Fruit Carving Bowl Kalash Nakshi",
-    "wPrice": 1850,
-    "priceType": "KG",
-    "rPrice": 2150,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 179,
-    "productName": "Tawa without Handle",
-    "wPrice": 1250,
-    "priceType": "KG",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 180,
-    "productName": "Tawa Handle",
-    "wPrice": 1150,
-    "priceType": "KG",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 181,
-    "productName": "Tawa Hammered",
-    "wPrice": 1300,
-    "priceType": "KG",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 182,
-    "productName": "Dosa Tawa Set",
-    "wPrice": 2500,
-    "priceType": "PP",
-    "rPrice": 2800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 183,
-    "productName": "Gol Deg",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 184,
-    "productName": "Tadka Pan 1",
-    "wPrice": 2100,
-    "priceType": "PP",
-    "rPrice": 800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 185,
-    "productName": "Tadka Pan 2",
-    "wPrice": 2100,
-    "priceType": "PP",
-    "rPrice": 900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 186,
-    "productName": "Tadka Pan 3",
-    "wPrice": 2100,
-    "priceType": "PP",
-    "rPrice": 1000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 187,
-    "productName": "Chutney Stand",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 188,
-    "productName": "Coffee Davara Plain / Matte",
-    "wPrice": 250,
-    "priceType": "PP",
-    "rPrice": 300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 189,
-    "productName": "Coffee Davara E / H",
-    "wPrice": 300,
-    "priceType": "PP",
-    "rPrice": 350,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 190,
-    "productName": "Coffee Davara ",
-    "wPrice": 400,
-    "priceType": "PP",
-    "rPrice": 500,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 191,
-    "productName": "Tea Chalni",
-    "wPrice": 350,
-    "priceType": "PP",
-    "rPrice": 450,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 192,
-    "productName": "Bujara",
-    "wPrice": 350,
-    "priceType": "PP",
-    "rPrice": 500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 193,
-    "productName": "Mukai Stand",
-    "wPrice": 1400,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 194,
-    "productName": "Bucket 18-24",
-    "wPrice": 1200,
-    "priceType": "KG",
-    "rPrice": 1300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 195,
-    "productName": "Bucket 14-16",
-    "wPrice": 1220,
-    "priceType": "KG",
-    "rPrice": 1300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 196,
-    "productName": "Bucket 12",
-    "wPrice": 1400,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 197,
-    "productName": "Saucepan Hammered",
-    "wPrice": 1350,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 198,
-    "productName": "Ugal Dan",
-    "wPrice": 1000,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 199,
-    "productName": "Chalni",
-    "wPrice": null,
-    "priceType": "PP",
-    "rPrice": null,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 200,
-    "productName": "Tong",
-    "wPrice": 300,
-    "priceType": "PP",
-    "rPrice": 400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 201,
-    "productName": "Chamukha 2",
-    "wPrice": 2500,
-    "priceType": "PP",
-    "rPrice": 3000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 202,
-    "productName": "Chamukha 3",
-    "wPrice": 3000,
-    "priceType": "PP",
-    "rPrice": 3500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 203,
-    "productName": "Chamukha 4",
-    "wPrice": 3500,
-    "priceType": "PP",
-    "rPrice": 4000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 204,
-    "productName": "Ashok Pillar",
-    "wPrice": 500,
-    "priceType": "PP",
-    "rPrice": 600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 205,
-    "productName": "Bell 1",
-    "wPrice": 300,
-    "priceType": "PP",
-    "rPrice": 400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 206,
-    "productName": "Only Cup",
-    "wPrice": 300,
-    "priceType": "PP",
-    "rPrice": 400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 207,
-    "productName": "Ring Langdi Fancy ",
-    "wPrice": 1500,
-    "priceType": "KG",
-    "rPrice": 1750,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 208,
-    "productName": "Parampara Lagan ",
-    "wPrice": 1550,
-    "priceType": "KG",
-    "rPrice": 1800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 209,
-    "productName": "Parampara Lagan ",
-    "wPrice": 1850,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 210,
-    "productName": "Pawali / Bucket Nakshi",
-    "wPrice": 2000,
-    "priceType": "KG",
-    "rPrice": 2300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 211,
-    "productName": "Pawali ",
-    "wPrice": 1250,
-    "priceType": "KG",
-    "rPrice": 1350,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 212,
-    "productName": "Pawali ",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 1800,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 213,
-    "productName": "Top 10-28",
-    "wPrice": 1130,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 214,
-    "productName": "Top 29-36",
-    "wPrice": 1140,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 215,
-    "productName": "Top 38-42",
-    "wPrice": 1280,
-    "priceType": "KG",
-    "rPrice": 1300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 216,
-    "productName": "Top 44-48",
-    "wPrice": 1290,
-    "priceType": "KG",
-    "rPrice": 1300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 217,
-    "productName": "Top 50-52",
-    "wPrice": 1310,
-    "priceType": "KG",
-    "rPrice": 1400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 218,
-    "productName": "Top Kalai +Polish +H 8-11",
-    "wPrice": 1350,
-    "priceType": "KG",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 219,
-    "productName": "Top Kalai +Polish +H 12 and above",
-    "wPrice": 1250,
-    "priceType": "KG",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 220,
-    "productName": "Chai Tea Top",
-    "wPrice": 1100,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 221,
-    "productName": "Langdi",
-    "wPrice": 1150,
-    "priceType": "KG",
-    "rPrice": 1300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 222,
-    "productName": "Langdi K+P",
-    "wPrice": 1250,
-    "priceType": "KG",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 223,
-    "productName": "Tasla Kadhai 6-7",
-    "wPrice": 1170,
-    "priceType": "KG",
-    "rPrice": 1300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 224,
-    "productName": "Tasla Kadhai 8-14",
-    "wPrice": 1070,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 225,
-    "productName": "Tasla Kadhai 15-24",
-    "wPrice": 1220,
-    "priceType": "KG",
-    "rPrice": 1300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 226,
-    "productName": "Tasla Kadhai 26-29",
-    "wPrice": 1320,
-    "priceType": "KG",
-    "rPrice": 1400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 227,
-    "productName": "Tasla Kadhai K+P 6-7",
-    "wPrice": 1220,
-    "priceType": "KG",
-    "rPrice": 1400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 228,
-    "productName": "Tasla Kadhai K+P 8-14",
-    "wPrice": 1120,
-    "priceType": "KG",
-    "rPrice": 1300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 229,
-    "productName": "Top Joint Bottom",
-    "wPrice": 1120,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 230,
-    "productName": "Langdi Joint Bottom",
-    "wPrice": 1140,
-    "priceType": "KG",
-    "rPrice": 1220,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 231,
-    "productName": "Langdi Joint Bottom",
-    "wPrice": 1650,
-    "priceType": "KG",
-    "rPrice": 1750,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 232,
-    "productName": "Langdi Regular",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 233,
-    "productName": "Tavi K+P",
-    "wPrice": 1750,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 234,
-    "productName": "Tavi K+P",
-    "wPrice": 1450,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 235,
-    "productName": "Patiya Regular",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 1800,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 236,
-    "productName": "Patiya K+P Regular",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 237,
-    "productName": "Patiya Heavy K+P",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 238,
-    "productName": "Parat Bidding",
-    "wPrice": 1325,
-    "priceType": "KG",
-    "rPrice": 1525,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 239,
-    "productName": "Parat 10",
-    "wPrice": 1440,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 240,
-    "productName": "Parat 11-13",
-    "wPrice": 1140,
-    "priceType": "KG",
-    "rPrice": 1300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 241,
-    "productName": "Parat 14",
-    "wPrice": 1140,
-    "priceType": "KG",
-    "rPrice": 1300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 242,
-    "productName": "Parat 15",
-    "wPrice": 1060,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 243,
-    "productName": "Parat 16-24",
-    "wPrice": 1040,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 244,
-    "productName": "Parat 25-30",
-    "wPrice": 1090,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 245,
-    "productName": "Parat 32-36",
-    "wPrice": 1140,
-    "priceType": "KG",
-    "rPrice": 1200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 246,
-    "productName": "Parat 13-14",
-    "wPrice": 1650,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 247,
-    "productName": "Parat 15-24",
-    "wPrice": 1650,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 248,
-    "productName": "Parat 25-30",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 249,
-    "productName": "Parat Bidding",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 250,
-    "productName": "Parsi Patiya K+P",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 251,
-    "productName": "Parat Etching",
-    "wPrice": 1950,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 252,
-    "productName": "Kadhai Special Small",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 253,
-    "productName": "Chaliya",
-    "wPrice": 1900,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 254,
-    "productName": "Tasla Kadhai",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 255,
-    "productName": "Tasla Kadhai K+P",
-    "wPrice": 2000,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 256,
-    "productName": "Tasla Kadhai Heavy",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 257,
-    "productName": "Samavar Kettle 0-12",
-    "wPrice": 1650,
-    "priceType": "KG",
-    "rPrice": 1800,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 258,
-    "productName": "Samavar Kettle 13 ",
-    "wPrice": 1750,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 259,
-    "productName": "Top Regular",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 260,
-    "productName": "Top Heavy",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2100,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 261,
-    "productName": "Top Joint Bottom",
-    "wPrice": 1650,
-    "priceType": "KG",
-    "rPrice": 1750,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 262,
-    "productName": "Frying Pan",
-    "wPrice": 1850,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 263,
-    "productName": "Deg Sipri Heavy K+P",
-    "wPrice": 1900,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 264,
-    "productName": "Lucknowee 10-12",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 1800,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 265,
-    "productName": "Lucknowee 13-24",
-    "wPrice": 1650,
-    "priceType": "KG",
-    "rPrice": 1800,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 266,
-    "productName": "Lucknowee 26-30",
-    "wPrice": 1750,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 267,
-    "productName": "Lucknowee 32-40",
-    "wPrice": 1750,
-    "priceType": "KG",
-    "rPrice": 1900,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 268,
-    "productName": "Mahi Tawa",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 269,
-    "productName": "Lid 8-14",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 270,
-    "productName": "Lid 6-7.5",
-    "wPrice": 1800,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 271,
-    "productName": "Lid 8-14",
-    "wPrice": 1100,
-    "priceType": "KG",
-    "rPrice": 1400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 272,
-    "productName": "Lid 6-7.5",
-    "wPrice": 1300,
-    "priceType": "KG",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 273,
-    "productName": "Sheet Top",
-    "wPrice": 1250,
-    "priceType": "KG",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 274,
-    "productName": "Polished Top Plain",
-    "wPrice": 1300,
-    "priceType": "KG",
-    "rPrice": 1550,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 275,
-    "productName": "Polished Top Hammered",
-    "wPrice": 1350,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 276,
-    "productName": "Chat Handi",
-    "wPrice": 1250,
-    "priceType": "KG",
-    "rPrice": 1400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 277,
-    "productName": "Glass New A",
-    "wPrice": 280,
-    "priceType": "PP",
-    "rPrice": 300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 278,
-    "productName": "Glass New B",
-    "wPrice": 300,
-    "priceType": "PP",
-    "rPrice": 350,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 279,
-    "productName": "Glass New C",
-    "wPrice": 330,
-    "priceType": "PP",
-    "rPrice": 400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 280,
-    "productName": "3 No Glass",
-    "wPrice": 100,
-    "priceType": "PP",
-    "rPrice": 150,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 281,
-    "productName": "4 No Glass",
-    "wPrice": 120,
-    "priceType": "PP",
-    "rPrice": 200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 282,
-    "productName": "Hammered Glass Pendi",
-    "wPrice": 250,
-    "priceType": "PP",
-    "rPrice": 300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 283,
-    "productName": "Etching Glass Pendi",
-    "wPrice": 250,
-    "priceType": "PP",
-    "rPrice": 300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 284,
-    "productName": "15 No Glass",
-    "wPrice": null,
-    "priceType": "PP",
-    "rPrice": null,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 285,
-    "productName": "18 No Glass",
-    "wPrice": 330,
-    "priceType": "PP",
-    "rPrice": 400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 286,
-    "productName": "24 No Glass",
-    "wPrice": 400,
-    "priceType": "PP",
-    "rPrice": 500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 287,
-    "productName": "6 No Glass",
-    "wPrice": 500,
-    "priceType": "PP",
-    "rPrice": 600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 288,
-    "productName": "7 No Glass",
-    "wPrice": 600,
-    "priceType": "PP",
-    "rPrice": 700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 289,
-    "productName": "8 No Glass",
-    "wPrice": 700,
-    "priceType": "PP",
-    "rPrice": 800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 290,
-    "productName": "9 No Glass",
-    "wPrice": 800,
-    "priceType": "PP",
-    "rPrice": 1000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 291,
-    "productName": "Prince Glass",
-    "wPrice": 350,
-    "priceType": "PP",
-    "rPrice": 400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 292,
-    "productName": "Ringer Matki Glass",
-    "wPrice": 350,
-    "priceType": "PP",
-    "rPrice": 400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 293,
-    "productName": "Ringer V 5 No Glass",
-    "wPrice": 400,
-    "priceType": "PP",
-    "rPrice": 450,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 294,
-    "productName": "Sheet Glass",
-    "wPrice": 1650,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 295,
-    "productName": "Curve Glass Small",
-    "wPrice": 260,
-    "priceType": "PP",
-    "rPrice": 300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 296,
-    "productName": "Curve Glass Big",
-    "wPrice": 280,
-    "priceType": "PP",
-    "rPrice": 350,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 297,
-    "productName": "Wine Champagne Glass",
-    "wPrice": 450,
-    "priceType": "PP",
-    "rPrice": 600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 298,
-    "productName": "Utensils",
-    "wPrice": null,
-    "priceType": "KG",
-    "rPrice": null,
-    "material": null,
-    "": null
-  },
-  {
-    "sr": 299,
-    "productName": "Packing + Forwarding",
-    "wPrice": 250,
-    "priceType": "PP",
-    "rPrice": null,
-    "material": null,
-    "": null
-  },
-  {
-    "sr": 300,
-    "productName": "Matte Glass",
-    "wPrice": 280,
-    "priceType": "PP",
-    "rPrice": 350,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 301,
-    "productName": "Toy Set Small",
-    "wPrice": 2800,
-    "priceType": "PP",
-    "rPrice": 3200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 302,
-    "productName": "Toy Set Big",
-    "wPrice": 3000,
-    "priceType": "PP",
-    "rPrice": 3500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 303,
-    "productName": "Jug Hotel",
-    "wPrice": 1250,
-    "priceType": "PP",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 304,
-    "productName": "Jug Kingfisher",
-    "wPrice": 1350,
-    "priceType": "PP",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 305,
-    "productName": "Jug Prince Peacock",
-    "wPrice": 1700,
-    "priceType": "PP",
-    "rPrice": 2000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 306,
-    "productName": "Jug Prince Peacock Cover",
-    "wPrice": 1800,
-    "priceType": "PP",
-    "rPrice": 2200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 307,
-    "productName": "Jug Ringer",
-    "wPrice": 1400,
-    "priceType": "PP",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 308,
-    "productName": "Jug Ringer Matki",
-    "wPrice": 1400,
-    "priceType": "PP",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 309,
-    "productName": "Jug Sheet Hammered Cover Small",
-    "wPrice": 1350,
-    "priceType": "PP",
-    "rPrice": 1550,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 310,
-    "productName": "Jug Sheet Hammered Cover Big",
-    "wPrice": 1550,
-    "priceType": "PP",
-    "rPrice": 1800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 311,
-    "productName": "Bottle HV Small",
-    "wPrice": 550,
-    "priceType": "PP",
-    "rPrice": 700,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 312,
-    "productName": "Bottle HV Big",
-    "wPrice": 700,
-    "priceType": "PP",
-    "rPrice": 800,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 313,
-    "productName": "Bottle Crown",
-    "wPrice": 700,
-    "priceType": "PP",
-    "rPrice": 800,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 314,
-    "productName": "Bottle Doctor",
-    "wPrice": 650,
-    "priceType": "PP",
-    "rPrice": 800,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 315,
-    "productName": "Bottle Tower",
-    "wPrice": 650,
-    "priceType": "PP",
-    "rPrice": 800,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 316,
-    "productName": "Jug Lily",
-    "wPrice": 900,
-    "priceType": "PP",
-    "rPrice": 1100,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 317,
-    "productName": "Jug Rose",
-    "wPrice": 800,
-    "priceType": "PP",
-    "rPrice": 1000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 318,
-    "productName": "Jug Two Tone Mughal Small",
-    "wPrice": 1550,
-    "priceType": "PP",
-    "rPrice": 1800,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 319,
-    "productName": "Jug Two Tone Mughal Big",
-    "wPrice": 1750,
-    "priceType": "PP",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 320,
-    "productName": "Jug Two Tone Straight Small",
-    "wPrice": 1550,
-    "priceType": "PP",
-    "rPrice": 1800,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 321,
-    "productName": "Jug Two Tone Straight Big",
-    "wPrice": 1750,
-    "priceType": "PP",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 322,
-    "productName": "Glass Special",
-    "wPrice": 2100,
-    "priceType": "KG",
-    "rPrice": 2400,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 323,
-    "productName": "Glass ST",
-    "wPrice": 150,
-    "priceType": "PP",
-    "rPrice": 180,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 324,
-    "productName": "Wine Champagne Glass",
-    "wPrice": 600,
-    "priceType": "PP",
-    "rPrice": 800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 325,
-    "productName": "Utensils Mix",
-    "wPrice": 2600,
-    "priceType": "KG",
-    "rPrice": 3000,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 326,
-    "productName": "Glass Small",
-    "wPrice": 500,
-    "priceType": "PP",
-    "rPrice": 600,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 327,
-    "productName": "Glass Big",
-    "wPrice": 700,
-    "priceType": "PP",
-    "rPrice": 800,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 328,
-    "productName": "Spoon Baby",
-    "wPrice": 200,
-    "priceType": "PP",
-    "rPrice": 250,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 329,
-    "productName": "Spoon Dessert",
-    "wPrice": 250,
-    "priceType": "PP",
-    "rPrice": 300,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 330,
-    "productName": "Serving Spoon",
-    "wPrice": 900,
-    "priceType": "PP",
-    "rPrice": 1100,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 331,
-    "productName": "Thali Khumcha 8-14",
-    "wPrice": 1330,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 332,
-    "productName": "Thali Khumcha 15-20",
-    "wPrice": 1430,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 333,
-    "productName": "Thali Khumcha 20 and above",
-    "wPrice": 1530,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 334,
-    "productName": "ST Dalda",
-    "wPrice": 1250,
-    "priceType": "KG",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 335,
-    "productName": "Jali Thali",
-    "wPrice": 1250,
-    "priceType": "KG",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 336,
-    "productName": "Pan Thal",
-    "wPrice": 1450,
-    "priceType": "KG",
-    "rPrice": 1750,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 337,
-    "productName": "Matte Thali Wati",
-    "wPrice": 1350,
-    "priceType": "KG",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 338,
-    "productName": "Liner",
-    "wPrice": 1500,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 339,
-    "productName": "Rectangular Oval Tray",
-    "wPrice": 1500,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": " "
-  },
-  {
-    "sr": 340,
-    "productName": "Dana Plate",
-    "wPrice": 1500,
-    "priceType": "KG",
-    "rPrice": 1800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 341,
-    "productName": "Dana Plate",
-    "wPrice": 1600,
-    "priceType": "KG",
-    "rPrice": 1800,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 342,
-    "productName": "China Plate",
-    "wPrice": 1375,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 343,
-    "productName": "Designer Plate",
-    "wPrice": 1900,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 344,
-    "productName": "Plate Pandu",
-    "wPrice": 1500,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 345,
-    "productName": "Tray",
-    "wPrice": 1900,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 346,
-    "productName": "Tray Without Dana",
-    "wPrice": 1900,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 347,
-    "productName": "Bhojan Patra",
-    "wPrice": 1500,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 348,
-    "productName": "Thali Plain Base",
-    "wPrice": 1750,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 349,
-    "productName": "Thali 10-14",
-    "wPrice": 1750,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 350,
-    "productName": "Thali Big",
-    "wPrice": 2000,
-    "priceType": "KG",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 351,
-    "productName": "Banana Leaf Thali",
-    "wPrice": 1500,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 352,
-    "productName": "Maharaja Thali",
-    "wPrice": 1400,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 353,
-    "productName": "Swastik Thali",
-    "wPrice": 1500,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 354,
-    "productName": "Thali Rose",
-    "wPrice": 1550,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 355,
-    "productName": "Thali Set Sanskriti Glossy",
-    "wPrice": 2200,
-    "priceType": "PP",
-    "rPrice": 2500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 356,
-    "productName": "Massager Small",
-    "wPrice": 700,
-    "priceType": "PP",
-    "rPrice": 900,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 357,
-    "productName": "Massager Medium",
-    "wPrice": 800,
-    "priceType": "PP",
-    "rPrice": 1000,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 358,
-    "productName": "Massager Double Head",
-    "wPrice": 900,
-    "priceType": "PP",
-    "rPrice": 1200,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 359,
-    "productName": "Massage Wati",
-    "wPrice": 400,
-    "priceType": "PP",
-    "rPrice": 500,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 360,
-    "productName": "Handmade",
-    "wPrice": 3800,
-    "priceType": "KG",
-    "rPrice": 4400,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 361,
-    "productName": "Handmade Set Pure",
-    "wPrice": 5300,
-    "priceType": "PP",
-    "rPrice": 5700,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 362,
-    "productName": "Handmade Maharaja Thali 16 inch",
-    "wPrice": 4000,
-    "priceType": "KG",
-    "rPrice": 4400,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 363,
-    "productName": "Serving Bowl Handmade",
-    "wPrice": 2600,
-    "priceType": "KG",
-    "rPrice": 3000,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 364,
-    "productName": "Glass Small Handmade",
-    "wPrice": 600,
-    "priceType": "PP",
-    "rPrice": 700,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 365,
-    "productName": "Glass Big Handmade",
-    "wPrice": 800,
-    "priceType": "PP",
-    "rPrice": 1000,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 366,
-    "productName": "Set Plain",
-    "wPrice": 2700,
-    "priceType": "PP",
-    "rPrice": 3200,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 367,
-    "productName": "Set Laser",
-    "wPrice": 2800,
-    "priceType": "PP",
-    "rPrice": 3400,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 368,
-    "productName": "Handmade Special",
-    "wPrice": 3800,
-    "priceType": "KG",
-    "rPrice": 4400,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 369,
-    "productName": "Bowl Small Special",
-    "wPrice": 600,
-    "priceType": "PP",
-    "rPrice": 800,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 370,
-    "productName": "Donga Small Special",
-    "wPrice": 3800,
-    "priceType": "PP",
-    "rPrice": 4400,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 371,
-    "productName": "Hammered Lota 0",
-    "wPrice": 1400,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 372,
-    "productName": "Hammered Lota 1-3",
-    "wPrice": 1350,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 373,
-    "productName": "Nakshi Lota 0",
-    "wPrice": 1350,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 374,
-    "productName": "Nakshi Lota 1-4",
-    "wPrice": 1300,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 375,
-    "productName": "Halwa Lota",
-    "wPrice": 1150,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 376,
-    "productName": "Japani Lota 300 g",
-    "wPrice": 600,
-    "priceType": "PP",
-    "rPrice": 700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 377,
-    "productName": "Japani Lota 400 g",
-    "wPrice": 650,
-    "priceType": "PP",
-    "rPrice": 800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 378,
-    "productName": "Japani Lota 500 g",
-    "wPrice": 750,
-    "priceType": "PP",
-    "rPrice": 900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 379,
-    "productName": "Japani Lota 600 g",
-    "wPrice": 950,
-    "priceType": "PP",
-    "rPrice": 1100,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 380,
-    "productName": "Japani Lota 700 g",
-    "wPrice": 1150,
-    "priceType": "PP",
-    "rPrice": 1300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 381,
-    "productName": "Japani Lota 900 g",
-    "wPrice": 1350,
-    "priceType": "PP",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 382,
-    "productName": "Japani Lota 1 kg",
-    "wPrice": 1600,
-    "priceType": "PP",
-    "rPrice": 1900,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 383,
-    "productName": "Japani Lota 1.25 kg",
-    "wPrice": 1800,
-    "priceType": "PP",
-    "rPrice": 2400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 384,
-    "productName": "Japani Lota 2 kg",
-    "wPrice": 2900,
-    "priceType": "PP",
-    "rPrice": 3400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 385,
-    "productName": "Hammered Lota 8",
-    "wPrice": 500,
-    "priceType": "PP",
-    "rPrice": 600,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 386,
-    "productName": "Hammered Lota 9",
-    "wPrice": 600,
-    "priceType": "PP",
-    "rPrice": 700,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 387,
-    "productName": "Lota Box 1",
-    "wPrice": 380,
-    "priceType": "PP",
-    "rPrice": 450,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 388,
-    "productName": "Lota Box 2",
-    "wPrice": 420,
-    "priceType": "PP",
-    "rPrice": 500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 389,
-    "productName": "Lota Box 3",
-    "wPrice": 500,
-    "priceType": "PP",
-    "rPrice": 600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 390,
-    "productName": "Lota Box 4",
-    "wPrice": 550,
-    "priceType": "PP",
-    "rPrice": 700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 391,
-    "productName": "Lota Box 5",
-    "wPrice": 650,
-    "priceType": "PP",
-    "rPrice": 800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 392,
-    "productName": "Lota with Lid (Shambhu Lota)",
-    "wPrice": 900,
-    "priceType": "PP",
-    "rPrice": 1100,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 393,
-    "productName": "Plain Lota",
-    "wPrice": 1300,
-    "priceType": "KG",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 394,
-    "productName": "Sheet Lota J",
-    "wPrice": 1600,
-    "priceType": "KG",
-    "rPrice": 1800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 395,
-    "productName": "Handmade Lota",
-    "wPrice": 950,
-    "priceType": "PP",
-    "rPrice": 1200,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 396,
-    "productName": "Bell",
-    "wPrice": 850,
-    "priceType": "PP",
-    "rPrice": 1000,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 397,
-    "productName": "Hammered Spoon Coffee",
-    "wPrice": 55,
-    "priceType": "PP",
-    "rPrice": 60,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 398,
-    "productName": "Hammered Spoon Tea",
-    "wPrice": 65,
-    "priceType": "PP",
-    "rPrice": 70,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 399,
-    "productName": "Hammered Spoon Baby",
-    "wPrice": 75,
-    "priceType": "PP",
-    "rPrice": 80,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 400,
-    "productName": "Hammered Spoon Dessert",
-    "wPrice": 85,
-    "priceType": "PP",
-    "rPrice": 90,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 401,
-    "productName": "Knife Dessert",
-    "wPrice": 200,
-    "priceType": "PP",
-    "rPrice": 300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 402,
-    "productName": "Pakkad",
-    "wPrice": 450,
-    "priceType": "PP",
-    "rPrice": 600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 403,
-    "productName": "Wooden Handle",
-    "wPrice": 400,
-    "priceType": "PP",
-    "rPrice": 500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 404,
-    "productName": "Handle",
-    "wPrice": 500,
-    "priceType": "PP",
-    "rPrice": 600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 405,
-    "productName": "Serving Spoon Sheet Small",
-    "wPrice": 1750,
-    "priceType": "PP",
-    "rPrice": 350,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 406,
-    "productName": "Serving Spoon Sheet Medium",
-    "wPrice": 1750,
-    "priceType": "PP",
-    "rPrice": 400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 407,
-    "productName": "Serving Spoon Sheet Big",
-    "wPrice": 1750,
-    "priceType": "PP",
-    "rPrice": 450,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 408,
-    "productName": "Full Hammered Serving Spoon S",
-    "wPrice": 350,
-    "priceType": "PP",
-    "rPrice": 400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 409,
-    "productName": "Full Hammered Serving Spoon M",
-    "wPrice": 400,
-    "priceType": "PP",
-    "rPrice": 450,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 410,
-    "productName": "Full Hammered Serving Spoon L",
-    "wPrice": 450,
-    "priceType": "PP",
-    "rPrice": 550,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 411,
-    "productName": "Spoon Fork Matte Coffee",
-    "wPrice": 60,
-    "priceType": "PP",
-    "rPrice": 70,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 412,
-    "productName": "Spoon Fork Matte Tea",
-    "wPrice": 80,
-    "priceType": "PP",
-    "rPrice": 100,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 413,
-    "productName": "Spoon Fork Matte Baby",
-    "wPrice": 90,
-    "priceType": "PP",
-    "rPrice": 120,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 414,
-    "productName": "Spoon Fork Matte Dessert",
-    "wPrice": 100,
-    "priceType": "PP",
-    "rPrice": 140,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 415,
-    "productName": "Handmade Spoon Set",
-    "wPrice": 4500,
-    "priceType": "PP",
-    "rPrice": 5000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 416,
-    "productName": "Wooden Handle SS Palta 15 inch",
-    "wPrice": 160,
-    "priceType": "PP",
-    "rPrice": 180,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 417,
-    "productName": "Wooden Handle SS Palta 20 inch",
-    "wPrice": 180,
-    "priceType": "PP",
-    "rPrice": 200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 418,
-    "productName": "Wooden Handle SS Palta 25 inch",
-    "wPrice": 200,
-    "priceType": "PP",
-    "rPrice": 220,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 419,
-    "productName": "Wooden Handle SS Palta 30 inch",
-    "wPrice": 220,
-    "priceType": "PP",
-    "rPrice": 250,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 420,
-    "productName": "Wooden Handle SS Palta 35 inch",
-    "wPrice": 250,
-    "priceType": "PP",
-    "rPrice": 300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 421,
-    "productName": "SS Palta 30-60",
-    "wPrice": 400,
-    "priceType": "PP",
-    "rPrice": 500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 422,
-    "productName": "SS Dabbu 4",
-    "wPrice": 160,
-    "priceType": "PP",
-    "rPrice": 180,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 423,
-    "productName": "SS Dabbu 4.5",
-    "wPrice": 170,
-    "priceType": "PP",
-    "rPrice": 200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 424,
-    "productName": "SS Dabbu 5",
-    "wPrice": 180,
-    "priceType": "PP",
-    "rPrice": 220,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 425,
-    "productName": "SS Dabbu 6",
-    "wPrice": 250,
-    "priceType": "PP",
-    "rPrice": 300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 426,
-    "productName": "Donga Deep Hammered",
-    "wPrice": 1800,
-    "priceType": "PP",
-    "rPrice": 2200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 427,
-    "productName": "Donga Flat Hammered",
-    "wPrice": 1800,
-    "priceType": "PP",
-    "rPrice": 2200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 428,
-    "productName": "Donga 1",
-    "wPrice": 1800,
-    "priceType": "PP",
-    "rPrice": 2200,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 429,
-    "productName": "Donga 2",
-    "wPrice": 2000,
-    "priceType": "PP",
-    "rPrice": 2400,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 430,
-    "productName": "Donga 3",
-    "wPrice": 2200,
-    "priceType": "PP",
-    "rPrice": 2600,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 431,
-    "productName": "Donga 4",
-    "wPrice": 2400,
-    "priceType": "PP",
-    "rPrice": 3000,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 432,
-    "productName": "Dessert Donga",
-    "wPrice": 1500,
-    "priceType": "KG",
-    "rPrice": 1700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 433,
-    "productName": "Casting Wati Etched Hammered",
-    "wPrice": 1250,
-    "priceType": "KG",
-    "rPrice": 1600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 434,
-    "productName": "Sheet Wati Etched Hammered",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 435,
-    "productName": "Arabi Katora 1",
-    "wPrice": 260,
-    "priceType": "PP",
-    "rPrice": 300,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 436,
-    "productName": "Arabi Katora 2",
-    "wPrice": 300,
-    "priceType": "PP",
-    "rPrice": 350,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 437,
-    "productName": "Arabi Katora 3",
-    "wPrice": 350,
-    "priceType": "PP",
-    "rPrice": 400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 438,
-    "productName": "Arabi Katora 4",
-    "wPrice": 400,
-    "priceType": "PP",
-    "rPrice": 500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 439,
-    "productName": "Arabi Katora 5",
-    "wPrice": 500,
-    "priceType": "PP",
-    "rPrice": 600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 440,
-    "productName": "Arabi Katora 6",
-    "wPrice": 600,
-    "priceType": "PP",
-    "rPrice": 700,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 441,
-    "productName": "Arabi Katora 7",
-    "wPrice": 700,
-    "priceType": "PP",
-    "rPrice": 850,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 442,
-    "productName": "Katora",
-    "wPrice": 2000,
-    "priceType": "KG",
-    "rPrice": 2300,
-    "material": "Copper",
-    "": null
-  },
-  {
-    "sr": 443,
-    "productName": "Oval Dabba",
-    "wPrice": 1600,
-    "priceType": "KG",
-    "rPrice": 1850,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 444,
-    "productName": "Saunf Pot",
-    "wPrice": 500,
-    "priceType": "PP",
-    "rPrice": 600,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 445,
-    "productName": "Pickle Pot",
-    "wPrice": 650,
-    "priceType": "PP",
-    "rPrice": 750,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 446,
-    "productName": "Triangle Masala Box",
-    "wPrice": 2800,
-    "priceType": "PP",
-    "rPrice": 3200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 447,
-    "productName": "Checked Dabba set of 3",
-    "wPrice": 1800,
-    "priceType": "PP",
-    "rPrice": 2200,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 448,
-    "productName": "Maharani Patili",
-    "wPrice": 1700,
-    "priceType": "KG",
-    "rPrice": 2000,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 449,
-    "productName": "Thali Set Sanskriti Matte",
-    "wPrice": 2000,
-    "priceType": "PP",
-    "rPrice": 2500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 450,
-    "productName": "Premium Roti Box Coloured",
-    "wPrice": 1500,
-    "priceType": "PP",
-    "rPrice": 1800,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 451,
-    "productName": "Unbreakable Set Plain",
-    "wPrice": 7700,
-    "priceType": "PP",
-    "rPrice": 7700,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 452,
-    "productName": "Unbreakable Set Hammered",
-    "wPrice": 9500,
-    "priceType": "PP",
-    "rPrice": 9500,
-    "material": "Kansa",
-    "": null
-  },
-  {
-    "sr": 453,
-    "productName": "Checked Dabba 3 x 3",
-    "wPrice": 2000,
-    "priceType": "PP",
-    "rPrice": 2400,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 454,
-    "productName": "Oil Dispenser Jar",
-    "wPrice": 1250,
-    "priceType": "PP",
-    "rPrice": 1500,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 455,
-    "productName": "Laddoo Box Coloured (8)",
-    "wPrice": 450,
-    "priceType": "PP",
-    "rPrice": 650,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 456,
-    "productName": "Laddoo Box Coloured (9)",
-    "wPrice": 550,
-    "priceType": "PP",
-    "rPrice": 750,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 457,
-    "productName": "Laddoo Box Coloured (10)",
-    "wPrice": 650,
-    "priceType": "PP",
-    "rPrice": 850,
-    "material": "Brass",
-    "": null
-  },
-  {
-    "sr": 458,
-    "productName": "Plain Lota (0)",
-    "wPrice": 1350,
-    "priceType": "KG",
-    "rPrice": 1550,
-    "material": "Brass",
-    "": null
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+  doc,
+  serverTimestamp,
+  query,
+  orderBy,
+  runTransaction,
+  getDocs,
+  writeBatch
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ================================
+   FIREBASE
+================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyCthUdAwAP0h67p3MfkanelAPdPzZMmPRo",
+  authDomain: "billing-app-73ac8.firebaseapp.com",
+  projectId: "billing-app-73ac8",
+  storageBucket: "billing-app-73ac8.firebasestorage.app",
+  messagingSenderId: "637437936055",
+  appId: "1:637437936055:web:f83da0ab2d3e994e96e832"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const billsCollection = collection(db, "bills");
+const daybookCollection = collection(db, "daybook");
+
+const billsQuery = query(
+  billsCollection,
+  orderBy("createdAt", "asc")
+);
+
+const daybookQuery = query(
+  daybookCollection,
+  orderBy("createdAt", "asc")
+);
+
+const serialDocRef = doc(
+  db,
+  "serialCounters",
+  "serials"
+);
+
+/* ================================
+   CONSTANTS
+================================ */
+const ADMIN_PASSWORD = "1110";
+const BILL_DRAFT_KEY = "billingAppDraftV4";
+const DRAFT_MAX_AGE_MS =
+  24 * 60 * 60 * 1000;
+
+const MAX_ITEMS_PER_DL_PAGE = 20;
+
+/* ================================
+   STATE
+================================ */
+let products = [];
+let billItems = [];
+let currentMode = "W";
+
+let incomingBillCache = {};
+let daybookCache = {};
+
+let isReceiverBusy = false;
+let isSendingBill = false;
+let isDaybookBusy = false;
+let daybookPrintedOnce = false;
+
+/* ================================
+   DOM
+================================ */
+const billingTab =
+  document.getElementById("billingTab");
+
+const receiverTab =
+  document.getElementById("receiverTab");
+
+const daybookTab =
+  document.getElementById("daybookTab");
+
+const billingView =
+  document.getElementById("billingView");
+
+const receiverView =
+  document.getElementById("receiverView");
+
+const daybookView =
+  document.getElementById("daybookView");
+
+const searchBox =
+  document.getElementById("searchBox");
+
+const suggestions =
+  document.getElementById("suggestions");
+
+const billItemsDiv =
+  document.getElementById("billItems");
+
+const grandTotalEl =
+  document.getElementById("grandTotal");
+
+const modeToggle =
+  document.getElementById("modeToggle");
+
+const clearSearch =
+  document.getElementById("clearSearch");
+
+const sendBtn =
+  document.getElementById("sendBtn");
+
+const printModal =
+  document.getElementById("printModal");
+
+const customerName =
+  document.getElementById("customerName");
+
+const customerGroup =
+  document.getElementById("customerGroup");
+
+const cancelPrint =
+  document.getElementById("cancelPrint");
+
+const confirmSend =
+  document.getElementById("confirmSend");
+
+const printInvoice =
+  document.getElementById("printInvoice");
+
+const incomingBills =
+  document.getElementById("incomingBills");
+
+const previewModal =
+  document.getElementById("previewModal");
+
+const previewContent =
+  document.getElementById("previewContent");
+
+const closePreview =
+  document.getElementById("closePreview");
+
+const daybookSummary =
+  document.getElementById("daybookSummary");
+
+const daybookActions =
+  document.getElementById("daybookActions");
+
+const daybookEntries =
+  document.getElementById("daybookEntries");
+
+/* ================================
+   HELPERS
+================================ */
+function normalize(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function tokenize(text) {
+  return normalize(text)
+    .split(" ")
+    .filter(Boolean);
+}
+
+function escapeAttr(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function requireAdminPassword() {
+  const entered =
+    prompt("Enter admin password");
+
+  if (entered === null) {
+    return false;
   }
-]
+
+  if (entered !== ADMIN_PASSWORD) {
+    alert("Incorrect password.");
+    return false;
+  }
+
+  return true;
+}
+
+function getIndiaDateInfo() {
+  const now = new Date();
+
+  const formatter =
+    new Intl.DateTimeFormat("en-IN", {
+      timeZone: "Asia/Kolkata",
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
+
+  return {
+    displayDate:
+      formatter.format(now)
+  };
+}
+
+function getCurrentPrice(product) {
+  return currentMode === "W"
+    ? product.wPrice
+    : product.rPrice;
+}
+
+function getMaterialClass(material) {
+  if (material === "Brass") {
+    return "material-brass";
+  }
+
+  if (material === "Copper") {
+    return "material-copper";
+  }
+
+  if (material === "Kansa") {
+    return "material-kansa";
+  }
+
+  return "";
+}
+
+function shortMaterialName(material) {
+  if (material === "Brass") {
+    return "BR";
+  }
+
+  if (material === "Copper") {
+    return "CU";
+  }
+
+  if (material === "Kansa") {
+    return "BZ";
+  }
+
+  return material || "-";
+}
+
+function formatIndianMoney(value) {
+  return Number(value || 0)
+    .toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+}
+
+function roundTo2(value) {
+  return Math.round(
+    Number(value) * 100
+  ) / 100;
+}
+function clearDraft() {
+  localStorage.removeItem(
+    BILL_DRAFT_KEY
+  );
+}
+
+function saveDraft() {
+  try {
+    if (!billItems.length) {
+      clearDraft();
+      return;
+    }
+
+    const draft = {
+      savedAt: Date.now(),
+      currentMode,
+      customerName:
+        customerName.value.trim(),
+
+      billItems:
+        billItems.map(item => ({
+          productSr:
+            item.product.sr,
+          mode:
+            item.mode,
+          price:
+            item.price,
+          qty:
+            item.qty
+        }))
+    };
+
+    localStorage.setItem(
+      BILL_DRAFT_KEY,
+      JSON.stringify(draft)
+    );
+  } catch (err) {
+    console.error(
+      "Draft save failed:",
+      err
+    );
+  }
+}
+
+function restoreDraft() {
+  try {
+    const raw =
+      localStorage.getItem(
+        BILL_DRAFT_KEY
+      );
+
+    if (!raw) {
+      return;
+    }
+
+    const draft =
+      JSON.parse(raw);
+
+    if (
+      !draft ||
+      !Array.isArray(
+        draft.billItems
+      ) ||
+      !draft.billItems.length
+    ) {
+      clearDraft();
+      return;
+    }
+
+    const age =
+      Date.now() -
+      (draft.savedAt || 0);
+
+    if (
+      age >
+      DRAFT_MAX_AGE_MS
+    ) {
+      clearDraft();
+      return;
+    }
+
+    const shouldRestore =
+      confirm(
+        "Resume unfinished bill?"
+      );
+
+    if (!shouldRestore) {
+      clearDraft();
+      return;
+    }
+
+    const restoredItems =
+      draft.billItems
+        .map(savedItem => {
+          const product =
+            products.find(
+              p =>
+                p.sr ===
+                savedItem.productSr
+            );
+
+          if (!product) {
+            return null;
+          }
+
+          const qty =
+            savedItem.qty || "";
+
+          const price =
+            parseFloat(
+              savedItem.price
+            ) || 0;
+
+          const qtyNum =
+            parseFloat(qty) || 0;
+
+          return {
+            product,
+            mode:
+              savedItem.mode ||
+              "W",
+            price,
+            qty,
+            total:
+              roundTo2(
+                price * qtyNum
+              )
+          };
+        })
+        .filter(Boolean);
+
+    if (
+      !restoredItems.length
+    ) {
+      clearDraft();
+      return;
+    }
+
+    currentMode =
+      draft.currentMode || "W";
+
+    modeToggle.innerText =
+      currentMode;
+
+    modeToggle.style.background =
+      currentMode === "W"
+        ? "#2f3f64"
+        : "#d65353";
+
+    customerName.value =
+      draft.customerName || "";
+
+    billItems =
+      restoredItems;
+
+    renderBill();
+    updateGrandTotal();
+  } catch (err) {
+    console.error(
+      "Draft restore failed:",
+      err
+    );
+
+    clearDraft();
+  }
+}
+
+function focusQtyInput(
+  index = 0
+) {
+  requestAnimationFrame(() => {
+    const input =
+      document.querySelector(
+        `[data-qty-index="${index}"]`
+      );
+
+    if (!input) {
+      return;
+    }
+
+    input.focus();
+    input.select();
+  });
+}
+
+function getModeKeys(
+  mode
+) {
+  return {
+    counterKey:
+      mode,
+    reusableKey:
+      mode +
+      "Reusable",
+    activeKey:
+      mode +
+      "Active"
+  };
+}
+
+function chunkItems(
+  items,
+  size
+) {
+  const chunks = [];
+
+  for (
+    let i = 0;
+    i < items.length;
+    i += size
+  ) {
+    chunks.push(
+      items.slice(
+        i,
+        i + size
+      )
+    );
+  }
+
+  return chunks;
+}
+
+function getLowestAvailableSerial(
+  counter,
+  reusable,
+  active
+) {
+  const reusableSorted =
+    [...reusable].sort(
+      (a, b) =>
+        a - b
+    );
+
+  if (
+    reusableSorted.length
+  ) {
+    return {
+      serial:
+        reusableSorted[0],
+      source:
+        "reusable"
+    };
+  }
+
+  for (
+    let i = 1;
+    i <= 100;
+    i++
+  ) {
+    const candidate =
+      ((counter +
+        i -
+        1) %
+        100) +
+      1;
+
+    if (
+      !active.includes(
+        candidate
+      )
+    ) {
+      return {
+        serial:
+          candidate,
+        source:
+          "new"
+      };
+    }
+  }
+
+  return null;
+}
+
+/* ================================
+   PRODUCTS
+================================ */
+fetch("productList.json")
+  .then(res => res.json())
+  .then(data => {
+    products = data.map(
+      product => {
+        const searchableText =
+          normalize(
+            `${product.productName} ${product.material || ""}`
+          );
+
+        return {
+          ...product,
+          searchableText,
+          searchableTokens:
+            tokenize(
+              searchableText
+            )
+        };
+      }
+    );
+
+    restoreDraft();
+  })
+  .catch(err => {
+    console.error(err);
+    alert(
+      "Failed to load products."
+    );
+  });
+/* ================================
+   SEARCH + NAVIGATION
+================================ */
+function renderSuggestions(
+  queryText
+) {
+  const query =
+    normalize(
+      queryText
+    );
+
+  if (!query) {
+    suggestions.innerHTML =
+      "";
+    clearSearch.style.display =
+      "none";
+    return;
+  }
+
+  clearSearch.style.display =
+    "flex";
+
+  const queryTokens =
+    tokenize(query);
+
+  const matches =
+    products
+      .filter(
+        product => {
+          if (
+            product.searchableText.includes(
+              query
+            )
+          ) {
+            return true;
+          }
+
+          return queryTokens.every(
+            token =>
+              product.searchableTokens.some(
+                pToken =>
+                  pToken.startsWith(
+                    token
+                  )
+              )
+          );
+        }
+      )
+      .slice(0, 20);
+
+  if (!matches.length) {
+    suggestions.innerHTML =
+      `
+        <div class="receiver-subtitle">
+          No products found.
+        </div>
+      `;
+    return;
+  }
+
+  let html = "";
+
+  matches.forEach(
+    product => {
+      const price =
+        getCurrentPrice(
+          product
+        ) || 0;
+
+      html += `
+        <div
+          class="suggestion-card"
+          onclick="selectProduct('${escapeAttr(product.sr)}')"
+        >
+          <div class="suggestion-top">
+            <div class="suggestion-name">
+              ${escapeAttr(product.productName)}
+            </div>
+
+            <div class="suggestion-price">
+              ₹${formatIndianMoney(price)}
+            </div>
+          </div>
+
+          <div class="badge-row">
+            ${
+              product.material
+                ? `
+                  <div class="unit ${getMaterialClass(product.material)}">
+                    ${escapeAttr(product.material)}
+                  </div>
+                `
+                : ""
+            }
+
+            ${
+              product.priceType
+                ? `
+                  <div class="unit">
+                    ${escapeAttr(product.priceType)}
+                  </div>
+                `
+                : ""
+            }
+          </div>
+        </div>
+      `;
+    }
+  );
+
+  suggestions.innerHTML =
+    html;
+}
+
+searchBox.addEventListener(
+  "input",
+  e => {
+    renderSuggestions(
+      e.target.value
+    );
+  }
+);
+
+clearSearch.addEventListener(
+  "click",
+  () => {
+    searchBox.value = "";
+    suggestions.innerHTML =
+      "";
+    clearSearch.style.display =
+      "none";
+    searchBox.focus();
+  }
+);
+
+modeToggle.addEventListener(
+  "click",
+  () => {
+    currentMode =
+      currentMode === "W"
+        ? "R"
+        : "W";
+
+    modeToggle.innerText =
+      currentMode;
+
+    modeToggle.style.background =
+      currentMode === "W"
+        ? "#2f3f64"
+        : "#d65353";
+
+    renderSuggestions(
+      searchBox.value
+    );
+
+    billItems =
+      billItems.map(
+        item => ({
+          ...item,
+          mode:
+            currentMode,
+          price:
+            getCurrentPrice(
+              item.product
+            ) || 0,
+          total:
+            roundTo2(
+              (parseFloat(
+                item.qty
+              ) || 0) *
+                (getCurrentPrice(
+                  item.product
+                ) || 0)
+            )
+        })
+      );
+
+    renderBill();
+    updateGrandTotal();
+    saveDraft();
+  }
+);
+
+billingTab.addEventListener(
+  "click",
+  () => {
+    billingView.style.display =
+      "block";
+    receiverView.style.display =
+      "none";
+    daybookView.style.display =
+      "none";
+
+    billingTab.classList.add(
+      "active"
+    );
+
+    receiverTab.classList.remove(
+      "active"
+    );
+
+    daybookTab.classList.remove(
+      "active"
+    );
+  }
+);
+
+receiverTab.addEventListener(
+  "click",
+  () => {
+    billingView.style.display =
+      "none";
+    receiverView.style.display =
+      "block";
+    daybookView.style.display =
+      "none";
+
+    receiverTab.classList.add(
+      "active"
+    );
+
+    billingTab.classList.remove(
+      "active"
+    );
+
+    daybookTab.classList.remove(
+      "active"
+    );
+  }
+);
+
+daybookTab.addEventListener(
+  "click",
+  () => {
+    billingView.style.display =
+      "none";
+    receiverView.style.display =
+      "none";
+    daybookView.style.display =
+      "block";
+
+    daybookTab.classList.add(
+      "active"
+    );
+
+    billingTab.classList.remove(
+      "active"
+    );
+
+    receiverTab.classList.remove(
+      "active"
+    );
+  }
+);
+
+/* ================================
+   BILLING
+================================ */
+window.selectProduct =
+  function(sr) {
+    const product =
+      products.find(
+        p => p.sr === sr
+      );
+
+    if (!product) {
+      return;
+    }
+
+    const existingIndex =
+      billItems.findIndex(
+        item =>
+          item.product.sr ===
+            sr &&
+          item.mode ===
+            currentMode
+      );
+
+    if (
+      existingIndex !==
+      -1
+    ) {
+      const existing =
+        billItems[
+          existingIndex
+        ];
+
+      billItems.splice(
+        existingIndex,
+        1
+      );
+
+      billItems.unshift(
+        existing
+      );
+    } else {
+      billItems.unshift({
+        product,
+        mode:
+          currentMode,
+        price:
+          getCurrentPrice(
+            product
+          ) || 0,
+        qty: "",
+        total: 0
+      });
+    }
+
+    renderBill();
+    updateGrandTotal();
+    saveDraft();
+
+    searchBox.value = "";
+    suggestions.innerHTML =
+      "";
+    clearSearch.style.display =
+      "none";
+
+    focusQtyInput(0);
+  };
+function renderBill() {
+  if (!billItems.length) {
+    billItemsDiv.innerHTML =
+      "";
+    return;
+  }
+
+  let html = "";
+
+  billItems.forEach(
+    (item, index) => {
+      const safeQty =
+        item.qty || "";
+
+      html += `
+        <div class="bill-card">
+          <div class="bill-title">
+            ${escapeAttr(item.product.productName)}
+          </div>
+
+          <div class="badge-row">
+            ${
+              item.product.priceType
+                ? `
+                  <div class="unit">
+                    ${escapeAttr(item.product.priceType)}
+                  </div>
+                `
+                : ""
+            }
+
+            ${
+              item.product.material
+                ? `
+                  <div class="unit ${getMaterialClass(item.product.material)}">
+                    ${escapeAttr(item.product.material)}
+                  </div>
+                `
+                : ""
+            }
+          </div>
+
+          <div class="input-row">
+            <input
+              class="bill-input"
+              type="text"
+              inputmode="decimal"
+              placeholder="Qty"
+              value="${safeQty}"
+              data-qty-index="${index}"
+              oninput="updateQty(${index}, this.value)"
+              onblur="finalizeQty(${index}, this)"
+            >
+
+            <input
+              class="bill-input"
+              type="number"
+              step="0.01"
+              placeholder="Price"
+              value="${item.price}"
+              oninput="updatePrice(${index}, this.value)"
+            >
+          </div>
+
+          <div class="bill-bottom">
+            <div class="line-total">
+              ₹${formatIndianMoney(item.total)}
+            </div>
+
+            <button
+              class="delete-btn"
+              onclick="removeItem(${index})"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      `;
+    }
+  );
+
+  billItemsDiv.innerHTML =
+    html;
+}
+
+window.updateQty =
+  function(index, value) {
+    if (!billItems[index]) {
+      return;
+    }
+
+    value =
+      value.replace(
+        /[^0-9.]/g,
+        ""
+      );
+
+    const parts =
+      value.split(".");
+
+    if (parts.length > 2) {
+      value =
+        parts[0] +
+        "." +
+        parts
+          .slice(1)
+          .join("");
+    }
+
+    billItems[index].qty =
+      value;
+
+    const parsedQty =
+      parseFloat(value);
+
+    if (isNaN(parsedQty)) {
+      billItems[index].total = 0;
+    } else {
+      billItems[index].total =
+        roundTo2(
+          parsedQty *
+            billItems[
+              index
+            ].price
+        );
+    }
+
+    updateGrandTotal();
+    saveDraft();
+
+    const totalEl =
+      billItemsDiv.querySelectorAll(
+        ".line-total"
+      )[index];
+
+    if (totalEl) {
+      totalEl.innerText =
+        `₹${formatIndianMoney(
+          billItems[
+            index
+          ].total
+        )}`;
+    }
+  };
+
+window.finalizeQty =
+  function(index, input) {
+    if (!billItems[index]) {
+      return;
+    }
+
+    const parsedQty =
+      parseFloat(
+        input.value
+      );
+
+    if (isNaN(parsedQty)) {
+      billItems[index].qty =
+        "";
+      billItems[index].total = 0;
+      input.value = "";
+    } else {
+      const roundedQty =
+        roundTo2(
+          parsedQty
+        );
+
+      billItems[index].qty =
+        roundedQty;
+
+      billItems[index].total =
+        roundTo2(
+          roundedQty *
+            billItems[
+              index
+            ].price
+        );
+
+      input.value =
+        roundedQty;
+    }
+
+    updateGrandTotal();
+    saveDraft();
+
+    const totalEl =
+      billItemsDiv.querySelectorAll(
+        ".line-total"
+      )[index];
+
+    if (totalEl) {
+      totalEl.innerText =
+        `₹${formatIndianMoney(
+          billItems[
+            index
+          ].total
+        )}`;
+    }
+  };
+
+window.updatePrice =
+  function(index, value) {
+    if (!billItems[index]) {
+      return;
+    }
+
+    const price =
+      parseFloat(
+        value
+      ) || 0;
+
+    billItems[index].price =
+      price;
+
+    const qty =
+      parseFloat(
+        billItems[index]
+          .qty
+      ) || 0;
+
+    billItems[index].total =
+      roundTo2(
+        qty * price
+      );
+
+    updateGrandTotal();
+    saveDraft();
+    renderBill();
+  };
+
+window.removeItem =
+  function(index) {
+    billItems.splice(
+      index,
+      1
+    );
+
+    renderBill();
+    updateGrandTotal();
+    saveDraft();
+  };
+
+function updateGrandTotal() {
+  const total =
+    billItems.reduce(
+      (
+        sum,
+        item
+      ) =>
+        sum +
+        item.total,
+      0
+    );
+
+  grandTotalEl.innerText =
+    `₹${formatIndianMoney(total)}`;
+}
+
+function validateBillInputs() {
+  if (!billItems.length) {
+    alert(
+      "No items in bill."
+    );
+    return false;
+  }
+
+  for (const item of billItems) {
+    const qty =
+      parseFloat(
+        item.qty
+      ) || 0;
+
+    if (qty <= 0) {
+      alert(
+        "Please enter valid quantity."
+      );
+      return false;
+    }
+  }
+
+  if (
+    currentMode === "R" &&
+    !customerName.value.trim()
+  ) {
+    alert(
+      "Customer name required."
+    );
+    return false;
+  }
+
+  return true;
+}
+/* ================================
+   SEND / FIRESTORE / PRINT / DAYBOOK
+================================ */
+sendBtn.addEventListener(
+  "click",
+  () => {
+    if (!validateBillInputs()) {
+      return;
+    }
+
+    customerGroup.style.display =
+      currentMode === "R"
+        ? "block"
+        : "none";
+
+    printModal.style.display =
+      "flex";
+  }
+);
+
+cancelPrint.addEventListener(
+  "click",
+  () => {
+    printModal.style.display =
+      "none";
+  }
+);
+
+confirmSend.addEventListener(
+  "click",
+  async () => {
+    if (isSendingBill) {
+      return;
+    }
+
+    if (!validateBillInputs()) {
+      return;
+    }
+
+    isSendingBill = true;
+
+    try {
+      const serialSnap =
+        await runTransaction(
+          db,
+          async tx => {
+            const snap =
+              await tx.get(
+                serialDocRef
+              );
+
+            const data =
+              snap.exists()
+                ? snap.data()
+                : {};
+
+            const keys =
+              getModeKeys(
+                currentMode
+              );
+
+            const counter =
+              data[
+                keys.counterKey
+              ] || 0;
+
+            const reusable =
+              data[
+                keys.reusableKey
+              ] || [];
+
+            const active =
+              data[
+                keys.activeKey
+              ] || [];
+
+            const allocation =
+              getLowestAvailableSerial(
+                counter,
+                reusable,
+                active
+              );
+
+            if (!allocation) {
+              throw new Error(
+                "No serial numbers available."
+              );
+            }
+
+            const serial =
+              allocation.serial;
+
+            const updatedReusable =
+              reusable.filter(
+                n =>
+                  n !== serial
+              );
+
+            const updatedActive =
+              [
+                ...active,
+                serial
+              ];
+
+            const payload =
+              {
+                ...data,
+                [
+                  keys.reusableKey
+                ]:
+                  updatedReusable,
+                [
+                  keys.activeKey
+                ]:
+                  updatedActive
+              };
+
+            if (
+              allocation.source ===
+              "new"
+            ) {
+              payload[
+                keys.counterKey
+              ] = serial;
+            }
+
+            tx.set(
+              serialDocRef,
+              payload
+            );
+
+            return serial;
+          }
+        );
+
+      const dateInfo =
+        getIndiaDateInfo();
+
+      const grandTotal =
+        billItems.reduce(
+          (
+            sum,
+            item
+          ) =>
+            sum +
+            item.total,
+          0
+        );
+
+      const billData = {
+        customerName:
+          customerName.value.trim(),
+        mode:
+          currentMode,
+        serialNumber:
+          serialSnap,
+        date:
+          dateInfo.displayDate,
+        grandTotal,
+        total:
+          grandTotal,
+        printed: false,
+        completed: false,
+        items:
+          billItems.map(
+            item => ({
+              productName:
+                item.product
+                  .productName,
+              material:
+                item.product
+                  .material ||
+                "",
+              qty:
+                parseFloat(
+                  item.qty
+                ) || 0,
+              price:
+                item.price,
+              total:
+                item.total
+            })
+          ),
+        createdAt:
+          serverTimestamp()
+      };
+
+      await addDoc(
+        billsCollection,
+        billData
+      );
+
+      billItems = [];
+      renderBill();
+      updateGrandTotal();
+      clearDraft();
+
+      customerName.value =
+        "";
+
+      printModal.style.display =
+        "none";
+
+      alert(
+        "Bill sent successfully."
+      );
+    } catch (err) {
+      console.error(err);
+      alert(
+        err.message ||
+          "Failed to send bill."
+      );
+    } finally {
+      isSendingBill = false;
+    }
+  }
+);
+
+/* ================================
+   RECEIVER LIVE VIEW
+================================ */
+onSnapshot(
+  billsQuery,
+  snap => {
+    incomingBillCache =
+      {};
+
+    snap.forEach(
+      docSnap => {
+        const data =
+          docSnap.data();
+
+        if (
+          !data.completed
+        ) {
+          incomingBillCache[
+            docSnap.id
+          ] = {
+            id:
+              docSnap.id,
+            ...data
+          };
+        }
+      }
+    );
+
+    renderIncomingBills();
+  }
+);
+
+function renderIncomingBills() {
+  const bills =
+    Object.values(
+      incomingBillCache
+    );
+
+  if (!bills.length) {
+    incomingBills.innerHTML =
+      `
+        <div class="receiver-subtitle">
+          No incoming bills.
+        </div>
+      `;
+    return;
+  }
+
+  bills.sort(
+    (a, b) =>
+      (a.serialNumber || 0) -
+      (b.serialNumber || 0)
+  );
+
+  let html = "";
+
+  bills.forEach(
+    bill => {
+      html += `
+        <div class="receiver-card">
+          <div class="receiver-title">
+            #${bill.serialNumber || "-"}
+          </div>
+
+          <div class="receiver-subtitle">
+            ${escapeAttr(
+              bill.customerName ||
+                "Walk-in"
+            )}
+          </div>
+
+          <div class="receiver-subtitle">
+            ₹${formatIndianMoney(
+              bill.grandTotal
+            )}
+          </div>
+
+          <div class="action-buttons">
+            <button
+              class="primary-btn"
+              onclick="printBill('${bill.id}')"
+            >
+              Print
+            </button>
+
+            ${
+              bill.printed
+                ? `
+                  <button
+                    class="send-btn"
+                    onclick="markDone('${bill.id}')"
+                  >
+                    Done
+                  </button>
+                `
+                : ""
+            }
+          </div>
+        </div>
+      `;
+    }
+  );
+
+  incomingBills.innerHTML =
+    html;
+}
+/* ================================
+   PRINT / COMPLETE / DAYBOOK
+================================ */
+window.printBill =
+  async function(id) {
+    if (
+      isReceiverBusy
+    ) {
+      return;
+    }
+
+    const bill =
+      incomingBillCache[
+        id
+      ];
+
+    if (!bill) {
+      return;
+    }
+
+    isReceiverBusy =
+      true;
+
+    try {
+      const chunks =
+        chunkItems(
+          bill.items || [],
+          MAX_ITEMS_PER_DL_PAGE
+        );
+
+      const pages =
+        chunks.length
+          ? chunks
+          : [[]];
+
+      printInvoice.innerHTML =
+        pages
+          .map(
+            (
+              chunk,
+              index
+            ) => `
+              <div class="receipt-copy">
+                ${buildSingleCopyPage(
+                  {
+                    ...bill,
+                    items:
+                      chunk
+                  }
+                )}
+              </div>
+            `
+          )
+          .join("");
+
+      window.print();
+
+      setTimeout(
+        () => {
+          printInvoice.innerHTML =
+            "";
+        },
+        2000
+      );
+
+      const billRef =
+        doc(
+          db,
+          "bills",
+          id
+        );
+
+      const batch =
+        writeBatch(
+          db
+        );
+
+      batch.update(
+        billRef,
+        {
+          printed: true
+        }
+      );
+
+      await batch.commit();
+
+      incomingBillCache[
+        id
+      ].printed = true;
+
+      renderIncomingBills();
+    } catch (err) {
+      console.error(
+        err
+      );
+
+      alert(
+        "Print failed."
+      );
+    } finally {
+      isReceiverBusy =
+        false;
+    }
+  };
+
+window.markDone =
+  async function(id) {
+    if (
+      isReceiverBusy
+    ) {
+      return;
+    }
+
+    const bill =
+      incomingBillCache[
+        id
+      ];
+
+    if (!bill) {
+      return;
+    }
+
+    isReceiverBusy =
+      true;
+
+    try {
+      await runTransaction(
+        db,
+        async tx => {
+          const billRef =
+            doc(
+              db,
+              "bills",
+              id
+            );
+
+          const serialSnap =
+            await tx.get(
+              serialDocRef
+            );
+
+          const serialData =
+            serialSnap.exists()
+              ? serialSnap.data()
+              : {};
+
+          const keys =
+            getModeKeys(
+              bill.mode ||
+                "W"
+            );
+
+          const active =
+            serialData[
+              keys.activeKey
+            ] || [];
+
+          const reusable =
+            serialData[
+              keys.reusableKey
+            ] || [];
+
+          tx.update(
+            billRef,
+            {
+              completed:
+                true
+            }
+          );
+
+         tx.set(
+  serialDocRef,
+  {
+    [keys.activeKey]:
+      active.filter(
+        n =>
+          n !==
+          bill.serialNumber
+      ),
+    [keys.reusableKey]:
+      reusable.includes(
+        bill.serialNumber
+      )
+        ? reusable
+        : [
+            ...reusable,
+            bill.serialNumber
+          ]
+  },
+  { merge: true }
+);
+
+          tx.set(
+            addDocRef(),
+            {
+              customerName:
+                bill.customerName ||
+                "Walk-in",
+              amount:
+                bill.grandTotal ||
+                0,
+              date:
+                bill.date,
+              serialNumber:
+                bill.serialNumber,
+              createdAt:
+                serverTimestamp()
+            }
+          );
+        }
+      );
+
+      delete incomingBillCache[
+        id
+      ];
+
+      renderIncomingBills();
+    } catch (err) {
+      console.error(
+        err
+      );
+
+      alert(
+        "Failed to complete bill."
+      );
+    } finally {
+      isReceiverBusy =
+        false;
+    }
+  };
+
+function addDocRef() {
+  return doc(
+    collection(
+      db,
+      "daybook"
+    )
+  );
+}
+
+function buildSingleCopyPage(
+  billData
+) {
+  const rows =
+    (billData.items || [])
+      .map(
+        item => `
+          <tr>
+            <td>
+              ${escapeAttr(
+                item.productName
+              )}
+            </td>
+            <td>
+              ${escapeAttr(
+                shortMaterialName(
+                  item.material
+                )
+              )}
+            </td>
+            <td>
+              ${item.qty}
+            </td>
+            <td>
+              ₹${formatIndianMoney(
+                item.price
+              )}
+            </td>
+            <td>
+              ₹${formatIndianMoney(
+                item.total
+              )}
+            </td>
+          </tr>
+        `
+      )
+      .join("");
+
+  return `
+    <div class="print-wrapper">
+      <div class="print-header-row">
+        <div class="print-customer">
+          ${escapeAttr(
+            billData.customerName ||
+              "Walk-in"
+          )}
+        </div>
+
+        <div class="print-date">
+          ${escapeAttr(
+            billData.date
+          )}
+        </div>
+
+        <div class="print-serial">
+          ${
+            billData.serialNumber
+              ? "#" +
+                billData.serialNumber
+              : ""
+          }
+        </div>
+      </div>
+
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Mat</th>
+            <th>Qty</th>
+            <th>Rate</th>
+            <th>Amt</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+
+      <div class="print-total">
+        GRAND TOTAL:
+        ₹${formatIndianMoney(
+          billData.grandTotal
+        )}/-
+      </div>
+
+      <div class="print-balance">
+        BALANCE H/V
+      </div>
+
+      <div class="receiver-name-box">
+        <div class="receiver-line"></div>
+        <div class="receiver-label">
+          Receiver Name
+        </div>
+      </div>
+    </div>
+  `;
+}
+/* ================================
+   DAYBOOK
+================================ */
+onSnapshot(
+  daybookQuery,
+  snap => {
+    daybookCache = {};
+
+    snap.forEach(
+      docSnap => {
+        daybookCache[
+          docSnap.id
+        ] = {
+          id:
+            docSnap.id,
+          ...docSnap.data()
+        };
+      }
+    );
+
+    renderDaybook();
+  }
+);
+
+function renderDaybook() {
+  const entries =
+    Object.values(
+      daybookCache
+    ).sort(
+      (a, b) =>
+        (a.serialNumber || 0) -
+        (b.serialNumber || 0)
+    );
+
+  const total =
+    entries.reduce(
+      (
+        sum,
+        entry
+      ) =>
+        sum +
+        (entry.amount ||
+          0),
+      0
+    );
+
+  daybookSummary.innerText =
+    `Total: ₹${formatIndianMoney(total)}`;
+
+  daybookActions.innerHTML =
+    `
+      <button
+        class="primary-btn"
+        onclick="printDaybook()"
+      >
+        Print Daybook
+      </button>
+
+      <button
+        class="delete-btn"
+        onclick="clearDaybook()"
+      >
+        Clear Daybook
+      </button>
+    `;
+
+  if (!entries.length) {
+    daybookEntries.innerHTML =
+      `
+        <div class="receiver-subtitle">
+          No daybook entries.
+        </div>
+      `;
+    return;
+  }
+
+  let html = "";
+
+  entries.forEach(
+    entry => {
+      html += `
+        <div class="daybook-entry">
+          <div class="daybook-date">
+            ${escapeAttr(
+              entry.date || ""
+            )}
+          </div>
+
+          <div class="daybook-name">
+            #${entry.serialNumber || "-"} —
+            ${escapeAttr(
+              entry.customerName
+            )}
+          </div>
+
+          <div class="daybook-amount">
+            ₹${formatIndianMoney(
+              entry.amount
+            )}
+          </div>
+        </div>
+      `;
+    }
+  );
+
+  daybookEntries.innerHTML =
+    html;
+}
+
+window.printDaybook =
+  function() {
+    if (
+      isDaybookBusy
+    ) {
+      return;
+    }
+
+    const entries =
+      Object.values(
+        daybookCache
+      ).sort(
+        (a, b) =>
+          (a.serialNumber ||
+            0) -
+          (b.serialNumber ||
+            0)
+      );
+
+    if (!entries.length) {
+      alert(
+        "No daybook entries."
+      );
+      return;
+    }
+
+    isDaybookBusy =
+      true;
+
+    try {
+      const total =
+        entries.reduce(
+          (
+            sum,
+            entry
+          ) =>
+            sum +
+            (entry.amount ||
+              0),
+          0
+        );
+
+      const rows =
+        entries
+          .map(
+            entry => `
+              <tr>
+                <td>
+                  ${escapeAttr(
+                    entry.date
+                  )}
+                </td>
+                <td>
+                  ${
+                    entry.serialNumber ||
+                    "-"
+                  }
+                </td>
+                <td>
+                  ${escapeAttr(
+                    entry.customerName
+                  )}
+                </td>
+                <td>
+                  ₹${formatIndianMoney(
+                    entry.amount
+                  )}
+                </td>
+              </tr>
+            `
+          )
+          .join("");
+
+      printInvoice.innerHTML =
+        `
+          <div class="print-wrapper">
+            <div class="daybook-print-title">
+              DAYBOOK
+            </div>
+
+            <table class="daybook-print-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Sr</th>
+                  <th>Customer</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${rows}
+              </tbody>
+            </table>
+
+            <div class="daybook-print-total">
+              TOTAL:
+              ₹${formatIndianMoney(
+                total
+              )}
+            </div>
+          </div>
+        `;
+
+      window.print();
+
+      setTimeout(
+        () => {
+          printInvoice.innerHTML =
+            "";
+        },
+        500
+      );
+    } finally {
+      isDaybookBusy =
+        false;
+    }
+  };
+
+window.clearDaybook =
+  async function() {
+    if (
+      !requireAdminPassword()
+    ) {
+      return;
+    }
+
+    try {
+      const snap =
+        await getDocs(
+          daybookCollection
+        );
+
+      if (
+        snap.empty
+      ) {
+        return;
+      }
+
+      const batch =
+        writeBatch(db);
+
+      snap.forEach(
+        docSnap => {
+          batch.delete(
+            docSnap.ref
+          );
+        }
+      );
+
+      await batch.commit();
+    } catch (err) {
+      console.error(
+        err
+      );
+
+      alert(
+        "Failed to clear daybook."
+      );
+    }
+  };
+
