@@ -41,12 +41,19 @@ const daybookQuery = query(
   orderBy("createdAt", "asc")
 );
 
-const serialDocRef = doc(db, "serialCounters", "serials");
+const serialDocRef = doc(
+  db,
+  "serialCounters",
+  "serials"
+);
 
 /* ================================
    CONSTANTS
 ================================ */
 const ADMIN_PASSWORD = "1110";
+const BILL_DRAFT_KEY = "billingAppDraftV3";
+const DRAFT_MAX_AGE_MS =
+  24 * 60 * 60 * 1000;
 
 /* ================================
    STATE
@@ -66,39 +73,65 @@ let daybookPrintedOnce = false;
 /* ================================
    DOM
 ================================ */
-const billingTab = document.getElementById("billingTab");
-const receiverTab = document.getElementById("receiverTab");
-const daybookTab = document.getElementById("daybookTab");
+const billingTab =
+  document.getElementById("billingTab");
+const receiverTab =
+  document.getElementById("receiverTab");
+const daybookTab =
+  document.getElementById("daybookTab");
 
-const billingView = document.getElementById("billingView");
-const receiverView = document.getElementById("receiverView");
-const daybookView = document.getElementById("daybookView");
+const billingView =
+  document.getElementById("billingView");
+const receiverView =
+  document.getElementById("receiverView");
+const daybookView =
+  document.getElementById("daybookView");
 
-const searchBox = document.getElementById("searchBox");
-const suggestions = document.getElementById("suggestions");
-const billItemsDiv = document.getElementById("billItems");
-const grandTotalEl = document.getElementById("grandTotal");
-const modeToggle = document.getElementById("modeToggle");
-const clearSearch = document.getElementById("clearSearch");
+const searchBox =
+  document.getElementById("searchBox");
+const suggestions =
+  document.getElementById("suggestions");
+const billItemsDiv =
+  document.getElementById("billItems");
+const grandTotalEl =
+  document.getElementById("grandTotal");
+const modeToggle =
+  document.getElementById("modeToggle");
+const clearSearch =
+  document.getElementById("clearSearch");
 
-const sendBtn = document.getElementById("sendBtn");
+const sendBtn =
+  document.getElementById("sendBtn");
 
-const printModal = document.getElementById("printModal");
-const customerName = document.getElementById("customerName");
-const customerGroup = document.getElementById("customerGroup");
-const cancelPrint = document.getElementById("cancelPrint");
-const confirmSend = document.getElementById("confirmSend");
+const printModal =
+  document.getElementById("printModal");
+const customerName =
+  document.getElementById("customerName");
+const customerGroup =
+  document.getElementById("customerGroup");
+const cancelPrint =
+  document.getElementById("cancelPrint");
+const confirmSend =
+  document.getElementById("confirmSend");
 
-const printInvoice = document.getElementById("printInvoice");
-const incomingBills = document.getElementById("incomingBills");
+const printInvoice =
+  document.getElementById("printInvoice");
+const incomingBills =
+  document.getElementById("incomingBills");
 
-const previewModal = document.getElementById("previewModal");
-const previewContent = document.getElementById("previewContent");
-const closePreview = document.getElementById("closePreview");
+const previewModal =
+  document.getElementById("previewModal");
+const previewContent =
+  document.getElementById("previewContent");
+const closePreview =
+  document.getElementById("closePreview");
 
-const daybookSummary = document.getElementById("daybookSummary");
-const daybookActions = document.getElementById("daybookActions");
-const daybookEntries = document.getElementById("daybookEntries");
+const daybookSummary =
+  document.getElementById("daybookSummary");
+const daybookActions =
+  document.getElementById("daybookActions");
+const daybookEntries =
+  document.getElementById("daybookEntries");
 
 /* ================================
    HELPERS
@@ -119,9 +152,12 @@ function tokenize(text) {
 }
 
 function requireAdminPassword() {
-  const entered = prompt("Enter admin password");
+  const entered =
+    prompt("Enter admin password");
 
-  if (entered === null) return false;
+  if (entered === null) {
+    return false;
+  }
 
   if (entered !== ADMIN_PASSWORD) {
     alert("Incorrect password.");
@@ -134,17 +170,17 @@ function requireAdminPassword() {
 function getIndiaDateInfo() {
   const now = new Date();
 
-  const formatter = new Intl.DateTimeFormat("en-IN", {
-    timeZone: "Asia/Kolkata",
-    day: "2-digit",
-    month: "short",
-    year: "numeric"
-  });
-
-  const displayDate = formatter.format(now);
+  const formatter =
+    new Intl.DateTimeFormat("en-IN", {
+      timeZone: "Asia/Kolkata",
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
 
   return {
-    displayDate
+    displayDate:
+      formatter.format(now)
   };
 }
 
@@ -155,26 +191,172 @@ function getCurrentPrice(product) {
 }
 
 function getMaterialClass(material) {
-  if (material === "Brass") return "material-brass";
-  if (material === "Copper") return "material-copper";
-  if (material === "Kansa") return "material-kansa";
+  if (material === "Brass") {
+    return "material-brass";
+  }
+
+  if (material === "Copper") {
+    return "material-copper";
+  }
+
+  if (material === "Kansa") {
+    return "material-kansa";
+  }
+
   return "";
 }
 
 function shortMaterialName(material) {
-  if (material === "Brass") return "BR";
-  if (material === "Copper") return "CU";
-  if (material === "Kansa") return "BZ";
+  if (material === "Brass") {
+    return "BR";
+  }
+
+  if (material === "Copper") {
+    return "CU";
+  }
+
+  if (material === "Kansa") {
+    return "BZ";
+  }
+
   return material || "-";
 }
 
 function formatIndianMoney(value) {
-  return Number(value || 0).toLocaleString("en-IN", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
+  return Number(value || 0)
+    .toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
 }
 
+function clearDraft() {
+  localStorage.removeItem(
+    BILL_DRAFT_KEY
+  );
+}
+
+function saveDraft() {
+  try {
+    if (!billItems.length) {
+      clearDraft();
+      return;
+    }
+
+    const draft = {
+      savedAt: Date.now(),
+      currentMode,
+      customerName:
+        customerName.value.trim(),
+      billItems: billItems.map(item => ({
+        product: item.product,
+        mode: item.mode,
+        price: item.price,
+        qty: item.qty,
+        total: item.total
+      }))
+    };
+
+    localStorage.setItem(
+      BILL_DRAFT_KEY,
+      JSON.stringify(draft)
+    );
+  } catch (err) {
+    console.error(
+      "Draft save failed:",
+      err
+    );
+  }
+}
+
+function restoreDraft() {
+  try {
+    const raw =
+      localStorage.getItem(
+        BILL_DRAFT_KEY
+      );
+
+    if (!raw) {
+      return;
+    }
+
+    const draft =
+      JSON.parse(raw);
+
+    if (
+      !draft ||
+      !Array.isArray(draft.billItems) ||
+      !draft.billItems.length
+    ) {
+      clearDraft();
+      return;
+    }
+
+    const age =
+      Date.now() -
+      (draft.savedAt || 0);
+
+    if (age > DRAFT_MAX_AGE_MS) {
+      clearDraft();
+      return;
+    }
+
+    const shouldRestore =
+      confirm(
+        "Resume unfinished bill?"
+      );
+
+    if (!shouldRestore) {
+      clearDraft();
+      return;
+    }
+
+    currentMode =
+      draft.currentMode || "W";
+
+    modeToggle.innerText =
+      currentMode;
+
+    modeToggle.style.background =
+      currentMode === "W"
+        ? "#2f3f64"
+        : "#d65353";
+
+    customerName.value =
+      draft.customerName || "";
+
+    billItems =
+      draft.billItems.map(item => ({
+        ...item
+      }));
+
+    renderBill();
+    updateGrandTotal();
+  } catch (err) {
+    console.error(
+      "Draft restore failed:",
+      err
+    );
+
+    clearDraft();
+  }
+}
+
+function focusQtyInput(index = 0) {
+  requestAnimationFrame(() => {
+    const input =
+      document.querySelector(
+        `[data-qty-index="${index}"]`
+      );
+
+    if (!input) {
+      return;
+    }
+
+    input.focus();
+    input.select();
+  });
+}
 /* ================================
    PRODUCTS
 ================================ */
@@ -183,15 +365,18 @@ fetch("productList.json")
   .then(data => {
     products = data.map(product => {
       const searchableText = normalize(
-        product.productName + " " + (product.material || "")
+        `${product.productName} ${product.material || ""}`
       );
 
       return {
         ...product,
         searchableText,
-        searchableTokens: tokenize(searchableText)
+        searchableTokens:
+          tokenize(searchableText)
       };
     });
+
+    restoreDraft();
   })
   .catch(err => {
     console.error(err);
@@ -215,12 +400,17 @@ const synonyms = {
 };
 
 function expandQuery(query) {
-  const words = tokenize(query);
-  let expanded = [...words];
+  const words =
+    tokenize(query);
+
+  let expanded =
+    [...words];
 
   words.forEach(word => {
     if (synonyms[word]) {
-      expanded.push(...synonyms[word]);
+      expanded.push(
+        ...synonyms[word]
+      );
     }
   });
 
@@ -228,7 +418,9 @@ function expandQuery(query) {
 }
 
 function levenshtein(a, b) {
-  if (a === b) return 0;
+  if (a === b) {
+    return 0;
+  }
 
   const matrix = [];
 
@@ -241,15 +433,24 @@ function levenshtein(a, b) {
   }
 
   for (let i = 1; i <= b.length; i++) {
-    for (let j = 1; j <= a.length; j++) {
-      if (b[i - 1] === a[j - 1]) {
-        matrix[i][j] = matrix[i - 1][j - 1];
+    for (
+      let j = 1;
+      j <= a.length;
+      j++
+    ) {
+      if (
+        b[i - 1] ===
+        a[j - 1]
+      ) {
+        matrix[i][j] =
+          matrix[i - 1][j - 1];
       } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1,
-          matrix[i][j - 1] + 1,
-          matrix[i - 1][j] + 1
-        );
+        matrix[i][j] =
+          Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
       }
     }
   }
@@ -257,131 +458,291 @@ function levenshtein(a, b) {
   return matrix[b.length][a.length];
 }
 
-function tokenScore(queryToken, productToken) {
-  if (queryToken === productToken) return 100;
-  if (productToken.startsWith(queryToken)) return 40;
-  if (productToken.includes(queryToken)) return 25;
+function tokenScore(
+  queryToken,
+  productToken
+) {
+  if (
+    queryToken ===
+    productToken
+  ) {
+    return 100;
+  }
 
-  const distance = levenshtein(queryToken, productToken);
+  if (
+    productToken.startsWith(
+      queryToken
+    )
+  ) {
+    return 40;
+  }
 
-  if (distance === 1) return 18;
-  if (distance === 2 && queryToken.length >= 5) return 10;
+  if (
+    productToken.includes(
+      queryToken
+    )
+  ) {
+    return 25;
+  }
+
+  const distance =
+    levenshtein(
+      queryToken,
+      productToken
+    );
+
+  if (distance === 1) {
+    return 18;
+  }
+
+  if (
+    distance === 2 &&
+    queryToken.length >= 5
+  ) {
+    return 10;
+  }
 
   return 0;
 }
 
-function scoreProduct(product, queryTokens, rawQuery) {
+function scoreProduct(
+  product,
+  queryTokens,
+  rawQuery
+) {
   let score = 0;
 
-  if (product.searchableText === rawQuery) score += 500;
-  if (product.searchableText.includes(rawQuery)) score += 120;
+  if (
+    product.searchableText ===
+    rawQuery
+  ) {
+    score += 500;
+  }
 
-  queryTokens.forEach(queryToken => {
-    let best = 0;
+  if (
+    product.searchableText.includes(
+      rawQuery
+    )
+  ) {
+    score += 120;
+  }
 
-    product.searchableTokens.forEach(productToken => {
-      const s = tokenScore(queryToken, productToken);
-      if (s > best) best = s;
-    });
+  queryTokens.forEach(
+    queryToken => {
+      let best = 0;
 
-    score += best;
-  });
+      product.searchableTokens.forEach(
+        productToken => {
+          const s =
+            tokenScore(
+              queryToken,
+              productToken
+            );
+
+          if (s > best) {
+            best = s;
+          }
+        }
+      );
+
+      score += best;
+    }
+  );
 
   return score;
 }
 
 function searchProducts(queryText) {
-  const clean = normalize(queryText);
-  if (!clean) return [];
+  const clean =
+    normalize(queryText);
 
-  const queryTokens = expandQuery(clean);
+  if (!clean) {
+    return [];
+  }
+
+  const queryTokens =
+    expandQuery(clean);
 
   return products
     .map(product => ({
       product,
-      score: scoreProduct(product, queryTokens, clean)
+      score:
+        scoreProduct(
+          product,
+          queryTokens,
+          clean
+        )
     }))
-    .filter(r => r.score > 0)
-    .sort((a, b) => b.score - a.score)
+    .filter(
+      result =>
+        result.score > 0
+    )
+    .sort(
+      (a, b) =>
+        b.score - a.score
+    )
     .slice(0, 8)
-    .map(r => r.product);
+    .map(
+      result =>
+        result.product
+    );
 }
+
 /* ================================
    TAB NAVIGATION
 ================================ */
 function activateView(view) {
-  billingView.style.display = "none";
-  receiverView.style.display = "none";
-  daybookView.style.display = "none";
+  billingView.style.display =
+    "none";
+  receiverView.style.display =
+    "none";
+  daybookView.style.display =
+    "none";
 
-  billingTab.classList.remove("active");
-  receiverTab.classList.remove("active");
-  daybookTab.classList.remove("active");
+  billingTab.classList.remove(
+    "active"
+  );
+  receiverTab.classList.remove(
+    "active"
+  );
+  daybookTab.classList.remove(
+    "active"
+  );
 
   if (view === "billing") {
-    billingView.style.display = "block";
-    billingTab.classList.add("active");
+    billingView.style.display =
+      "block";
+
+    billingTab.classList.add(
+      "active"
+    );
   }
 
   if (view === "receiver") {
-    receiverView.style.display = "block";
-    receiverTab.classList.add("active");
+    receiverView.style.display =
+      "block";
+
+    receiverTab.classList.add(
+      "active"
+    );
   }
 
   if (view === "daybook") {
-    daybookView.style.display = "block";
-    daybookTab.classList.add("active");
+    daybookView.style.display =
+      "block";
+
+    daybookTab.classList.add(
+      "active"
+    );
   }
 }
 
-billingTab.addEventListener("click", () => activateView("billing"));
-receiverTab.addEventListener("click", () => activateView("receiver"));
-daybookTab.addEventListener("click", () => activateView("daybook"));
+billingTab.addEventListener(
+  "click",
+  () => {
+    activateView("billing");
+  }
+);
+
+receiverTab.addEventListener(
+  "click",
+  () => {
+    activateView("receiver");
+  }
+);
+
+daybookTab.addEventListener(
+  "click",
+  () => {
+    activateView("daybook");
+  }
+);
 
 /* ================================
    MODE TOGGLE
 ================================ */
-modeToggle.addEventListener("click", () => {
-  if (currentMode === "W") {
-    currentMode = "R";
-    modeToggle.innerText = "R";
-    modeToggle.style.background = "#d65353";
-  } else {
-    currentMode = "W";
-    modeToggle.innerText = "W";
-    modeToggle.style.background = "#2f3f64";
-  }
+modeToggle.addEventListener(
+  "click",
+  () => {
+    if (currentMode === "W") {
+      currentMode = "R";
+      modeToggle.innerText =
+        "R";
+      modeToggle.style.background =
+        "#d65353";
+    } else {
+      currentMode = "W";
+      modeToggle.innerText =
+        "W";
+      modeToggle.style.background =
+        "#2f3f64";
+    }
 
-  if (searchBox.value.trim()) {
-    renderSuggestions(searchProducts(searchBox.value));
+    if (
+      searchBox.value.trim()
+    ) {
+      renderSuggestions(
+        searchProducts(
+          searchBox.value
+        )
+      );
+    }
+
+    saveDraft();
   }
-});
+);
+
+customerName.addEventListener(
+  "input",
+  () => {
+    saveDraft();
+  }
+);
 
 /* ================================
    SEARCH UI
 ================================ */
-searchBox.addEventListener("input", e => {
-  const value = e.target.value;
-  clearSearch.style.display = value ? "flex" : "none";
+searchBox.addEventListener(
+  "input",
+  e => {
+    const value =
+      e.target.value;
 
-  if (!value.trim()) {
-    suggestions.innerHTML = "";
-    return;
+    clearSearch.style.display =
+      value
+        ? "flex"
+        : "none";
+
+    if (!value.trim()) {
+      suggestions.innerHTML =
+        "";
+      return;
+    }
+
+    renderSuggestions(
+      searchProducts(value)
+    );
   }
+);
 
-  renderSuggestions(searchProducts(value));
-});
+clearSearch.addEventListener(
+  "click",
+  () => {
+    searchBox.value = "";
+    suggestions.innerHTML =
+      "";
+    clearSearch.style.display =
+      "none";
+    searchBox.focus();
+  }
+);
 
-clearSearch.addEventListener("click", () => {
-  searchBox.value = "";
-  suggestions.innerHTML = "";
-  clearSearch.style.display = "none";
-  searchBox.focus();
-});
-
-function renderSuggestions(results) {
+function renderSuggestions(
+  results
+) {
   if (!results.length) {
-    suggestions.innerHTML = "";
+    suggestions.innerHTML =
+      "";
     return;
   }
 
@@ -389,17 +750,32 @@ function renderSuggestions(results) {
 
   results.forEach(product => {
     html += `
-      <div class="suggestion-card" onclick="selectProduct(${product.sr})">
+      <div
+        class="suggestion-card"
+        onclick="selectProduct(${product.sr})"
+      >
         <div class="suggestion-top">
-          <div class="suggestion-name">${product.productName}</div>
-          <div class="suggestion-price">₹${getCurrentPrice(product) || "-"}</div>
+          <div class="suggestion-name">
+            ${product.productName}
+          </div>
+
+          <div class="suggestion-price">
+            ₹${getCurrentPrice(product) || "-"}
+          </div>
         </div>
 
         <div class="badge-row">
-          <div class="unit">${product.priceType || ""}</div>
+          <div class="unit">
+            ${product.priceType || ""}
+          </div>
+
           ${
             product.material
-              ? `<div class="unit ${getMaterialClass(product.material)}">${product.material}</div>`
+              ? `
+                <div class="unit ${getMaterialClass(product.material)}">
+                  ${product.material}
+                </div>
+              `
               : ""
           }
         </div>
@@ -407,128 +783,207 @@ function renderSuggestions(results) {
     `;
   });
 
-  suggestions.innerHTML = html;
+  suggestions.innerHTML =
+    html;
 }
-
 /* ================================
    BILLING
 ================================ */
 window.selectProduct = function(sr) {
-  const product = products.find(p => p.sr === sr);
-  if (!product) return;
+  const product =
+    products.find(
+      p => p.sr === sr
+    );
 
-  const existing = billItems.find(
-    item =>
-      item.product.sr === product.sr &&
-      item.mode === currentMode
-  );
+  if (!product) {
+    return;
+  }
 
-  if (existing) {
-    existing.qty += 1;
-    existing.total = existing.qty * existing.price;
+  const existingIndex =
+    billItems.findIndex(
+      item =>
+        item.product.sr ===
+          product.sr &&
+        item.mode ===
+          currentMode
+    );
+
+  if (existingIndex !== -1) {
+    const existingItem =
+      billItems.splice(
+        existingIndex,
+        1
+      )[0];
+
+    billItems.unshift(
+      existingItem
+    );
   } else {
-    const price = getCurrentPrice(product) || 0;
+    const price =
+      getCurrentPrice(
+        product
+      ) || 0;
 
-    billItems.push({
+    billItems.unshift({
       product,
       mode: currentMode,
       price,
-      qty: 1,
-      total: price
+      qty: "",
+      total: 0
     });
   }
 
   renderBill();
   updateGrandTotal();
+  saveDraft();
 
   searchBox.value = "";
-  suggestions.innerHTML = "";
-  clearSearch.style.display = "none";
+  suggestions.innerHTML =
+    "";
+  clearSearch.style.display =
+    "none";
+
+  focusQtyInput(0);
 };
 
 function renderBill() {
   let html = "";
 
-  billItems.forEach((item, index) => {
-    html += `
-      <div class="bill-card">
-        <div class="bill-title">${item.product.productName}</div>
+  billItems.forEach(
+    (item, index) => {
+      const safeQty =
+        item.qty ?? "";
 
-        <div class="badge-row">
-          <div class="unit">${item.product.priceType || ""}</div>
-          ${
-            item.product.material
-              ? `<div class="unit ${getMaterialClass(item.product.material)}">${item.product.material}</div>`
-              : ""
-          }
+      const safePrice =
+        item.price ?? 0;
+
+      html += `
+        <div class="bill-card">
+          <div class="bill-title">
+            ${item.product.productName}
+          </div>
+
+          <div class="badge-row">
+            <div class="unit">
+              ${item.product.priceType || ""}
+            </div>
+
+            ${
+              item.product.material
+                ? `
+                  <div class="unit ${getMaterialClass(item.product.material)}">
+                    ${item.product.material}
+                  </div>
+                `
+                : ""
+            }
+          </div>
+
+          <div class="input-row">
+
+            <input
+              class="bill-input"
+              type="text"
+              inputmode="decimal"
+              value="${safeQty}"
+              data-qty-index="${index}"
+              onchange="updateQty(${index}, this.value)"
+            >
+
+            <input
+              class="bill-input"
+              type="text"
+              inputmode="decimal"
+              value="${safePrice}"
+              onchange="updatePrice(${index}, this.value)"
+            >
+
+          </div>
+
+          <div class="bill-bottom">
+            <div class="line-total">
+              ₹${item.total.toFixed(2)}
+            </div>
+
+            <button
+              class="delete-btn"
+              onclick="deleteItem(${index})"
+            >
+              Remove
+            </button>
+          </div>
         </div>
-
-        <div class="input-row">
-          <input
-            class="bill-input"
-            type="text"
-            inputmode="decimal"
-            value="${item.price}"
-            onchange="updatePrice(${index}, this.value)"
-          >
-
-          <input
-            class="bill-input"
-            type="text"
-            inputmode="decimal"
-            value="${item.qty}"
-            onchange="updateQty(${index}, this.value)"
-          >
-        </div>
-
-        <div class="bill-bottom">
-          <div class="line-total">₹${item.total.toFixed(2)}</div>
-
-          <button
-            class="delete-btn"
-            onclick="deleteItem(${index})"
-          >
-            Remove
-          </button>
-        </div>
-      </div>
-    `;
-  });
-
-  billItemsDiv.innerHTML = html;
-}
-
-window.updatePrice = function(index, value) {
-  billItems[index].price = parseFloat(value) || 0;
-  billItems[index].total =
-    billItems[index].price * billItems[index].qty;
-
-  renderBill();
-  updateGrandTotal();
-};
-
-window.updateQty = function(index, value) {
-  billItems[index].qty = parseFloat(value) || 0;
-  billItems[index].total =
-    billItems[index].price * billItems[index].qty;
-
-  renderBill();
-  updateGrandTotal();
-};
-
-window.deleteItem = function(index) {
-  billItems.splice(index, 1);
-  renderBill();
-  updateGrandTotal();
-};
-
-function updateGrandTotal() {
-  const total = billItems.reduce(
-    (sum, item) => sum + item.total,
-    0
+      `;
+    }
   );
 
-  grandTotalEl.innerText = `₹${Math.round(total)}`;
+  billItemsDiv.innerHTML =
+    html;
+}
+
+window.updatePrice =
+  function(index, value) {
+    const parsedPrice =
+      parseFloat(value);
+
+    billItems[index].price =
+      isNaN(parsedPrice)
+        ? 0
+        : parsedPrice;
+
+    const qty =
+      parseFloat(
+        billItems[index].qty
+      ) || 0;
+
+    billItems[index].total =
+      billItems[index].price *
+      qty;
+
+    renderBill();
+    updateGrandTotal();
+    saveDraft();
+  };
+
+window.updateQty =
+  function(index, value) {
+    billItems[index].qty =
+      value;
+
+    const qty =
+      parseFloat(value) || 0;
+
+    billItems[index].total =
+      billItems[index].price *
+      qty;
+
+    renderBill();
+    updateGrandTotal();
+    saveDraft();
+  };
+
+window.deleteItem =
+  function(index) {
+    billItems.splice(
+      index,
+      1
+    );
+
+    renderBill();
+    updateGrandTotal();
+    saveDraft();
+  };
+
+function updateGrandTotal() {
+  const total =
+    billItems.reduce(
+      (sum, item) =>
+        sum + item.total,
+      0
+    );
+
+  grandTotalEl.innerText =
+    `₹${Math.round(total)}`;
 }
 
 /* ================================
@@ -536,12 +991,57 @@ function updateGrandTotal() {
 ================================ */
 function validateBillInputs() {
   if (!billItems.length) {
-    alert("Add at least one item.");
+    alert(
+      "Add at least one item."
+    );
     return false;
   }
 
-  if (currentMode === "W" && !customerName.value.trim()) {
-    alert("Enter customer name.");
+  const invalidQty =
+    billItems.some(item => {
+      const qty =
+        parseFloat(item.qty);
+
+      return (
+        isNaN(qty) ||
+        qty <= 0
+      );
+    });
+
+  if (invalidQty) {
+    alert(
+      "All items must have quantity greater than zero."
+    );
+    return false;
+  }
+
+  const invalidPrice =
+    billItems.some(item => {
+      const price =
+        parseFloat(
+          item.price
+        );
+
+      return (
+        isNaN(price) ||
+        price <= 0
+      );
+    });
+
+  if (invalidPrice) {
+    alert(
+      "All items must have valid price greater than zero."
+    );
+    return false;
+  }
+
+  if (
+    currentMode === "W" &&
+    !customerName.value.trim()
+  ) {
+    alert(
+      "Enter customer name."
+    );
     return false;
   }
 
@@ -549,79 +1049,150 @@ function validateBillInputs() {
 }
 
 function openSendModal() {
-  if (!billItems.length) return;
+  if (!billItems.length) {
+    return;
+  }
 
   customerGroup.style.display =
-    currentMode === "W" ? "block" : "none";
+    currentMode === "W"
+      ? "block"
+      : "none";
 
-  printModal.style.display = "flex";
+  printModal.style.display =
+    "flex";
 }
 
-sendBtn.addEventListener("click", openSendModal);
-cancelPrint.addEventListener("click", () => {
-  printModal.style.display = "none";
-});
+sendBtn.addEventListener(
+  "click",
+  openSendModal
+);
 
-closePreview.addEventListener("click", () => {
-  previewModal.style.display = "none";
-  previewContent.innerHTML = "";
-});
+cancelPrint.addEventListener(
+  "click",
+  () => {
+    printModal.style.display =
+      "none";
+  }
+);
+
+closePreview.addEventListener(
+  "click",
+  () => {
+    previewModal.style.display =
+      "none";
+
+    previewContent.innerHTML =
+      "";
+  }
+);
 
 function createBillData() {
-  const grandTotal = billItems.reduce(
-    (sum, item) => sum + item.total,
-    0
-  );
+  const grandTotal =
+    billItems.reduce(
+      (sum, item) =>
+        sum + item.total,
+      0
+    );
 
-  const indiaDate = getIndiaDateInfo();
+  const indiaDate =
+    getIndiaDateInfo();
 
   return {
     mode: currentMode,
-    date: indiaDate.displayDate,
+    date:
+      indiaDate.displayDate,
+
     customerName:
       currentMode === "W"
         ? customerName.value.trim()
         : "Retail Bill",
-    grandTotal: Math.round(grandTotal),
+
+    grandTotal:
+      Math.round(
+        grandTotal
+      ),
+
     status: "pending",
     serialNumber: null,
-    items: billItems.map(item => ({
-      productName: item.product.productName,
-      material: item.product.material || "",
-      qty: item.qty,
-      price: item.price,
-      total: item.total
-    }))
+
+    items: billItems.map(
+      item => ({
+        productName:
+          item.product
+            .productName,
+
+        material:
+          item.product
+            .material || "",
+
+        qty:
+          parseFloat(
+            item.qty
+          ),
+
+        price:
+          item.price,
+
+        total:
+          item.total
+      })
+    )
   };
 }
 
-confirmSend.addEventListener("click", async () => {
-  if (isSendingBill) return;
-  if (!validateBillInputs()) return;
+confirmSend.addEventListener(
+  "click",
+  async () => {
+    if (isSendingBill) {
+      return;
+    }
 
-  isSendingBill = true;
+    if (
+      !validateBillInputs()
+    ) {
+      return;
+    }
 
-  try {
-    const billData = createBillData();
-    billData.createdAt = serverTimestamp();
+    isSendingBill = true;
 
-    await addDoc(billsCollection, billData);
+    try {
+      const billData =
+        createBillData();
 
-    billItems = [];
-    renderBill();
-    updateGrandTotal();
+      billData.createdAt =
+        serverTimestamp();
 
-    customerName.value = "";
-    printModal.style.display = "none";
+      await addDoc(
+        billsCollection,
+        billData
+      );
 
-    alert("Bill sent successfully.");
-  } catch (err) {
-    console.error(err);
-    alert("Failed to send bill: " + err.message);
-  } finally {
-    isSendingBill = false;
+      billItems = [];
+      customerName.value = "";
+
+      renderBill();
+      updateGrandTotal();
+
+      clearDraft();
+
+      printModal.style.display =
+        "none";
+
+      alert(
+        "Bill sent successfully."
+      );
+    } catch (err) {
+      console.error(err);
+
+      alert(
+        "Failed to send bill: " +
+        err.message
+      );
+    } finally {
+      isSendingBill = false;
+    }
   }
-});
+);
 /* ================================
    SERIAL HELPERS
 ================================ */
@@ -638,30 +1209,68 @@ const MAX_ITEMS_PER_DL_PAGE = 20;
 function chunkItems(items, size) {
   const chunks = [];
 
-  for (let i = 0; i < items.length; i += size) {
-    chunks.push(items.slice(i, i + size));
+  for (
+    let i = 0;
+    i < items.length;
+    i += size
+  ) {
+    chunks.push(
+      items.slice(
+        i,
+        i + size
+      )
+    );
   }
 
   return chunks;
 }
 
-function getLowestAvailableSerial(counter, reusable, active) {
-  const reusableSorted = [...reusable].sort((a, b) => a - b);
+function getLowestAvailableSerial(
+  counter,
+  reusable,
+  active
+) {
+  const reusableSorted =
+    [...reusable].sort(
+      (a, b) => a - b
+    );
 
-  if (reusableSorted.length > 0) {
+  if (
+    reusableSorted.length > 0
+  ) {
     return {
-      serial: reusableSorted[0],
-      source: "reusable"
+      serial:
+        reusableSorted[0],
+      source:
+        "reusable"
     };
   }
 
-  for (let i = 1; i <= 100; i++) {
-    const candidate = ((counter + i - 1) % 100) + 1;
+  for (
+    let i = 1;
+    i <= 100;
+    i++
+  ) {
+    const candidate =
+      (
+        (
+          counter +
+          i -
+          1
+        ) %
+        100
+      ) + 1;
 
-    if (!active.includes(candidate)) {
+    if (
+      !active.includes(
+        candidate
+      )
+    ) {
       return {
-        serial: candidate,
-        source: "new"
+        serial:
+          candidate,
+        source:
+          "new"
       };
     }
   }
@@ -669,44 +1278,69 @@ function getLowestAvailableSerial(counter, reusable, active) {
   return null;
 }
 
-function buildSingleCopyPage(billData, label, itemsChunk, isLastPage) {
+function buildSingleCopyPage(
+  billData,
+  label,
+  itemsChunk,
+  isLastPage
+) {
   let rows = "";
 
-  itemsChunk.forEach(item => {
-    rows += `
-      <tr>
-        <td>${item.productName}</td>
-      <td>${shortMaterialName(item.material)}</td>
-        <td>${item.qty}</td>
-<td>${formatIndianMoney(item.price)}</td>
-       <td>${formatIndianMoney(item.total)}</td>
-      </tr>
-    `;
-  });
+  itemsChunk.forEach(
+    item => {
+      rows += `
+        <tr>
+          <td>${item.productName}</td>
+          <td>${shortMaterialName(item.material)}</td>
+          <td>${item.qty}</td>
+          <td>${formatIndianMoney(item.price)}</td>
+          <td>${formatIndianMoney(item.total)}</td>
+        </tr>
+      `;
+    }
+  );
 
   const wholesaleExtras =
-    billData.mode === "W" && isLastPage
+    billData.mode === "W" &&
+    isLastPage
       ? `
-          <div class="print-balance">Balance HV</div>
-          <div class="receiver-name-box">
-            <div class="receiver-line"></div>
-            <div class="receiver-label">Receiver’s Name</div>
+        <div class="print-balance">
+          Balance HV
+        </div>
+
+        <div class="receiver-name-box">
+          <div class="receiver-line"></div>
+          <div class="receiver-label">
+            Receiver’s Name
           </div>
-        `
+        </div>
+      `
       : "";
 
   return `
     <div class="print-wrapper receipt-copy">
-      <div class="copy-label">${label}</div>
-
-      <div class="print-header-row">
-        <div class="print-customer">${billData.customerName}</div>
-       <div class="print-serial">
-  ${billData.serialNumber ? "#" + billData.serialNumber : ""}
-</div>
+      <div class="copy-label">
+        ${label}
       </div>
 
-      <div class="print-date">${billData.date}</div>
+      <div class="print-header-row">
+        <div class="print-customer">
+          ${billData.customerName}
+        </div>
+
+        <div class="print-serial">
+          ${
+            billData.serialNumber
+              ? "#" +
+                billData.serialNumber
+              : ""
+          }
+        </div>
+      </div>
+
+      <div class="print-date">
+        ${billData.date}
+      </div>
 
       <table class="print-table">
         <thead>
@@ -718,13 +1352,15 @@ function buildSingleCopyPage(billData, label, itemsChunk, isLastPage) {
             <th>Amt</th>
           </tr>
         </thead>
+
         <tbody>
           ${rows}
         </tbody>
       </table>
 
       <div class="print-total">
-        Grand Total: ₹${billData.grandTotal}
+        Grand Total:
+        ₹${billData.grandTotal}
       </div>
 
       ${wholesaleExtras}
@@ -732,107 +1368,154 @@ function buildSingleCopyPage(billData, label, itemsChunk, isLastPage) {
   `;
 }
 
-function buildReceiptPrintHTML(billData) {
-  const chunks = chunkItems(
-    billData.items,
-    MAX_ITEMS_PER_DL_PAGE
-  );
+function buildReceiptPrintHTML(
+  billData
+) {
+  const chunks =
+    chunkItems(
+      billData.items,
+      MAX_ITEMS_PER_DL_PAGE
+    );
 
   let html = "";
 
-  chunks.forEach((chunk, index) => {
-    html += buildSingleCopyPage(
-      billData,
-      "CUSTOMER COPY",
-      chunk,
-      index === chunks.length - 1
-    );
-  });
+  chunks.forEach(
+    (chunk, index) => {
+      html +=
+        buildSingleCopyPage(
+          billData,
+          "CUSTOMER COPY",
+          chunk,
+          index ===
+            chunks.length -
+              1
+        );
+    }
+  );
 
-  chunks.forEach((chunk, index) => {
-    html += buildSingleCopyPage(
-      billData,
-      "OFFICE COPY",
-      chunk,
-      index === chunks.length - 1
-    );
-  });
+  chunks.forEach(
+    (chunk, index) => {
+      html +=
+        buildSingleCopyPage(
+          billData,
+          "OFFICE COPY",
+          chunk,
+          index ===
+            chunks.length -
+              1
+        );
+    }
+  );
 
   return html;
 }
 
 function buildDaybookPrintHTML() {
-  const entries = Object.values(daybookCache);
+  const entries =
+    Object.values(
+      daybookCache
+    );
 
   let rows = "";
   let total = 0;
 
-  entries.forEach(entry => {
-    total += entry.amount;
+  entries.forEach(
+    entry => {
+      total +=
+        entry.amount;
 
-   rows += `
-  <tr>
-    <td>${entry.date}</td>
-    <td>#${entry.serialNumber}</td>
-    <td>${entry.customerName}</td>
-    <td>₹${entry.amount}</td>
-  </tr>
-`;
-  });
+      rows += `
+        <tr>
+          <td>${entry.date}</td>
+          <td>#${entry.serialNumber}</td>
+          <td>${entry.customerName}</td>
+          <td>₹${entry.amount}</td>
+        </tr>
+      `;
+    }
+  );
 
   return `
     <div class="print-wrapper">
-      <div class="daybook-print-title">DAYBOOK</div>
+      <div class="daybook-print-title">
+        DAYBOOK
+      </div>
 
       <table class="daybook-print-table">
         <thead>
           <tr>
-           <th>Date</th>
-  <th>Sr No</th>
-  <th>Customer</th>
+            <th>Date</th>
+            <th>Sr No</th>
+            <th>Customer</th>
             <th>Amount</th>
           </tr>
         </thead>
+
         <tbody>
           ${rows}
         </tbody>
       </table>
 
       <div class="daybook-print-total">
-        TOTAL: ₹${total}
+        TOTAL:
+        ₹${total}
       </div>
     </div>
   `;
 }
-function previewReceipt(billData) {
-  const chunks = chunkItems(
-    billData.items,
-    MAX_ITEMS_PER_DL_PAGE
-  );
+
+function previewReceipt(
+  billData
+) {
+  const chunks =
+    chunkItems(
+      billData.items,
+      MAX_ITEMS_PER_DL_PAGE
+    );
 
   let html = "";
 
-  chunks.forEach((chunk, index) => {
-    html += buildSingleCopyPage(
-      billData,
-      "VIEW",
-      chunk,
-      index === chunks.length - 1
-    );
-  });
+  chunks.forEach(
+    (chunk, index) => {
+      html +=
+        buildSingleCopyPage(
+          billData,
+          "VIEW",
+          chunk,
+          index ===
+            chunks.length -
+              1
+        );
+    }
+  );
 
-  previewContent.innerHTML = html;
-  previewModal.style.display = "flex";
+  previewContent.innerHTML =
+    html;
+
+  previewModal.style.display =
+    "flex";
 }
-function printReceipt(billData) {
-  printInvoice.innerHTML = buildReceiptPrintHTML(billData);
+
+function printReceipt(
+  billData
+) {
+  printInvoice.innerHTML =
+    buildReceiptPrintHTML(
+      billData
+    );
+
   window.print();
 }
 
 function printDaybook() {
-  printInvoice.innerHTML = buildDaybookPrintHTML();
+  printInvoice.innerHTML =
+    buildDaybookPrintHTML();
+
   window.print();
-  daybookPrintedOnce = true;
+
+  daybookPrintedOnce =
+    true;
+
   renderDaybook();
 }
 
@@ -840,7 +1523,10 @@ function printDaybook() {
    RECEIVER UI
 ================================ */
 function renderIncomingBills() {
-  const ids = Object.keys(incomingBillCache);
+  const ids =
+    Object.keys(
+      incomingBillCache
+    );
 
   if (!ids.length) {
     incomingBills.innerHTML = `
@@ -854,62 +1540,77 @@ function renderIncomingBills() {
   let html = "";
 
   ids.forEach(id => {
-    const bill = incomingBillCache[id];
+    const bill =
+      incomingBillCache[id];
 
     let buttons = "";
 
- if (bill.status === "pending") {
-  buttons = `
-    <button
-      class="secondary-btn"
-      onclick="viewReceivedBill('${id}')"
-    >
-      View
-    </button>
+    if (
+      bill.status ===
+      "pending"
+    ) {
+      buttons = `
+        <button
+          class="secondary-btn"
+          onclick="viewReceivedBill('${id}')"
+        >
+          View
+        </button>
 
-    <button
-      class="primary-btn"
-      onclick="printReceivedBill('${id}')"
-    >
-      Print
-    </button>
-  `;
-}
- else {
-     buttons = `
-  <button
-    class="secondary-btn"
-    onclick="viewReceivedBill('${id}')"
-  >
-    View
-  </button>
+        <button
+          class="primary-btn"
+          onclick="printReceivedBill('${id}')"
+        >
+          Print
+        </button>
+      `;
+    } else {
+      buttons = `
+        <button
+          class="secondary-btn"
+          onclick="viewReceivedBill('${id}')"
+        >
+          View
+        </button>
 
-  <button
-    class="primary-btn"
-    onclick="reprintReceivedBill('${id}')"
-  >
-    Reprint
-  </button>
+        <button
+          class="primary-btn"
+          onclick="reprintReceivedBill('${id}')"
+        >
+          Reprint
+        </button>
 
-  <button
-    class="send-btn"
-    onclick="doneReceivedBill('${id}')"
-  >
-    Done
-  </button>
-`;
+        <button
+          class="send-btn"
+          onclick="doneReceivedBill('${id}')"
+        >
+          Done
+        </button>
+      `;
     }
 
     html += `
       <div class="bill-card">
-        <div class="bill-title">${bill.customerName}</div>
+        <div class="bill-title">
+          ${bill.customerName}
+        </div>
 
         <div class="badge-row">
-          <div class="unit">${bill.date}</div>
-          <div class="unit">${bill.mode}</div>
+          <div class="unit">
+            ${bill.date}
+          </div>
+
+          <div class="unit">
+            ${bill.mode}
+          </div>
+
           ${
             bill.serialNumber
-              ? `<div class="unit">#${bill.serialNumber}</div>`
+              ? `
+                <div class="unit">
+                  #${bill.serialNumber}
+                </div>
+              `
               : ""
           }
         </div>
@@ -918,53 +1619,78 @@ function renderIncomingBills() {
           ₹${bill.grandTotal}
         </div>
 
-        <div class="action-buttons" style="margin-top:14px;">
+        <div
+          class="action-buttons"
+          style="margin-top:14px;"
+        >
           ${buttons}
         </div>
       </div>
     `;
   });
 
-  incomingBills.innerHTML = html;
+  incomingBills.innerHTML =
+    html;
 }
 
 /* ================================
    DAYBOOK UI
 ================================ */
 function renderDaybook() {
-  const entries = Object.values(daybookCache);
+  const entries =
+    Object.values(
+      daybookCache
+    );
 
   if (!entries.length) {
-    daybookSummary.innerHTML = "Total: ₹0";
-    daybookActions.innerHTML = "";
+    daybookSummary.innerHTML =
+      "Total: ₹0";
+
+    daybookActions.innerHTML =
+      "";
+
     daybookEntries.innerHTML = `
       <div class="receiver-subtitle">
         No finalized bills
       </div>
     `;
+
     return;
   }
 
-  const total = entries.reduce(
-    (sum, entry) => sum + entry.amount,
-    0
-  );
+  const total =
+    entries.reduce(
+      (sum, entry) =>
+        sum +
+        entry.amount,
+      0
+    );
 
-  daybookSummary.innerHTML = `Total: ₹${total}`;
+  daybookSummary.innerHTML =
+    `Total: ₹${total}`;
 
   if (!daybookPrintedOnce) {
     daybookActions.innerHTML = `
-      <button class="primary-btn" onclick="printDaybookNow()">
+      <button
+        class="primary-btn"
+        onclick="printDaybookNow()"
+      >
         Print Daybook
       </button>
     `;
   } else {
     daybookActions.innerHTML = `
-      <button class="primary-btn" onclick="reprintDaybookNow()">
+      <button
+        class="primary-btn"
+        onclick="reprintDaybookNow()"
+      >
         Reprint
       </button>
 
-      <button class="delete-btn" onclick="deleteDaybookNow()">
+      <button
+        class="delete-btn"
+        onclick="deleteDaybookNow()"
+      >
         Delete
       </button>
     `;
@@ -972,240 +1698,464 @@ function renderDaybook() {
 
   let html = "";
 
-  entries.forEach(entry => {
-   html += `
-  <div class="daybook-entry">
-    <div class="daybook-date">
-      ${entry.date} | #${entry.serialNumber}
-    </div>
+  entries.forEach(
+    entry => {
+      html += `
+        <div class="daybook-entry">
+          <div class="daybook-date">
+            ${entry.date} |
+            #${entry.serialNumber}
+          </div>
 
-    <div class="daybook-name">
-      ${entry.customerName}
-    </div>
+          <div class="daybook-name">
+            ${entry.customerName}
+          </div>
 
-    <div class="daybook-amount">
-      ₹${entry.amount}
-    </div>
-  </div>
-`;
-  });
+          <div class="daybook-amount">
+            ₹${entry.amount}
+          </div>
+        </div>
+      `;
+    }
+  );
 
-  daybookEntries.innerHTML = html;
+  daybookEntries.innerHTML =
+    html;
 }
 
-window.printDaybookNow = function() {
-  printDaybook();
-};
+window.printDaybookNow =
+  function() {
+    printDaybook();
+  };
 
-window.reprintDaybookNow = function() {
-  printDaybook();
-};
+window.reprintDaybookNow =
+  function() {
+    printDaybook();
+  };
 
-window.deleteDaybookNow = async function() {
-  if (isDaybookBusy) return;
-  if (!requireAdminPassword()) return;
+window.deleteDaybookNow =
+  async function() {
+    if (isDaybookBusy) {
+      return;
+    }
 
-  isDaybookBusy = true;
+    if (
+      !requireAdminPassword()
+    ) {
+      return;
+    }
 
-  try {
-    const snapshot = await getDocs(daybookCollection);
-    const batch = writeBatch(db);
+    isDaybookBusy = true;
 
-    snapshot.forEach(docSnap => {
-      batch.delete(docSnap.ref);
-    });
+    try {
+      const snapshot =
+        await getDocs(
+          daybookCollection
+        );
 
-    await batch.commit();
+      const batch =
+        writeBatch(db);
 
-    daybookPrintedOnce = false;
-  } catch (err) {
-    console.error(err);
-    alert("Failed to delete daybook.");
-  } finally {
-    isDaybookBusy = false;
-  }
-};
+      snapshot.forEach(
+        docSnap => {
+          batch.delete(
+            docSnap.ref
+          );
+        }
+      );
+
+      await batch.commit();
+
+      daybookPrintedOnce =
+        false;
+    } catch (err) {
+      console.error(err);
+
+      alert(
+        "Failed to delete daybook."
+      );
+    } finally {
+      isDaybookBusy = false;
+    }
+  };
 
 /* ================================
    FIREBASE LISTENERS
 ================================ */
-onSnapshot(billsQuery, snapshot => {
-  incomingBillCache = {};
+onSnapshot(
+  billsQuery,
+  snapshot => {
+    incomingBillCache = {};
 
-  snapshot.forEach(docSnap => {
-    incomingBillCache[docSnap.id] = docSnap.data();
-  });
+    snapshot.forEach(
+      docSnap => {
+        incomingBillCache[
+          docSnap.id
+        ] =
+          docSnap.data();
+      }
+    );
 
-  renderIncomingBills();
-});
+    renderIncomingBills();
+  }
+);
 
-onSnapshot(daybookQuery, snapshot => {
-  daybookCache = {};
+onSnapshot(
+  daybookQuery,
+  snapshot => {
+    daybookCache = {};
 
-  snapshot.forEach(docSnap => {
-    daybookCache[docSnap.id] = docSnap.data();
-  });
+    snapshot.forEach(
+      docSnap => {
+        daybookCache[
+          docSnap.id
+        ] =
+          docSnap.data();
+      }
+    );
 
-  renderDaybook();
-});
+    renderDaybook();
+  }
+);
 
 /* ================================
    RECEIVER ACTIONS
 ================================ */
-window.printReceivedBill = async function(docId) {
-  if (isReceiverBusy) return;
-  isReceiverBusy = true;
+window.printReceivedBill =
+  async function(docId) {
+    if (isReceiverBusy) {
+      return;
+    }
 
-  try {
-    const billRef = doc(db, "bills", docId);
+    isReceiverBusy = true;
 
-    const finalBill = await runTransaction(db, async transaction => {
-      const billSnap = await transaction.get(billRef);
+    try {
+      const billRef =
+        doc(
+          db,
+          "bills",
+          docId
+        );
 
-      if (!billSnap.exists()) {
-        throw new Error("Bill not found.");
-      }
+      const finalBill =
+        await runTransaction(
+          db,
+          async transaction => {
+            const billSnap =
+              await transaction.get(
+                billRef
+              );
 
-      const bill = billSnap.data();
+            if (
+              !billSnap.exists()
+            ) {
+              throw new Error(
+                "Bill not found."
+              );
+            }
 
-      if (bill.status !== "pending") {
-        throw new Error("Bill already processed.");
-      }
+            const bill =
+              billSnap.data();
 
-      const serialSnap = await transaction.get(serialDocRef);
+            if (
+              bill.status !==
+              "pending"
+            ) {
+              throw new Error(
+                "Bill already processed."
+              );
+            }
 
-      if (!serialSnap.exists()) {
-        throw new Error("Serial document missing.");
-      }
+            const serialSnap =
+              await transaction.get(
+                serialDocRef
+              );
 
-      const serialData = serialSnap.data();
-      const keys = getModeKeys(bill.mode);
+            if (
+              !serialSnap.exists()
+            ) {
+              throw new Error(
+                "Serial document missing."
+              );
+            }
 
-      const counter = serialData[keys.counterKey] || 0;
+            const serialData =
+              serialSnap.data();
 
-      const active = [
-        ...new Set(serialData[keys.activeKey] || [])
+            const keys =
+              getModeKeys(
+                bill.mode
+              );
+
+            const counter =
+              serialData[
+                keys.counterKey
+              ] || 0;
+
+            const active = [
+              ...new Set(
+                serialData[
+                  keys.activeKey
+                ] || []
+              )
+            ];
+
+            let reusable = [
+              ...new Set(
+                serialData[
+                  keys.reusableKey
+                ] || []
+              )
+            ];
+
+            reusable =
+              reusable.filter(
+                s =>
+                  !active.includes(
+                    s
+                  )
+              );
+
+            const allocation =
+              getLowestAvailableSerial(
+                counter,
+                reusable,
+                active
+              );
+
+            if (
+              !allocation
+            ) {
+              throw new Error(
+                "No serials available."
+              );
+            }
+
+            let updates = {
+              [keys.activeKey]:
+                [
+                  ...active,
+                  allocation.serial
+                ]
+            };
+
+            if (
+              allocation.source ===
+              "reusable"
+            ) {
+              updates[
+                keys.reusableKey
+              ] =
+                reusable.filter(
+                  s =>
+                    s !==
+                    allocation.serial
+                );
+            } else {
+              updates[
+                keys.counterKey
+              ] =
+                allocation.serial;
+            }
+
+            transaction.update(
+              serialDocRef,
+              updates
+            );
+
+            transaction.update(
+              billRef,
+              {
+                status:
+                  "printed",
+                serialNumber:
+                  allocation.serial
+              }
+            );
+
+            return {
+              ...bill,
+              status:
+                "printed",
+              serialNumber:
+                allocation.serial
+            };
+          }
+        );
+
+      printReceipt(
+        finalBill
+      );
+    } catch (err) {
+      console.error(err);
+
+      alert(
+        "Failed to print: " +
+        err.message
+      );
+    } finally {
+      isReceiverBusy =
+        false;
+    }
+  };
+
+window.viewReceivedBill =
+  function(docId) {
+    const bill =
+      incomingBillCache[
+        docId
       ];
 
-      let reusable = [
-        ...new Set(serialData[keys.reusableKey] || [])
+    if (!bill) {
+      return;
+    }
+
+    previewReceipt(
+      bill
+    );
+  };
+
+window.reprintReceivedBill =
+  function(docId) {
+    const bill =
+      incomingBillCache[
+        docId
       ];
 
-      reusable = reusable.filter(
-        s => !active.includes(s)
+    if (!bill) {
+      return;
+    }
+
+    printReceipt(
+      bill
+    );
+  };
+
+window.doneReceivedBill =
+  async function(docId) {
+    if (isReceiverBusy) {
+      return;
+    }
+
+    if (
+      !requireAdminPassword()
+    ) {
+      return;
+    }
+
+    isReceiverBusy = true;
+
+    try {
+      const billRef =
+        doc(
+          db,
+          "bills",
+          docId
+        );
+
+      await runTransaction(
+        db,
+        async transaction => {
+          const billSnap =
+            await transaction.get(
+              billRef
+            );
+
+          if (
+            !billSnap.exists()
+          ) {
+            throw new Error(
+              "Bill not found."
+            );
+          }
+
+          const bill =
+            billSnap.data();
+
+          if (
+            bill.status !==
+            "printed"
+          ) {
+            throw new Error(
+              "Bill must be printed first."
+            );
+          }
+
+          const serialSnap =
+            await transaction.get(
+              serialDocRef
+            );
+
+          if (
+            !serialSnap.exists()
+          ) {
+            throw new Error(
+              "Serial document missing."
+            );
+          }
+
+          const serialData =
+            serialSnap.data();
+
+          const keys =
+            getModeKeys(
+              bill.mode
+            );
+
+          let active = [
+            ...new Set(
+              serialData[
+                keys.activeKey
+              ] || []
+            )
+          ];
+
+          active =
+            active.filter(
+              s =>
+                s !==
+                bill.serialNumber
+            );
+
+          transaction.update(
+            serialDocRef,
+            {
+              [keys.activeKey]:
+                active
+            }
+          );
+
+          transaction.set(
+            doc(
+              daybookCollection
+            ),
+            {
+              date:
+                bill.date,
+              serialNumber:
+                bill.serialNumber,
+              customerName:
+                bill.customerName,
+              amount:
+                bill.grandTotal,
+              createdAt:
+                serverTimestamp()
+            }
+          );
+
+          transaction.delete(
+            billRef
+          );
+        }
       );
+    } catch (err) {
+      console.error(err);
 
-      const allocation = getLowestAvailableSerial(
-        counter,
-        reusable,
-        active
+      alert(
+        "Failed to complete bill."
       );
-
-      if (!allocation) {
-        throw new Error("No serials available.");
-      }
-
-      let updates = {
-        [keys.activeKey]: [...active, allocation.serial]
-      };
-
-      if (allocation.source === "reusable") {
-        updates[keys.reusableKey] =
-          reusable.filter(s => s !== allocation.serial);
-      } else {
-        updates[keys.counterKey] = allocation.serial;
-      }
-
-      transaction.update(serialDocRef, updates);
-
-      transaction.update(billRef, {
-        status: "printed",
-        serialNumber: allocation.serial
-      });
-
-      return {
-        ...bill,
-        status: "printed",
-        serialNumber: allocation.serial
-      };
-    });
-
-    printReceipt(finalBill);
-  } catch (err) {
-    console.error(err);
-    alert("Failed to print: " + err.message);
-  } finally {
-    isReceiverBusy = false;
-  }
-};
-window.viewReceivedBill = function(docId) {
-  const bill = incomingBillCache[docId];
-  if (!bill) return;
-
-  previewReceipt(bill);
-};
-window.reprintReceivedBill = function(docId) {
-  const bill = incomingBillCache[docId];
-  if (!bill) return;
-  printReceipt(bill);
-};
-
-window.doneReceivedBill = async function(docId) {
-  if (isReceiverBusy) return;
-  if (!requireAdminPassword()) return;
-
-  isReceiverBusy = true;
-
-  try {
-    const billRef = doc(db, "bills", docId);
-
-    await runTransaction(db, async transaction => {
-      const billSnap = await transaction.get(billRef);
-
-      if (!billSnap.exists()) {
-        throw new Error("Bill not found.");
-      }
-
-      const bill = billSnap.data();
-
-      if (bill.status !== "printed") {
-        throw new Error("Bill must be printed first.");
-      }
-
-      const serialSnap = await transaction.get(serialDocRef);
-
-      if (!serialSnap.exists()) {
-        throw new Error("Serial document missing.");
-      }
-
-      const serialData = serialSnap.data();
-      const keys = getModeKeys(bill.mode);
-
-      let active = [
-        ...new Set(serialData[keys.activeKey] || [])
-      ];
-
-      active = active.filter(
-        s => s !== bill.serialNumber
-      );
-
-      transaction.update(serialDocRef, {
-        [keys.activeKey]: active
-      });
-
-    transaction.set(doc(daybookCollection), {
-  date: bill.date,
-  serialNumber: bill.serialNumber,
-  customerName: bill.customerName,
-  amount: bill.grandTotal,
-  createdAt: serverTimestamp()
-});
-      transaction.delete(billRef);
-    });
-  } catch (err) {
-    console.error(err);
-    alert("Failed to complete bill.");
-  } finally {
-    isReceiverBusy = false;
-  }
-};
+    } finally {
+      isReceiverBusy =
+        false;
+    }
+  };
