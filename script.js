@@ -55,8 +55,6 @@ const BILL_DRAFT_KEY = "billingAppDraftV4";
 const DRAFT_MAX_AGE_MS =
   24 * 60 * 60 * 1000;
 
-const MAX_ITEMS_PER_DL_PAGE = 20;
-
 /* ================================
    STATE
 ================================ */
@@ -70,44 +68,35 @@ let daybookCache = {};
 let isReceiverBusy = false;
 let isSendingBill = false;
 let isDaybookBusy = false;
-
+let daybookPrintedOnce = false;
 
 /* ================================
    DOM
 ================================ */
 const billingTab =
   document.getElementById("billingTab");
-
 const receiverTab =
   document.getElementById("receiverTab");
-
 const daybookTab =
   document.getElementById("daybookTab");
 
 const billingView =
   document.getElementById("billingView");
-
 const receiverView =
   document.getElementById("receiverView");
-
 const daybookView =
   document.getElementById("daybookView");
 
 const searchBox =
   document.getElementById("searchBox");
-
 const suggestions =
   document.getElementById("suggestions");
-
 const billItemsDiv =
   document.getElementById("billItems");
-
 const grandTotalEl =
   document.getElementById("grandTotal");
-
 const modeToggle =
   document.getElementById("modeToggle");
-
 const clearSearch =
   document.getElementById("clearSearch");
 
@@ -116,40 +105,31 @@ const sendBtn =
 
 const printModal =
   document.getElementById("printModal");
-
 const customerName =
   document.getElementById("customerName");
-
 const customerGroup =
   document.getElementById("customerGroup");
-
 const cancelPrint =
   document.getElementById("cancelPrint");
-
 const confirmSend =
   document.getElementById("confirmSend");
 
 const printInvoice =
   document.getElementById("printInvoice");
-
 const incomingBills =
   document.getElementById("incomingBills");
 
 const previewModal =
   document.getElementById("previewModal");
-
 const previewContent =
   document.getElementById("previewContent");
-
 const closePreview =
   document.getElementById("closePreview");
 
 const daybookSummary =
   document.getElementById("daybookSummary");
-
 const daybookActions =
   document.getElementById("daybookActions");
-
 const daybookEntries =
   document.getElementById("daybookEntries");
 
@@ -258,11 +238,6 @@ function formatIndianMoney(value) {
     });
 }
 
-function roundTo2(value) {
-  return Math.round(
-    Number(value) * 100
-  ) / 100;
-}
 function clearDraft() {
   localStorage.removeItem(
     BILL_DRAFT_KEY
@@ -387,9 +362,7 @@ function restoreDraft() {
             price,
             qty,
             total:
-              roundTo2(
-                price * qtyNum
-              )
+              price * qtyNum
           };
         })
         .filter(Boolean);
@@ -417,8 +390,7 @@ function restoreDraft() {
 
     billItems =
       restoredItems;
-
-    renderBill();
+        renderBill();
     updateGrandTotal();
   } catch (err) {
     console.error(
@@ -448,6 +420,1041 @@ function focusQtyInput(
   });
 }
 
+/* ================================
+   PRODUCTS
+================================ */
+fetch("productList.json")
+  .then(res => res.json())
+  .then(data => {
+    products = data.map(
+      product => {
+        const searchableText =
+          normalize(
+            `${product.productName} ${product.material || ""}`
+          );
+
+        return {
+          ...product,
+          searchableText,
+          searchableTokens:
+            tokenize(
+              searchableText
+            )
+        };
+      }
+    );
+
+    restoreDraft();
+  })
+  .catch(err => {
+    console.error(err);
+    alert(
+      "Failed to load products."
+    );
+  });
+
+/* ================================
+   SEARCH
+================================ */
+const synonyms = {
+  bucket: [
+    "balti",
+    "baldi"
+  ],
+  balti: ["bucket"],
+  baldi: ["bucket"],
+  thal: [
+    "thaal",
+    "thali",
+    "thaali"
+  ],
+  thaal: [
+    "thal",
+    "thali"
+  ],
+  thali: [
+    "thal",
+    "thaal"
+  ],
+  hammer: [
+    "mathar"
+  ],
+  mathar: [
+    "hammer"
+  ],
+  kansa: [
+    "bronze"
+  ],
+  bronze: [
+    "kansa"
+  ]
+};
+
+function expandQuery(
+  query
+) {
+  const words =
+    tokenize(query);
+
+  let expanded =
+    [...words];
+
+  words.forEach(
+    word => {
+      if (
+        synonyms[word]
+      ) {
+        expanded.push(
+          ...synonyms[word]
+        );
+      }
+    }
+  );
+
+  return [
+    ...new Set(
+      expanded
+    )
+  ];
+}
+
+function levenshtein(
+  a,
+  b
+) {
+  if (a === b) {
+    return 0;
+  }
+
+  const matrix = [];
+
+  for (
+    let i = 0;
+    i <= b.length;
+    i++
+  ) {
+    matrix[i] = [i];
+  }
+
+  for (
+    let j = 0;
+    j <= a.length;
+    j++
+  ) {
+    matrix[0][j] = j;
+  }
+
+  for (
+    let i = 1;
+    i <= b.length;
+    i++
+  ) {
+    for (
+      let j = 1;
+      j <= a.length;
+      j++
+    ) {
+      if (
+        b[i - 1] ===
+        a[j - 1]
+      ) {
+        matrix[i][j] =
+          matrix[
+            i - 1
+          ][j - 1];
+      } else {
+        matrix[i][j] =
+          Math.min(
+            matrix[
+              i - 1
+            ][
+              j - 1
+            ] + 1,
+            matrix[i][
+              j - 1
+            ] + 1,
+            matrix[
+              i - 1
+            ][j] + 1
+          );
+      }
+    }
+  }
+
+  return matrix[
+    b.length
+  ][a.length];
+}
+
+function tokenScore(
+  queryToken,
+  productToken
+) {
+  if (
+    queryToken ===
+    productToken
+  ) {
+    return 100;
+  }
+
+  if (
+    productToken.startsWith(
+      queryToken
+    )
+  ) {
+    return 40;
+  }
+
+  if (
+    productToken.includes(
+      queryToken
+    )
+  ) {
+    return 25;
+  }
+
+  const distance =
+    levenshtein(
+      queryToken,
+      productToken
+    );
+
+  if (
+    distance === 1
+  ) {
+    return 18;
+  }
+
+  if (
+    distance === 2 &&
+    queryToken.length >=
+      5
+  ) {
+    return 10;
+  }
+
+  return 0;
+}
+
+function scoreProduct(
+  product,
+  queryTokens,
+  rawQuery
+) {
+  let score = 0;
+
+  if (
+    product.searchableText ===
+    rawQuery
+  ) {
+    score += 500;
+  }
+
+  if (
+    product.searchableText.includes(
+      rawQuery
+    )
+  ) {
+    score += 120;
+  }
+
+  queryTokens.forEach(
+    queryToken => {
+      let best = 0;
+
+      product.searchableTokens.forEach(
+        productToken => {
+          const s =
+            tokenScore(
+              queryToken,
+              productToken
+            );
+
+          if (
+            s > best
+          ) {
+            best = s;
+          }
+        }
+      );
+
+      score += best;
+    }
+  );
+
+  return score;
+}
+
+function searchProducts(
+  queryText
+) {
+  const clean =
+    normalize(
+      queryText
+    );
+
+  if (!clean) {
+    return [];
+  }
+
+  const queryTokens =
+    expandQuery(
+      clean
+    );
+
+  return products
+    .map(product => ({
+      product,
+      score:
+        scoreProduct(
+          product,
+          queryTokens,
+          clean
+        )
+    }))
+    .filter(
+      result =>
+        result.score >
+        0
+    )
+    .sort(
+      (a, b) =>
+        b.score -
+        a.score
+    )
+    .slice(0, 8)
+    .map(
+      result =>
+        result.product
+    );
+}
+
+/* ================================
+   NAVIGATION
+================================ */
+function activateView(
+  view
+) {
+  billingView.style.display =
+    "none";
+  receiverView.style.display =
+    "none";
+  daybookView.style.display =
+    "none";
+
+  billingTab.classList.remove(
+    "active"
+  );
+  receiverTab.classList.remove(
+    "active"
+  );
+  daybookTab.classList.remove(
+    "active"
+  );
+
+  if (
+    view ===
+    "billing"
+  ) {
+    billingView.style.display =
+      "block";
+
+    billingTab.classList.add(
+      "active"
+    );
+  }
+
+  if (
+    view ===
+    "receiver"
+  ) {
+    receiverView.style.display =
+      "block";
+
+    receiverTab.classList.add(
+      "active"
+    );
+  }
+
+  if (
+    view ===
+    "daybook"
+  ) {
+    daybookView.style.display =
+      "block";
+
+    daybookTab.classList.add(
+      "active"
+    );
+  }
+}
+
+billingTab.addEventListener(
+  "click",
+  () =>
+    activateView(
+      "billing"
+    )
+);
+
+receiverTab.addEventListener(
+  "click",
+  () =>
+    activateView(
+      "receiver"
+    )
+);
+
+daybookTab.addEventListener(
+  "click",
+  () =>
+    activateView(
+      "daybook"
+    )
+);
+/* ================================
+   MODE + SEARCH UI
+================================ */
+modeToggle.addEventListener(
+  "click",
+  () => {
+    if (
+      currentMode === "W"
+    ) {
+      currentMode = "R";
+      modeToggle.innerText =
+        "R";
+      modeToggle.style.background =
+        "#d65353";
+    } else {
+      currentMode = "W";
+      modeToggle.innerText =
+        "W";
+      modeToggle.style.background =
+        "#2f3f64";
+    }
+
+    if (
+      searchBox.value.trim()
+    ) {
+      renderSuggestions(
+        searchProducts(
+          searchBox.value
+        )
+      );
+    }
+
+    saveDraft();
+  }
+);
+
+customerName.addEventListener(
+  "input",
+  () => {
+    saveDraft();
+  }
+);
+
+searchBox.addEventListener(
+  "input",
+  e => {
+    const value =
+      e.target.value;
+
+    clearSearch.style.display =
+      value
+        ? "flex"
+        : "none";
+
+    if (
+      !value.trim()
+    ) {
+      suggestions.innerHTML =
+        "";
+      return;
+    }
+
+    renderSuggestions(
+      searchProducts(
+        value
+      )
+    );
+  }
+);
+
+clearSearch.addEventListener(
+  "click",
+  () => {
+    searchBox.value = "";
+    suggestions.innerHTML =
+      "";
+    clearSearch.style.display =
+      "none";
+    searchBox.focus();
+  }
+);
+
+function renderSuggestions(
+  results
+) {
+  if (
+    !results.length
+  ) {
+    suggestions.innerHTML =
+      "";
+    return;
+  }
+
+  let html = "";
+
+  results.forEach(
+    product => {
+      html += `
+        <div
+          class="suggestion-card"
+          onclick="selectProduct(${product.sr})"
+        >
+          <div class="suggestion-top">
+            <div class="suggestion-name">
+              ${product.productName}
+            </div>
+
+            <div class="suggestion-price">
+              ₹${getCurrentPrice(product) || "-"}
+            </div>
+          </div>
+
+          <div class="badge-row">
+            <div class="unit">
+              ${product.priceType || ""}
+            </div>
+
+            ${
+              product.material
+                ? `
+                  <div class="unit ${getMaterialClass(product.material)}">
+                    ${product.material}
+                  </div>
+                `
+                : ""
+            }
+          </div>
+        </div>
+      `;
+    }
+  );
+
+  suggestions.innerHTML =
+    html;
+}
+
+/* ================================
+   BILLING
+================================ */
+window.selectProduct =
+  function(sr) {
+    const product =
+      products.find(
+        p =>
+          p.sr === sr
+      );
+
+    if (!product) {
+      return;
+    }
+
+    const existingIndex =
+      billItems.findIndex(
+        item =>
+          item.product.sr ===
+            product.sr &&
+          item.mode ===
+            currentMode
+      );
+
+    if (
+      existingIndex !== -1
+    ) {
+      const existingItem =
+        billItems.splice(
+          existingIndex,
+          1
+        )[0];
+
+      billItems.unshift(
+        existingItem
+      );
+    } else {
+      billItems.unshift({
+        product,
+        mode:
+          currentMode,
+        price:
+          getCurrentPrice(
+            product
+          ) || 0,
+        qty: "",
+        total: 0
+      });
+    }
+
+    renderBill();
+    updateGrandTotal();
+    saveDraft();
+
+    searchBox.value = "";
+    suggestions.innerHTML =
+      "";
+    clearSearch.style.display =
+      "none";
+
+    focusQtyInput(0);
+  };
+
+function renderBill() {
+  let html = "";
+
+  billItems.forEach(
+    (
+      item,
+      index
+    ) => {
+      const safeQty =
+        escapeAttr(
+          item.qty
+        );
+
+      const safePrice =
+        escapeAttr(
+          item.price
+        );
+
+      html += `
+        <div class="bill-card">
+          <div class="bill-title">
+            ${item.product.productName}
+          </div>
+
+          <div class="badge-row">
+            <div class="unit">
+              ${item.product.priceType || ""}
+            </div>
+
+            ${
+              item.product.material
+                ? `
+                  <div class="unit ${getMaterialClass(item.product.material)}">
+                    ${item.product.material}
+                  </div>
+                `
+                : ""
+            }
+          </div>
+
+          <div class="input-row">
+
+            <input
+              class="bill-input"
+              type="text"
+              inputmode="decimal"
+              value="${safeQty}"
+              data-qty-index="${index}"
+              oninput="updateQty(${index}, this.value)"
+            >
+
+            <input
+              class="bill-input"
+              type="text"
+              inputmode="decimal"
+              value="${safePrice}"
+              oninput="updatePrice(${index}, this.value)"
+            >
+
+          </div>
+
+          <div class="bill-bottom">
+            <div class="line-total">
+              ₹${item.total.toFixed(2)}
+            </div>
+
+            <button
+              class="delete-btn"
+              onclick="deleteItem(${index})"
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+      `;
+    }
+  );
+
+  billItemsDiv.innerHTML =
+    html;
+}
+
+window.updateQty =
+  function(
+    index,
+    value
+  ) {
+    if (
+      !billItems[index]
+    ) {
+      return;
+    }
+
+    billItems[index].qty =
+      value;
+
+    const qty =
+      parseFloat(
+        value
+      ) || 0;
+
+    billItems[index].total =
+      billItems[index]
+        .price * qty;
+
+    updateGrandTotal();
+    saveDraft();
+
+    const totalEl =
+      billItemsDiv.querySelectorAll(
+        ".line-total"
+      )[index];
+
+    if (totalEl) {
+      totalEl.innerText =
+        `₹${billItems[
+          index
+        ].total.toFixed(
+          2
+        )}`;
+    }
+  };
+
+window.updatePrice =
+  function(
+    index,
+    value
+  ) {
+    if (
+      !billItems[index]
+    ) {
+      return;
+    }
+
+    const parsedPrice =
+      parseFloat(
+        value
+      );
+
+    billItems[index].price =
+      isNaN(
+        parsedPrice
+      )
+        ? 0
+        : parsedPrice;
+
+    const qty =
+      parseFloat(
+        billItems[
+          index
+        ].qty
+      ) || 0;
+
+    billItems[index].total =
+      billItems[index]
+        .price * qty;
+
+    updateGrandTotal();
+    saveDraft();
+
+    const totalEl =
+      billItemsDiv.querySelectorAll(
+        ".line-total"
+      )[index];
+
+    if (totalEl) {
+      totalEl.innerText =
+        `₹${billItems[
+          index
+        ].total.toFixed(
+          2
+        )}`;
+    }
+  };
+
+window.deleteItem =
+  function(index) {
+    billItems.splice(
+      index,
+      1
+    );
+
+    renderBill();
+    updateGrandTotal();
+    saveDraft();
+  };
+
+function updateGrandTotal() {
+  const total =
+    billItems.reduce(
+      (
+        sum,
+        item
+      ) =>
+        sum +
+        item.total,
+      0
+    );
+
+  grandTotalEl.innerText =
+    `₹${Math.round(
+      total
+    )}`;
+}
+
+/* ================================
+   SEND FLOW
+================================ */
+function validateBillInputs() {
+  if (
+    !billItems.length
+  ) {
+    alert(
+      "Add at least one item."
+    );
+    return false;
+  }
+
+  const invalidQty =
+    billItems.some(
+      item => {
+        const qty =
+          parseFloat(
+            item.qty
+          );
+
+        return (
+          isNaN(qty) ||
+          qty <= 0
+        );
+      }
+    );
+
+  if (
+    invalidQty
+  ) {
+    alert(
+      "All items must have quantity greater than zero."
+    );
+    return false;
+  }
+
+  const invalidPrice =
+    billItems.some(
+      item => {
+        const price =
+          parseFloat(
+            item.price
+          );
+
+        return (
+          isNaN(
+            price
+          ) ||
+          price <= 0
+        );
+      }
+    );
+
+  if (
+    invalidPrice
+  ) {
+    alert(
+      "All items must have valid price greater than zero."
+    );
+    return false;
+  }
+
+  if (
+    currentMode ===
+      "W" &&
+    !customerName.value.trim()
+  ) {
+    alert(
+      "Enter customer name."
+    );
+    return false;
+  }
+
+  return true;
+}
+function openSendModal() {
+  if (!billItems.length) {
+    return;
+  }
+
+  customerGroup.style.display =
+    currentMode === "W"
+      ? "block"
+      : "none";
+
+  printModal.style.display =
+    "flex";
+}
+
+sendBtn.addEventListener(
+  "click",
+  openSendModal
+);
+
+cancelPrint.addEventListener(
+  "click",
+  () => {
+    printModal.style.display =
+      "none";
+  }
+);
+
+closePreview.addEventListener(
+  "click",
+  () => {
+    previewModal.style.display =
+      "none";
+
+    previewContent.innerHTML =
+      "";
+  }
+);
+
+function createBillData() {
+  const grandTotal =
+    billItems.reduce(
+      (
+        sum,
+        item
+      ) =>
+        sum +
+        item.total,
+      0
+    );
+
+  const indiaDate =
+    getIndiaDateInfo();
+
+  return {
+    mode:
+      currentMode,
+
+    date:
+      indiaDate.displayDate,
+
+    customerName:
+      currentMode === "W"
+        ? customerName.value.trim()
+        : "Retail Bill",
+
+    grandTotal:
+      Math.round(
+        grandTotal
+      ),
+
+    status:
+      "pending",
+
+    serialNumber:
+      null,
+
+    items:
+      billItems.map(
+        item => ({
+          productName:
+            item.product
+              .productName,
+
+          material:
+            item.product
+              .material || "",
+
+          qty:
+            parseFloat(
+              item.qty
+            ),
+
+          price:
+            item.price,
+
+          total:
+            item.total
+        })
+      )
+  };
+}
+
+confirmSend.addEventListener(
+  "click",
+  async () => {
+    if (
+      isSendingBill
+    ) {
+      return;
+    }
+
+    if (
+      !validateBillInputs()
+    ) {
+      return;
+    }
+
+    isSendingBill =
+      true;
+
+    try {
+      const billData =
+        createBillData();
+
+      billData.createdAt =
+        serverTimestamp();
+
+      await addDoc(
+        billsCollection,
+        billData
+      );
+
+      billItems = [];
+      customerName.value =
+        "";
+
+      renderBill();
+      updateGrandTotal();
+      clearDraft();
+
+      printModal.style.display =
+        "none";
+
+      alert(
+        "Bill sent successfully."
+      );
+    } catch (err) {
+      console.error(err);
+
+      alert(
+        "Failed to send bill: " +
+          err.message
+      );
+    } finally {
+      isSendingBill =
+        false;
+    }
+  }
+);
+
+/* ================================
+   RECEIVER / DAYBOOK
+================================ */
 function getModeKeys(
   mode
 ) {
@@ -462,6 +1469,9 @@ function getModeKeys(
       "Active"
   };
 }
+
+const MAX_ITEMS_PER_DL_PAGE =
+  20;
 
 function chunkItems(
   items,
@@ -536,1264 +1546,48 @@ function getLowestAvailableSerial(
   return null;
 }
 
-/* ================================
-   PRODUCTS
-================================ */
-fetch("productList.json")
-  .then(res => res.json())
-  .then(data => {
-    products = data.map(
-      product => {
-        const searchableText =
-          normalize(
-            `${product.productName} ${product.material || ""}`
-          );
-
-        return {
-          ...product,
-          searchableText,
-          searchableTokens:
-            tokenize(
-              searchableText
-            )
-        };
-      }
-    );
-
-    restoreDraft();
-  })
-  .catch(err => {
-    console.error(err);
-    alert(
-      "Failed to load products."
-    );
-  });
-/* ================================
-   SEARCH + NAVIGATION
-================================ */
-function renderSuggestions(
-  queryText
-) {
-  const query =
-    normalize(
-      queryText
-    );
-
-  if (!query) {
-    suggestions.innerHTML =
-      "";
-    clearSearch.style.display =
-      "none";
-    return;
-  }
-
-  clearSearch.style.display =
-    "flex";
-
-  const queryTokens =
-    tokenize(query);
-
-  const matches =
-    products
-      .filter(
-        product => {
-          if (
-            product.searchableText.includes(
-              query
-            )
-          ) {
-            return true;
-          }
-
-          return queryTokens.every(
-            token =>
-              product.searchableTokens.some(
-                pToken =>
-                  pToken.startsWith(
-                    token
-                  )
-              )
-          );
-        }
-      )
-      .slice(0, 20);
-
-  if (!matches.length) {
-    suggestions.innerHTML =
-      `
-        <div class="receiver-subtitle">
-          No products found.
-        </div>
-      `;
-    return;
-  }
-
-  let html = "";
-
-  matches.forEach(
-    product => {
-      const price =
-        getCurrentPrice(
-          product
-        ) || 0;
-
-      html += `
-        <div
-          class="suggestion-card"
-          onclick="selectProduct('${escapeAttr(product.sr)}')"
-        >
-          <div class="suggestion-top">
-            <div class="suggestion-name">
-              ${escapeAttr(product.productName)}
-            </div>
-
-            <div class="suggestion-price">
-              ₹${formatIndianMoney(price)}
-            </div>
-          </div>
-
-          <div class="badge-row">
-            ${
-              product.material
-                ? `
-                  <div class="unit ${getMaterialClass(product.material)}">
-                    ${escapeAttr(product.material)}
-                  </div>
-                `
-                : ""
-            }
-
-            ${
-              product.priceType
-                ? `
-                  <div class="unit">
-                    ${escapeAttr(product.priceType)}
-                  </div>
-                `
-                : ""
-            }
-          </div>
-        </div>
-      `;
-    }
-  );
-
-  suggestions.innerHTML =
-    html;
-}
-
-searchBox.addEventListener(
-  "input",
-  e => {
-    renderSuggestions(
-      e.target.value
-    );
-  }
-);
-
-clearSearch.addEventListener(
-  "click",
-  () => {
-    searchBox.value = "";
-    suggestions.innerHTML =
-      "";
-    clearSearch.style.display =
-      "none";
-    searchBox.focus();
-  }
-);
-
-modeToggle.addEventListener(
-  "click",
-  () => {
-    currentMode =
-      currentMode === "W"
-        ? "R"
-        : "W";
-
-    modeToggle.innerText =
-      currentMode;
-
-    modeToggle.style.background =
-      currentMode === "W"
-        ? "#2f3f64"
-        : "#d65353";
-
-    renderSuggestions(
-      searchBox.value
-    );
-
-    billItems =
-      billItems.map(
-        item => ({
-          ...item,
-          mode:
-            currentMode,
-          price:
-            getCurrentPrice(
-              item.product
-            ) || 0,
-          total:
-            roundTo2(
-              (parseFloat(
-                item.qty
-              ) || 0) *
-                (getCurrentPrice(
-                  item.product
-                ) || 0)
-            )
-        })
-      );
-
-    renderBill();
-    updateGrandTotal();
-    saveDraft();
-  }
-);
-
-billingTab.addEventListener(
-  "click",
-  () => {
-    billingView.style.display =
-      "block";
-    receiverView.style.display =
-      "none";
-    daybookView.style.display =
-      "none";
-
-    billingTab.classList.add(
-      "active"
-    );
-
-    receiverTab.classList.remove(
-      "active"
-    );
-
-    daybookTab.classList.remove(
-      "active"
-    );
-  }
-);
-
-receiverTab.addEventListener(
-  "click",
-  () => {
-    billingView.style.display =
-      "none";
-    receiverView.style.display =
-      "block";
-    daybookView.style.display =
-      "none";
-
-    receiverTab.classList.add(
-      "active"
-    );
-
-    billingTab.classList.remove(
-      "active"
-    );
-
-    daybookTab.classList.remove(
-      "active"
-    );
-  }
-);
-
-daybookTab.addEventListener(
-  "click",
-  () => {
-    billingView.style.display =
-      "none";
-    receiverView.style.display =
-      "none";
-    daybookView.style.display =
-      "block";
-
-    daybookTab.classList.add(
-      "active"
-    );
-
-    billingTab.classList.remove(
-      "active"
-    );
-
-    receiverTab.classList.remove(
-      "active"
-    );
-  }
-);
-
-/* ================================
-   BILLING
-================================ */
-window.selectProduct =
-  function(sr) {
-    const product =
-      products.find(
-        p => p.sr === sr
-      );
-
-    if (!product) {
-      return;
-    }
-
-    const existingIndex =
-      billItems.findIndex(
-        item =>
-          item.product.sr ===
-            sr &&
-          item.mode ===
-            currentMode
-      );
-
-    if (
-      existingIndex !==
-      -1
-    ) {
-      const existing =
-        billItems[
-          existingIndex
-        ];
-
-      billItems.splice(
-        existingIndex,
-        1
-      );
-
-      billItems.unshift(
-        existing
-      );
-    } else {
-      billItems.unshift({
-        product,
-        mode:
-          currentMode,
-        price:
-          getCurrentPrice(
-            product
-          ) || 0,
-        qty: "",
-        total: 0
-      });
-    }
-
-    renderBill();
-    updateGrandTotal();
-    saveDraft();
-
-    searchBox.value = "";
-    suggestions.innerHTML =
-      "";
-    clearSearch.style.display =
-      "none";
-
-    focusQtyInput(0);
-  };
-function renderBill() {
-  if (!billItems.length) {
-    billItemsDiv.innerHTML =
-      "";
-    return;
-  }
-
-  let html = "";
-
-  billItems.forEach(
-    (item, index) => {
-      const safeQty =
-        item.qty || "";
-
-      html += `
-        <div class="bill-card">
-          <div class="bill-title">
-            ${escapeAttr(item.product.productName)}
-          </div>
-
-          <div class="badge-row">
-            ${
-              item.product.priceType
-                ? `
-                  <div class="unit">
-                    ${escapeAttr(item.product.priceType)}
-                  </div>
-                `
-                : ""
-            }
-
-            ${
-              item.product.material
-                ? `
-                  <div class="unit ${getMaterialClass(item.product.material)}">
-                    ${escapeAttr(item.product.material)}
-                  </div>
-                `
-                : ""
-            }
-          </div>
-
-          <div class="input-row">
-            <input
-              class="bill-input"
-              type="text"
-              inputmode="decimal"
-              placeholder="Qty"
-              value="${safeQty}"
-              data-qty-index="${index}"
-              oninput="updateQty(${index}, this.value)"
-              onblur="finalizeQty(${index}, this)"
-            >
-
-            <input
-              class="bill-input"
-              type="number"
-              step="0.01"
-              placeholder="Price"
-              value="${item.price}"
-              oninput="updatePrice(${index}, this.value)"
-            >
-          </div>
-
-          <div class="bill-bottom">
-            <div class="line-total">
-              ₹${formatIndianMoney(item.total)}
-            </div>
-
-            <button
-              class="delete-btn"
-              onclick="removeItem(${index})"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      `;
-    }
-  );
-
-  billItemsDiv.innerHTML =
-    html;
-}
-
-window.updateQty =
-  function(index, value) {
-    if (!billItems[index]) {
-      return;
-    }
-
-    value =
-      value.replace(
-        /[^0-9.]/g,
-        ""
-      );
-
-    const parts =
-      value.split(".");
-
-    if (parts.length > 2) {
-      value =
-        parts[0] +
-        "." +
-        parts
-          .slice(1)
-          .join("");
-    }
-
-    billItems[index].qty =
-      value;
-
-    const parsedQty =
-      parseFloat(value);
-
-    if (isNaN(parsedQty)) {
-      billItems[index].total = 0;
-    } else {
-      billItems[index].total =
-        roundTo2(
-          parsedQty *
-            billItems[
-              index
-            ].price
-        );
-    }
-
-    updateGrandTotal();
-    saveDraft();
-
-    const totalEl =
-      billItemsDiv.querySelectorAll(
-        ".line-total"
-      )[index];
-
-    if (totalEl) {
-      totalEl.innerText =
-        `₹${formatIndianMoney(
-          billItems[
-            index
-          ].total
-        )}`;
-    }
-  };
-
-window.finalizeQty =
-  function(index, input) {
-    if (!billItems[index]) {
-      return;
-    }
-
-    const parsedQty =
-      parseFloat(
-        input.value
-      );
-
-    if (isNaN(parsedQty)) {
-      billItems[index].qty =
-        "";
-      billItems[index].total = 0;
-      input.value = "";
-    } else {
-      const roundedQty =
-        roundTo2(
-          parsedQty
-        );
-
-      billItems[index].qty =
-        roundedQty;
-
-      billItems[index].total =
-        roundTo2(
-          roundedQty *
-            billItems[
-              index
-            ].price
-        );
-
-      input.value =
-        roundedQty;
-    }
-
-    updateGrandTotal();
-    saveDraft();
-
-    const totalEl =
-      billItemsDiv.querySelectorAll(
-        ".line-total"
-      )[index];
-
-    if (totalEl) {
-      totalEl.innerText =
-        `₹${formatIndianMoney(
-          billItems[
-            index
-          ].total
-        )}`;
-    }
-  };
-
-window.updatePrice =
-  function(index, value) {
-    if (!billItems[index]) {
-      return;
-    }
-
-    const price =
-      parseFloat(
-        value
-      ) || 0;
-
-    billItems[index].price =
-      price;
-
-    const qty =
-      parseFloat(
-        billItems[index]
-          .qty
-      ) || 0;
-
-    billItems[index].total =
-      roundTo2(
-        qty * price
-      );
-
-    updateGrandTotal();
-    saveDraft();
-    renderBill();
-  };
-
-window.removeItem =
-  function(index) {
-    billItems.splice(
-      index,
-      1
-    );
-
-    renderBill();
-    updateGrandTotal();
-    saveDraft();
-  };
-
-function updateGrandTotal() {
-  const total =
-    billItems.reduce(
-      (
-        sum,
-        item
-      ) =>
-        sum +
-        item.total,
-      0
-    );
-
-  grandTotalEl.innerText =
-    `₹${formatIndianMoney(total)}`;
-}
-
-function validateBillInputs() {
-  if (!billItems.length) {
-    alert(
-      "No items in bill."
-    );
-    return false;
-  }
-
-  for (const item of billItems) {
-    const qty =
-      parseFloat(
-        item.qty
-      ) || 0;
-
-    if (qty <= 0) {
-      alert(
-        "Please enter valid quantity."
-      );
-      return false;
-    }
-  }
-
-  if (
-    currentMode === "R" &&
-    !customerName.value.trim()
-  ) {
-    alert(
-      "Customer name required."
-    );
-    return false;
-  }
-
-  return true;
-}
-/* ================================
-   SEND / FIRESTORE / PRINT / DAYBOOK
-================================ */
-sendBtn.addEventListener(
-  "click",
-  () => {
-    if (!validateBillInputs()) {
-      return;
-    }
-
-    customerGroup.style.display =
-      currentMode === "R"
-        ? "block"
-        : "none";
-
-    printModal.style.display =
-      "flex";
-  }
-);
-
-cancelPrint.addEventListener(
-  "click",
-  () => {
-    printModal.style.display =
-      "none";
-  }
-);
-
-confirmSend.addEventListener(
-  "click",
-  async () => {
-    if (isSendingBill) {
-      return;
-    }
-
-    if (!validateBillInputs()) {
-      return;
-    }
-
-    isSendingBill = true;
-
-    try {
-      const serialSnap =
-        await runTransaction(
-          db,
-          async tx => {
-            const snap =
-              await tx.get(
-                serialDocRef
-              );
-
-            const data =
-              snap.exists()
-                ? snap.data()
-                : {};
-
-            const keys =
-              getModeKeys(
-                currentMode
-              );
-
-            const counter =
-              data[
-                keys.counterKey
-              ] || 0;
-
-            const reusable =
-              data[
-                keys.reusableKey
-              ] || [];
-
-            const active =
-              data[
-                keys.activeKey
-              ] || [];
-
-            const allocation =
-              getLowestAvailableSerial(
-                counter,
-                reusable,
-                active
-              );
-
-            if (!allocation) {
-              throw new Error(
-                "No serial numbers available."
-              );
-            }
-
-            const serial =
-              allocation.serial;
-
-            const updatedReusable =
-              reusable.filter(
-                n =>
-                  n !== serial
-              );
-
-            const updatedActive =
-              [
-                ...active,
-                serial
-              ];
-
-            const payload =
-              {
-                ...data,
-                [
-                  keys.reusableKey
-                ]:
-                  updatedReusable,
-                [
-                  keys.activeKey
-                ]:
-                  updatedActive
-              };
-
-            if (
-              allocation.source ===
-              "new"
-            ) {
-              payload[
-                keys.counterKey
-              ] = serial;
-            }
-
-            tx.set(
-              serialDocRef,
-              payload
-            );
-
-            return serial;
-          }
-        );
-
-      const dateInfo =
-        getIndiaDateInfo();
-
-      const grandTotal =
-        billItems.reduce(
-          (
-            sum,
-            item
-          ) =>
-            sum +
-            item.total,
-          0
-        );
-
-      const billData = {
-        customerName:
-          customerName.value.trim(),
-        mode:
-          currentMode,
-        serialNumber:
-          serialSnap,
-        date:
-          dateInfo.displayDate,
-        grandTotal,
-        total:
-          grandTotal,
-        printed: false,
-        completed: false,
-        items:
-          billItems.map(
-            item => ({
-              productName:
-                item.product
-                  .productName,
-              material:
-                item.product
-                  .material ||
-                "",
-              qty:
-                parseFloat(
-                  item.qty
-                ) || 0,
-              price:
-                item.price,
-              total:
-                item.total
-            })
-          ),
-        createdAt:
-          serverTimestamp()
-      };
-
-      await addDoc(
-        billsCollection,
-        billData
-      );
-
-      billItems = [];
-      renderBill();
-      updateGrandTotal();
-      clearDraft();
-
-      customerName.value =
-        "";
-
-      printModal.style.display =
-        "none";
-
-      alert(
-        "Bill sent successfully."
-      );
-    } catch (err) {
-      console.error(err);
-      alert(
-        err.message ||
-          "Failed to send bill."
-      );
-    } finally {
-      isSendingBill = false;
-    }
-  }
-);
-
-/* ================================
-   RECEIVER LIVE VIEW
-================================ */
-onSnapshot(
-  billsQuery,
-  snap => {
-    incomingBillCache =
-      {};
-
-    snap.forEach(
-      docSnap => {
-        const data =
-          docSnap.data();
-
-        if (
-          !data.completed
-        ) {
-          incomingBillCache[
-            docSnap.id
-          ] = {
-            id:
-              docSnap.id,
-            ...data
-          };
-        }
-      }
-    );
-
-    renderIncomingBills();
-  }
-);
-
-function renderIncomingBills() {
-  const bills =
-    Object.values(
-      incomingBillCache
-    );
-
-  if (!bills.length) {
-    incomingBills.innerHTML =
-      `
-        <div class="receiver-subtitle">
-          No incoming bills.
-        </div>
-      `;
-    return;
-  }
-
-  bills.sort(
-    (a, b) =>
-      (a.serialNumber || 0) -
-      (b.serialNumber || 0)
-  );
-
-  let html = "";
-
-  bills.forEach(
-    bill => {
-      html += `
-        <div class="receiver-card">
-          <div class="receiver-title">
-            #${bill.serialNumber || "-"}
-          </div>
-
-          <div class="receiver-subtitle">
-            ${escapeAttr(
-              bill.customerName ||
-                "Walk-in"
-            )}
-          </div>
-
-          <div class="receiver-subtitle">
-            ₹${formatIndianMoney(
-              bill.grandTotal
-            )}
-          </div>
-
-          <div class="action-buttons">
-            <button
-              class="primary-btn"
-              onclick="printBill('${bill.id}')"
-            >
-              Print
-            </button>
-
-            ${
-              bill.printed
-                ? `
-                  <button
-                    class="send-btn"
-                    onclick="markDone('${bill.id}')"
-                  >
-                    Done
-                  </button>
-                `
-                : ""
-            }
-          </div>
-        </div>
-      `;
-    }
-  );
-
-  incomingBills.innerHTML =
-    html;
-}
-/* ================================
-   PRINT / COMPLETE / DAYBOOK
-================================ */
-window.printBill =
-  async function(id) {
-    if (
-      isReceiverBusy
-    ) {
-      return;
-    }
-
-    const bill =
-      incomingBillCache[
-        id
-      ];
-
-    if (!bill) {
-      return;
-    }
-
-    isReceiverBusy =
-      true;
-
-    try {
-      const chunks =
-        chunkItems(
-          bill.items || [],
-          MAX_ITEMS_PER_DL_PAGE
-        );
-
-      const pages =
-        chunks.length
-          ? chunks
-          : [[]];
-
-      printInvoice.innerHTML =
-        pages
-          .map(
-            (
-              chunk,
-              index
-            ) => `
-              <div class="receipt-copy">
-                ${buildSingleCopyPage(
-                  {
-                    ...bill,
-                    items:
-                      chunk
-                  }
-                )}
-              </div>
-            `
-          )
-          .join("");
-
-      window.print();
-
-      setTimeout(
-        () => {
-          printInvoice.innerHTML =
-            "";
-        },
-        2000
-      );
-
-      const billRef =
-        doc(
-          db,
-          "bills",
-          id
-        );
-
-      const batch =
-        writeBatch(
-          db
-        );
-
-      batch.update(
-        billRef,
-        {
-          printed: true
-        }
-      );
-
-      await batch.commit();
-
-      incomingBillCache[
-        id
-      ].printed = true;
-
-      renderIncomingBills();
-    } catch (err) {
-      console.error(
-        err
-      );
-
-      alert(
-        "Print failed."
-      );
-    } finally {
-      isReceiverBusy =
-        false;
-    }
-  };
-
-window.markDone =
-  async function(id) {
-    if (
-      isReceiverBusy
-    ) {
-      return;
-    }
-
-    const bill =
-      incomingBillCache[
-        id
-      ];
-
-    if (!bill) {
-      return;
-    }
-
-    isReceiverBusy =
-      true;
-
-    try {
-      await runTransaction(
-        db,
-        async tx => {
-          const billRef =
-            doc(
-              db,
-              "bills",
-              id
-            );
-
-          const serialSnap =
-            await tx.get(
-              serialDocRef
-            );
-
-          const serialData =
-            serialSnap.exists()
-              ? serialSnap.data()
-              : {};
-
-          const keys =
-            getModeKeys(
-              bill.mode ||
-                "W"
-            );
-
-          const active =
-            serialData[
-              keys.activeKey
-            ] || [];
-
-          const reusable =
-            serialData[
-              keys.reusableKey
-            ] || [];
-
-          tx.update(
-            billRef,
-            {
-              completed:
-                true
-            }
-          );
-
- tx.set(
-  serialDocRef,
-  {
-    [keys.activeKey]: active.filter(
-      n => n !== bill.serialNumber
-    ),
-    [keys.reusableKey]: reusable.includes(
-      bill.serialNumber
-    )
-      ? reusable
-      : [
-          ...reusable,
-          bill.serialNumber
-        ]
-  },
-  {
-    merge: true
-  }
-);
-          tx.set(
-            addDocRef(),
-            {
-              customerName:
-                bill.customerName ||
-                "Walk-in",
-              amount:
-                bill.grandTotal ||
-                0,
-              date:
-                bill.date,
-              serialNumber:
-                bill.serialNumber,
-              createdAt:
-                serverTimestamp()
-            }
-          );
-        }
-      );
-
-      delete incomingBillCache[
-        id
-      ];
-
-      renderIncomingBills();
-    } catch (err) {
-      console.error(
-        err
-      );
-
-      alert(
-        "Failed to complete bill."
-      );
-    } finally {
-      isReceiverBusy =
-        false;
-    }
-  };
-
-function addDocRef() {
-  return doc(
-    collection(
-      db,
-      "daybook"
-    )
-  );
-}
-
 function buildSingleCopyPage(
-  billData
+  billData,
+  label,
+  itemsChunk,
+  isLastPage
 ) {
-  const rows =
-    (billData.items || [])
-      .map(
-        item => `
-          <tr>
-            <td>
-              ${escapeAttr(
-                item.productName
-              )}
-            </td>
-            <td>
-              ${escapeAttr(
-                shortMaterialName(
-                  item.material
-                )
-              )}
-            </td>
-            <td>
-              ${item.qty}
-            </td>
-            <td>
-              ₹${formatIndianMoney(
-                item.price
-              )}
-            </td>
-            <td>
-              ₹${formatIndianMoney(
-                item.total
-              )}
-            </td>
-          </tr>
-        `
-      )
-      .join("");
+  let rows = "";
+
+  itemsChunk.forEach(
+    item => {
+      rows += `
+        <tr>
+          <td>${item.productName}</td>
+          <td>${shortMaterialName(item.material)}</td>
+          <td>${item.qty}</td>
+          <td>${formatIndianMoney(item.price)}</td>
+          <td>${formatIndianMoney(item.total)}</td>
+        </tr>
+      `;
+    }
+  );
+
+  const wholesaleExtras =
+    billData.mode ===
+      "W" &&
+    isLastPage
+      ? `
+        <div class="print-balance">Balance HV</div>
+        <div class="receiver-name-box">
+          <div class="receiver-line"></div>
+          <div class="receiver-label">Receiver’s Name</div>
+        </div>
+      `
+      : "";
 
   return `
-    <div class="print-wrapper">
+    <div class="print-wrapper receipt-copy">
+      <div class="copy-label">${label}</div>
+
       <div class="print-header-row">
         <div class="print-customer">
-          ${escapeAttr(
-            billData.customerName ||
-              "Walk-in"
-          )}
-        </div>
-
-        <div class="print-date">
-          ${escapeAttr(
-            billData.date
-          )}
+          ${billData.customerName}
         </div>
 
         <div class="print-serial">
@@ -1806,6 +1600,10 @@ function buildSingleCopyPage(
         </div>
       </div>
 
+      <div class="print-date">
+        ${billData.date}
+      </div>
+
       <table class="print-table">
         <thead>
           <tr>
@@ -1816,64 +1614,308 @@ function buildSingleCopyPage(
             <th>Amt</th>
           </tr>
         </thead>
+
         <tbody>
           ${rows}
         </tbody>
       </table>
 
       <div class="print-total">
-        GRAND TOTAL:
-        ₹${formatIndianMoney(
-          billData.grandTotal
-        )}/-
+        Grand Total:
+        ₹${billData.grandTotal}
       </div>
 
-      <div class="print-balance">
-        BALANCE H/V
-      </div>
+      ${wholesaleExtras}
+    </div>
+  `;
+}
 
-      <div class="receiver-name-box">
-        <div class="receiver-line"></div>
-        <div class="receiver-label">
-          Receiver Name
-        </div>
+function buildReceiptPrintHTML(
+  billData
+) {
+  const chunks =
+    chunkItems(
+      billData.items,
+      MAX_ITEMS_PER_DL_PAGE
+    );
+
+  let html = "";
+
+  chunks.forEach(
+    (
+      chunk,
+      index
+    ) => {
+      html +=
+        buildSingleCopyPage(
+          billData,
+          "CUSTOMER COPY",
+          chunk,
+          index ===
+            chunks.length -
+              1
+        );
+    }
+  );
+
+  chunks.forEach(
+    (
+      chunk,
+      index
+    ) => {
+      html +=
+        buildSingleCopyPage(
+          billData,
+          "OFFICE COPY",
+          chunk,
+          index ===
+            chunks.length -
+              1
+        );
+    }
+  );
+
+  return html;
+}
+
+function previewReceipt(
+  billData
+) {
+  const chunks =
+    chunkItems(
+      billData.items,
+      MAX_ITEMS_PER_DL_PAGE
+    );
+
+  let html = "";
+
+  chunks.forEach(
+    (
+      chunk,
+      index
+    ) => {
+      html +=
+        buildSingleCopyPage(
+          billData,
+          "VIEW",
+          chunk,
+          index ===
+            chunks.length -
+              1
+        );
+    }
+  );
+
+  previewContent.innerHTML =
+    html;
+
+  previewModal.style.display =
+    "flex";
+}
+
+function printReceipt(
+  billData
+) {
+  printInvoice.innerHTML =
+    buildReceiptPrintHTML(
+      billData
+    );
+
+  window.print();
+}
+
+function buildDaybookPrintHTML() {
+  const entries =
+    Object.values(
+      daybookCache
+    );
+
+  let rows = "";
+  let total = 0;
+
+  entries.forEach(
+    entry => {
+      total +=
+        entry.amount;
+
+      rows += `
+        <tr>
+          <td>${entry.date}</td>
+          <td>#${entry.serialNumber}</td>
+          <td>${entry.customerName}</td>
+          <td>₹${entry.amount}</td>
+        </tr>
+      `;
+    }
+  );
+
+  return `
+    <div class="print-wrapper">
+      <div class="daybook-print-title">DAYBOOK</div>
+      <table class="daybook-print-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Sr No</th>
+            <th>Customer</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="daybook-print-total">
+        TOTAL: ₹${total}
       </div>
     </div>
   `;
 }
-/* ================================
-   DAYBOOK
-================================ */
-onSnapshot(
-  daybookQuery,
-  snap => {
-    daybookCache = {};
+function printDaybook() {
+  printInvoice.innerHTML =
+    buildDaybookPrintHTML();
 
-    snap.forEach(
-      docSnap => {
-        daybookCache[
-          docSnap.id
-        ] = {
-          id:
-            docSnap.id,
-          ...docSnap.data()
-        };
-      }
+  window.print();
+
+  daybookPrintedOnce =
+    true;
+
+  renderDaybook();
+}
+
+/* ================================
+   UI RENDERERS
+================================ */
+function renderIncomingBills() {
+  const ids =
+    Object.keys(
+      incomingBillCache
     );
 
-    renderDaybook();
+  if (!ids.length) {
+    incomingBills.innerHTML = `
+      <div class="receiver-subtitle">
+        No incoming bills
+      </div>
+    `;
+    return;
   }
-);
+
+  let html = "";
+
+  ids.forEach(id => {
+    const bill =
+      incomingBillCache[id];
+
+    let buttons = "";
+
+    if (
+      bill.status ===
+      "pending"
+    ) {
+      buttons = `
+        <button
+          class="secondary-btn"
+          onclick="viewReceivedBill('${id}')"
+        >
+          View
+        </button>
+
+        <button
+          class="primary-btn"
+          onclick="printReceivedBill('${id}')"
+        >
+          Print
+        </button>
+      `;
+    } else {
+      buttons = `
+        <button
+          class="secondary-btn"
+          onclick="viewReceivedBill('${id}')"
+        >
+          View
+        </button>
+
+        <button
+          class="primary-btn"
+          onclick="reprintReceivedBill('${id}')"
+        >
+          Reprint
+        </button>
+
+        <button
+          class="send-btn"
+          onclick="doneReceivedBill('${id}')"
+        >
+          Done
+        </button>
+      `;
+    }
+
+    html += `
+      <div class="bill-card">
+        <div class="bill-title">
+          ${bill.customerName}
+        </div>
+
+        <div class="badge-row">
+          <div class="unit">
+            ${bill.date}
+          </div>
+
+          <div class="unit">
+            ${bill.mode}
+          </div>
+
+          ${
+            bill.serialNumber
+              ? `
+                <div class="unit">
+                  #${bill.serialNumber}
+                </div>
+              `
+              : ""
+          }
+        </div>
+
+        <div style="margin-top:12px;font-weight:700;font-size:20px;">
+          ₹${bill.grandTotal}
+        </div>
+
+        <div
+          class="action-buttons"
+          style="margin-top:14px;"
+        >
+          ${buttons}
+        </div>
+      </div>
+    `;
+  });
+
+  incomingBills.innerHTML =
+    html;
+}
 
 function renderDaybook() {
   const entries =
     Object.values(
       daybookCache
-    ).sort(
-      (a, b) =>
-        (a.serialNumber || 0) -
-        (b.serialNumber || 0)
     );
+
+  if (!entries.length) {
+    daybookSummary.innerHTML =
+      "Total: ₹0";
+
+    daybookActions.innerHTML =
+      "";
+
+    daybookEntries.innerHTML = `
+      <div class="receiver-subtitle">
+        No finalized bills
+      </div>
+    `;
+
+    return;
+  }
 
   const total =
     entries.reduce(
@@ -1882,39 +1924,40 @@ function renderDaybook() {
         entry
       ) =>
         sum +
-        (entry.amount ||
-          0),
+        entry.amount,
       0
     );
 
-  daybookSummary.innerText =
-    `Total: ₹${formatIndianMoney(total)}`;
+  daybookSummary.innerHTML =
+    `Total: ₹${total}`;
 
-  daybookActions.innerHTML =
-    `
+  if (
+    !daybookPrintedOnce
+  ) {
+    daybookActions.innerHTML = `
       <button
         class="primary-btn"
-        onclick="printDaybook()"
+        onclick="printDaybookNow()"
       >
         Print Daybook
+      </button>
+    `;
+  } else {
+    daybookActions.innerHTML = `
+      <button
+        class="primary-btn"
+        onclick="reprintDaybookNow()"
+      >
+        Reprint
       </button>
 
       <button
         class="delete-btn"
-        onclick="clearDaybook()"
+        onclick="deleteDaybookNow()"
       >
-        Clear Daybook
+        Delete
       </button>
     `;
-
-  if (!entries.length) {
-    daybookEntries.innerHTML =
-      `
-        <div class="receiver-subtitle">
-          No daybook entries.
-        </div>
-      `;
-    return;
   }
 
   let html = "";
@@ -1924,22 +1967,16 @@ function renderDaybook() {
       html += `
         <div class="daybook-entry">
           <div class="daybook-date">
-            ${escapeAttr(
-              entry.date || ""
-            )}
+            ${entry.date} |
+            #${entry.serialNumber}
           </div>
 
           <div class="daybook-name">
-            #${entry.serialNumber || "-"} —
-            ${escapeAttr(
-              entry.customerName
-            )}
+            ${entry.customerName}
           </div>
 
           <div class="daybook-amount">
-            ₹${formatIndianMoney(
-              entry.amount
-            )}
+            ₹${entry.amount}
           </div>
         </div>
       `;
@@ -1950,29 +1987,27 @@ function renderDaybook() {
     html;
 }
 
-window.printDaybook =
+window.printDaybookNow =
   function() {
+    printDaybook();
+  };
+
+window.reprintDaybookNow =
+  function() {
+    printDaybook();
+  };
+
+window.deleteDaybookNow =
+  async function() {
     if (
       isDaybookBusy
     ) {
       return;
     }
 
-    const entries =
-      Object.values(
-        daybookCache
-      ).sort(
-        (a, b) =>
-          (a.serialNumber ||
-            0) -
-          (b.serialNumber ||
-            0)
-      );
-
-    if (!entries.length) {
-      alert(
-        "No daybook entries."
-      );
+    if (
+      !requireAdminPassword()
+    ) {
       return;
     }
 
@@ -1980,119 +2015,15 @@ window.printDaybook =
       true;
 
     try {
-      const total =
-        entries.reduce(
-          (
-            sum,
-            entry
-          ) =>
-            sum +
-            (entry.amount ||
-              0),
-          0
-        );
-
-      const rows =
-        entries
-          .map(
-            entry => `
-              <tr>
-                <td>
-                  ${escapeAttr(
-                    entry.date
-                  )}
-                </td>
-                <td>
-                  ${
-                    entry.serialNumber ||
-                    "-"
-                  }
-                </td>
-                <td>
-                  ${escapeAttr(
-                    entry.customerName
-                  )}
-                </td>
-                <td>
-                  ₹${formatIndianMoney(
-                    entry.amount
-                  )}
-                </td>
-              </tr>
-            `
-          )
-          .join("");
-
-      printInvoice.innerHTML =
-        `
-          <div class="print-wrapper">
-            <div class="daybook-print-title">
-              DAYBOOK
-            </div>
-
-            <table class="daybook-print-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Sr</th>
-                  <th>Customer</th>
-                  <th>Amount</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                ${rows}
-              </tbody>
-            </table>
-
-            <div class="daybook-print-total">
-              TOTAL:
-              ₹${formatIndianMoney(
-                total
-              )}
-            </div>
-          </div>
-        `;
-
-      window.print();
-
-      setTimeout(
-        () => {
-          printInvoice.innerHTML =
-            "";
-        },
-        2000
-      );
-    } finally {
-      isDaybookBusy =
-        false;
-    }
-  };
-
-window.clearDaybook =
-  async function() {
-    if (
-      !requireAdminPassword()
-    ) {
-      return;
-    }
-
-    try {
-      const snap =
+      const snapshot =
         await getDocs(
           daybookCollection
         );
 
-      if (
-        snap.empty
-      ) {
-        return;
-      }
-
       const batch =
         writeBatch(db);
 
-      snap.forEach(
+      snapshot.forEach(
         docSnap => {
           batch.delete(
             docSnap.ref
@@ -2101,15 +2032,404 @@ window.clearDaybook =
       );
 
       await batch.commit();
+
+      daybookPrintedOnce =
+        false;
     } catch (err) {
-      console.error(
-        err
-      );
+      console.error(err);
 
       alert(
-        "Failed to clear daybook."
+        "Failed to delete daybook."
       );
+    } finally {
+      isDaybookBusy =
+        false;
     }
   };
 
+/* ================================
+   FIREBASE LISTENERS
+================================ */
+onSnapshot(
+  billsQuery,
+  snapshot => {
+    incomingBillCache = {};
 
+    snapshot.forEach(
+      docSnap => {
+        incomingBillCache[
+          docSnap.id
+        ] =
+          docSnap.data();
+      }
+    );
+
+    renderIncomingBills();
+  }
+);
+
+onSnapshot(
+  daybookQuery,
+  snapshot => {
+    daybookCache = {};
+
+    snapshot.forEach(
+      docSnap => {
+        daybookCache[
+          docSnap.id
+        ] =
+          docSnap.data();
+      }
+    );
+
+    renderDaybook();
+  }
+);
+
+/* ================================
+   RECEIVER ACTIONS
+================================ */
+window.viewReceivedBill =
+  function(docId) {
+    const bill =
+      incomingBillCache[
+        docId
+      ];
+
+    if (!bill) {
+      return;
+    }
+
+    previewReceipt(
+      bill
+    );
+  };
+
+window.reprintReceivedBill =
+  function(docId) {
+    const bill =
+      incomingBillCache[
+        docId
+      ];
+
+    if (!bill) {
+      return;
+    }
+
+    printReceipt(
+      bill
+    );
+  };
+
+window.printReceivedBill =
+  async function(docId) {
+    if (
+      isReceiverBusy
+    ) {
+      return;
+    }
+
+    isReceiverBusy =
+      true;
+
+    try {
+      const billRef =
+        doc(
+          db,
+          "bills",
+          docId
+        );
+
+      const finalBill =
+        await runTransaction(
+          db,
+          async transaction => {
+            const billSnap =
+              await transaction.get(
+                billRef
+              );
+
+            if (
+              !billSnap.exists()
+            ) {
+              throw new Error(
+                "Bill not found."
+              );
+            }
+
+            const bill =
+              billSnap.data();
+
+            if (
+              bill.status !==
+              "pending"
+            ) {
+              throw new Error(
+                "Bill already processed."
+              );
+            }
+
+            const serialSnap =
+              await transaction.get(
+                serialDocRef
+              );
+
+            if (
+              !serialSnap.exists()
+            ) {
+              throw new Error(
+                "Serial document missing."
+              );
+            }
+
+            const serialData =
+              serialSnap.data();
+
+            const keys =
+              getModeKeys(
+                bill.mode
+              );
+
+            const counter =
+              serialData[
+                keys.counterKey
+              ] || 0;
+
+            const active = [
+              ...new Set(
+                serialData[
+                  keys.activeKey
+                ] || []
+              )
+            ];
+
+            let reusable = [
+              ...new Set(
+                serialData[
+                  keys.reusableKey
+                ] || []
+              )
+            ];
+
+            reusable =
+              reusable.filter(
+                s =>
+                  !active.includes(
+                    s
+                  )
+              );
+
+            const allocation =
+              getLowestAvailableSerial(
+                counter,
+                reusable,
+                active
+              );
+
+            if (
+              !allocation
+            ) {
+              throw new Error(
+                "No serials available."
+              );
+            }
+
+            const updates = {
+              [keys.activeKey]:
+                [
+                  ...active,
+                  allocation.serial
+                ]
+            };
+
+            if (
+              allocation.source ===
+              "reusable"
+            ) {
+              updates[
+                keys.reusableKey
+              ] =
+                reusable.filter(
+                  s =>
+                    s !==
+                    allocation.serial
+                );
+            } else {
+              updates[
+                keys.counterKey
+              ] =
+                allocation.serial;
+            }
+
+            transaction.update(
+              serialDocRef,
+              updates
+            );
+
+            transaction.update(
+              billRef,
+              {
+                status:
+                  "printed",
+                serialNumber:
+                  allocation.serial
+              }
+            );
+
+            return {
+              ...bill,
+              status:
+                "printed",
+              serialNumber:
+                allocation.serial
+            };
+          }
+        );
+
+      printReceipt(
+        finalBill
+      );
+    } catch (err) {
+      console.error(err);
+
+      alert(
+        "Failed to print: " +
+          err.message
+      );
+    } finally {
+      isReceiverBusy =
+        false;
+    }
+  };
+
+window.doneReceivedBill =
+  async function(docId) {
+    if (
+      isReceiverBusy
+    ) {
+      return;
+    }
+
+    if (
+      !requireAdminPassword()
+    ) {
+      return;
+    }
+
+    isReceiverBusy =
+      true;
+
+    try {
+      const billRef =
+        doc(
+          db,
+          "bills",
+          docId
+        );
+
+      await runTransaction(
+        db,
+        async transaction => {
+          const billSnap =
+            await transaction.get(
+              billRef
+            );
+
+          if (
+            !billSnap.exists()
+          ) {
+            throw new Error(
+              "Bill not found."
+            );
+          }
+
+          const bill =
+            billSnap.data();
+
+          if (
+            bill.status !==
+            "printed"
+          ) {
+            throw new Error(
+              "Bill must be printed first."
+            );
+          }
+
+          const serialSnap =
+            await transaction.get(
+              serialDocRef
+            );
+
+          if (
+            !serialSnap.exists()
+          ) {
+            throw new Error(
+              "Serial document missing."
+            );
+          }
+
+          const serialData =
+            serialSnap.data();
+
+          const keys =
+            getModeKeys(
+              bill.mode
+            );
+
+          let active = [
+            ...new Set(
+              serialData[
+                keys.activeKey
+              ] || []
+            )
+          ];
+
+          active =
+            active.filter(
+              s =>
+                s !==
+                bill.serialNumber
+            );
+
+          transaction.update(
+            serialDocRef,
+            {
+              [keys.activeKey]:
+                active
+            }
+          );
+
+          transaction.set(
+            doc(
+              daybookCollection
+            ),
+            {
+              date:
+                bill.date,
+              serialNumber:
+                bill.serialNumber,
+              customerName:
+                bill.customerName,
+              amount:
+                bill.grandTotal,
+              createdAt:
+                serverTimestamp()
+            }
+          );
+
+          transaction.delete(
+            billRef
+          );
+        }
+      );
+    } catch (err) {
+      console.error(err);
+
+      alert(
+        "Failed to complete bill."
+      );
+    } finally {
+      isReceiverBusy =
+        false;
+    }
+  };
