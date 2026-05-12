@@ -1636,10 +1636,12 @@ function buildSingleCopyPage(
         </tbody>
       </table>
 
-      <div class="print-total">
-        Grand Total:
-        ₹${billData.grandTotal}
-      </div>
+    <div class="print-total">
+  GRAND TOTAL:
+  ₹${formatIndianMoney(
+    billData.total
+  )}/-
+</div>
 
       ${wholesaleExtras}
     </div>
