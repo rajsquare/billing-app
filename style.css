@@ -212,12 +212,19 @@ button {
   margin-top: 14px;
 }
 
+.input-row input:first-child {
+  flex: 0.8;
+}
+
+.input-row input:last-child {
+  flex: 1.2;
+}
+
 .bill-input {
-  flex: 1;
   padding: 14px;
   border-radius: 12px;
   border: 1px solid #ccc;
-  font-size: 18px;
+  font-size: 16px;
   min-width: 0;
 }
 
@@ -312,8 +319,9 @@ button {
   background: #ddd;
   color: #111;
 }
+
 /* ================================
-   MODALS CONTINUED
+   MODALS
 ================================ */
 .modal-overlay {
   position: fixed;
@@ -374,9 +382,11 @@ button {
 
 .preview-content .print-wrapper {
   width: 100%;
-  height: auto;
-  padding: 0;
+  min-height: auto;
+  padding: 10px;
   border: none;
+  page-break-after: auto;
+  display: block;
 }
 
 .preview-content .copy-label {
@@ -384,7 +394,7 @@ button {
 }
 
 /* ================================
-   DAYBOOK
+   DAYBOOK UI
 ================================ */
 .daybook-date {
   font-size: 13px;
@@ -405,22 +415,24 @@ button {
 }
 
 /* ================================
-   FINAL DL PRINT
+   PRINT FOUNDATION
 ================================ */
 #printInvoice {
   display: none;
 }
 
 .print-wrapper {
-  width: 85mm;
+  width: 100%;
   min-height: 180mm;
-  padding: 15mm 2mm 8mm 10mm;
+  padding: 5mm 3mm 5mm 3mm;
   border: 1px solid #000;
   margin: 0 auto;
-  box-sizing: border-box;
   background: white;
   color: #000;
   font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   page-break-after: always;
 }
 
@@ -430,154 +442,197 @@ button {
 
 .copy-label {
   text-align: center;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  margin: 0 0 2px 0;
-  line-height: 1.1;
+  margin-bottom: 4px;
+}
+/* ================================
+   INVOICE PRINT
+================================ */
+
+/* Line 1: Customer */
+.print-header-row {
+  display: block;
+  margin-bottom: 4px;
 }
 
-/* UPDATED HEADER */
-.print-header-row {
+.print-customer {
+  display: block;
+  width: 100%;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: left;
+  word-break: break-word;
+  margin-bottom: 4px;
+}
+
+/* Hide serial here because we'll place it with date visually */
+.print-header-row .print-serial {
+  display: none;
+}
+
+/* Line 2: Date + Serial */
+.print-date {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 4px;
-  flex-wrap: nowrap;
-}
-
-.print-customer,
-.print-serial,
-.print-date {
-  font-size: 22px;
+  font-size: 14px;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.15;
+  margin-bottom: 8px;
   white-space: nowrap;
+  position: relative;
 }
 
-.print-table,
-.daybook-print-table {
+.print-date::after {
+  content: attr(data-serial);
+}
+
+/* ================================
+   INVOICE TABLE
+================================ */
+.print-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
   font-size: 10px;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .print-table th,
-.print-table td,
-.daybook-print-table th,
-.daybook-print-table td {
+.print-table td {
   border: 1px solid #000;
-  padding: 2px 2px;
+  padding: 3px 2px;
   vertical-align: middle;
 }
 
-/* PRODUCT GETS EVERYTHING */
-.col-product,
 .print-table th:nth-child(1),
-.print-table td:nth-child(1),
-.daybook-print-table th:nth-child(1),
-.daybook-print-table td:nth-child(1) {
-  width: auto;
+.print-table td:nth-child(1) {
+  width: 46%;
   text-align: left;
-  overflow-wrap: break-word;
   word-break: break-word;
-  line-height: 1.1;
-  min-height: 20px;
 }
 
-/* FIXED SUPPORT COLUMNS */
-.col-material,
 .print-table th:nth-child(2),
-.print-table td:nth-child(2),
-.daybook-print-table th:nth-child(2),
-.daybook-print-table td:nth-child(2) {
-  width: 8mm;
-  min-width: 8mm;
-  max-width: 8mm;
+.print-table td:nth-child(2) {
+  width: 8%;
   text-align: center;
   white-space: nowrap;
 }
 
-.col-qty,
 .print-table th:nth-child(3),
-.print-table td:nth-child(3),
-.daybook-print-table th:nth-child(3),
-.daybook-print-table td:nth-child(3) {
-  width: 8mm;
-  min-width: 8mm;
-  max-width: 8mm;
+.print-table td:nth-child(3) {
+  width: 10%;
   text-align: right;
   white-space: nowrap;
 }
 
-.col-rate,
 .print-table th:nth-child(4),
-.print-table td:nth-child(4),
-.daybook-print-table th:nth-child(4),
-.daybook-print-table td:nth-child(4) {
-  width: 11mm;
-  min-width: 11mm;
-  max-width: 11mm;
+.print-table td:nth-child(4) {
+  width: 16%;
   text-align: right;
   white-space: nowrap;
 }
 
-.col-amount,
 .print-table th:nth-child(5),
-.print-table td:nth-child(5),
-.daybook-print-table th:nth-child(5),
-.daybook-print-table td:nth-child(5) {
-  width: 15mm;
-  min-width: 15mm;
-  max-width: 15mm;
+.print-table td:nth-child(5) {
+  width: 20%;
   text-align: right;
   white-space: nowrap;
 }
 
-/* CONTROLLED ROW HEIGHTS */
-.print-table tr,
-.daybook-print-table tr {
-  height: 20px;
-}
-
-.print-total,
-.daybook-print-total {
-  margin-top: 6px;
+/* ================================
+   TOTAL + BOTTOM
+================================ */
+.print-total {
+  margin-top: 8px;
   text-align: right;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   line-height: 1.1;
 }
 
 .print-balance {
-  margin-top: 8px;
-  font-size: 30px;
+  margin-top: auto;
+  font-size: 14px;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.15;
 }
 
 .receiver-name-box {
-  margin-top: 40px;
+  margin-top: 8px;
 }
 
 .receiver-line {
-  width: 60mm;
+  width: 50mm;
   border-top: 1px solid #000;
 }
 
 .receiver-label {
   margin-top: 4px;
-  font-size: 18px;
+  font-size: 10px;
+  font-weight: 700;
   line-height: 1.1;
 }
 
+/* ================================
+   DAYBOOK PRINT
+================================ */
 .daybook-print-title {
   text-align: center;
-  font-size: 13px;
+  font-size: 18px;
   font-weight: 700;
-  margin-bottom: 3px;
+  margin-bottom: 10px;
+}
+
+.daybook-print-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 11px;
+}
+
+.daybook-print-table th,
+.daybook-print-table td {
+  border: 1px solid #000;
+  padding: 5px 6px;
+  vertical-align: top;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.daybook-print-table th:nth-child(1),
+.daybook-print-table td:nth-child(1) {
+  width: 22%;
+  text-align: left;
+}
+
+.daybook-print-table th:nth-child(2),
+.daybook-print-table td:nth-child(2) {
+  width: 12%;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.daybook-print-table th:nth-child(3),
+.daybook-print-table td:nth-child(3) {
+  width: 46%;
+  text-align: left;
+}
+
+.daybook-print-table th:nth-child(4),
+.daybook-print-table td:nth-child(4) {
+  width: 20%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.daybook-print-total {
+  margin-top: 14px;
+  text-align: right;
+  font-size: 20px;
+  font-weight: 700;
 }
 
 /* ================================
@@ -597,18 +652,18 @@ button {
 }
 
 /* ================================
-   DL PRINT MEDIA
+   PRINT MEDIA
 ================================ */
 @page {
   size: DL portrait;
-  margin: 15mm 4mm 8mm 10mm;
+  margin: 6mm 4mm 6mm 4mm;
 }
 
 @media print {
   html,
   body {
     width: 99mm;
-    height: 210mm;
+    height: auto;
     margin: 0;
     padding: 0;
     background: white;
