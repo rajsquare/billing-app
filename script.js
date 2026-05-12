@@ -1769,3 +1769,667 @@ function buildDaybookPrintHTML() {
     </div>
   `;
 }
+function printDaybook() {
+  printInvoice.innerHTML =
+    buildDaybookPrintHTML();
+
+  window.print();
+
+  daybookPrintedOnce =
+    true;
+
+  renderDaybook();
+}
+
+/* ================================
+   UI RENDERERS
+================================ */
+function renderIncomingBills() {
+  const ids =
+    Object.keys(
+      incomingBillCache
+    );
+
+  if (!ids.length) {
+    incomingBills.innerHTML = `
+      <div class="receiver-subtitle">
+        No incoming bills
+      </div>
+    `;
+    return;
+  }
+
+  let html = "";
+
+  ids.forEach(id => {
+    const bill =
+      incomingBillCache[id];
+
+    let buttons = "";
+
+    if (
+      bill.status ===
+      "pending"
+    ) {
+      buttons = `
+        <button
+          class="secondary-btn"
+          onclick="viewReceivedBill('${id}')"
+        >
+          View
+        </button>
+
+        <button
+          class="primary-btn"
+          onclick="printReceivedBill('${id}')"
+        >
+          Print
+        </button>
+      `;
+    } else {
+      buttons = `
+        <button
+          class="secondary-btn"
+          onclick="viewReceivedBill('${id}')"
+        >
+          View
+        </button>
+
+        <button
+          class="primary-btn"
+          onclick="reprintReceivedBill('${id}')"
+        >
+          Reprint
+        </button>
+
+        <button
+          class="send-btn"
+          onclick="doneReceivedBill('${id}')"
+        >
+          Done
+        </button>
+      `;
+    }
+
+    html += `
+      <div class="bill-card">
+        <div class="bill-title">
+          ${bill.customerName}
+        </div>
+
+        <div class="badge-row">
+          <div class="unit">
+            ${bill.date}
+          </div>
+
+          <div class="unit">
+            ${bill.mode}
+          </div>
+
+          ${
+            bill.serialNumber
+              ? `
+                <div class="unit">
+                  #${bill.serialNumber}
+                </div>
+              `
+              : ""
+          }
+        </div>
+
+        <div style="margin-top:12px;font-weight:700;font-size:20px;">
+          ₹${bill.grandTotal}
+        </div>
+
+        <div
+          class="action-buttons"
+          style="margin-top:14px;"
+        >
+          ${buttons}
+        </div>
+      </div>
+    `;
+  });
+
+  incomingBills.innerHTML =
+    html;
+}
+
+function renderDaybook() {
+  const entries =
+    Object.values(
+      daybookCache
+    );
+
+  if (!entries.length) {
+    daybookSummary.innerHTML =
+      "Total: ₹0";
+
+    daybookActions.innerHTML =
+      "";
+
+    daybookEntries.innerHTML = `
+      <div class="receiver-subtitle">
+        No finalized bills
+      </div>
+    `;
+
+    return;
+  }
+
+  const total =
+    entries.reduce(
+      (
+        sum,
+        entry
+      ) =>
+        sum +
+        entry.amount,
+      0
+    );
+
+  daybookSummary.innerHTML =
+    `Total: ₹${total}`;
+
+  if (
+    !daybookPrintedOnce
+  ) {
+    daybookActions.innerHTML = `
+      <button
+        class="primary-btn"
+        onclick="printDaybookNow()"
+      >
+        Print Daybook
+      </button>
+    `;
+  } else {
+    daybookActions.innerHTML = `
+      <button
+        class="primary-btn"
+        onclick="reprintDaybookNow()"
+      >
+        Reprint
+      </button>
+
+      <button
+        class="delete-btn"
+        onclick="deleteDaybookNow()"
+      >
+        Delete
+      </button>
+    `;
+  }
+
+  let html = "";
+
+  entries.forEach(
+    entry => {
+      html += `
+        <div class="daybook-entry">
+          <div class="daybook-date">
+            ${entry.date} |
+            #${entry.serialNumber}
+          </div>
+
+          <div class="daybook-name">
+            ${entry.customerName}
+          </div>
+
+          <div class="daybook-amount">
+            ₹${entry.amount}
+          </div>
+        </div>
+      `;
+    }
+  );
+
+  daybookEntries.innerHTML =
+    html;
+}
+
+window.printDaybookNow =
+  function() {
+    printDaybook();
+  };
+
+window.reprintDaybookNow =
+  function() {
+    printDaybook();
+  };
+
+window.deleteDaybookNow =
+  async function() {
+    if (
+      isDaybookBusy
+    ) {
+      return;
+    }
+
+    if (
+      !requireAdminPassword()
+    ) {
+      return;
+    }
+
+    isDaybookBusy =
+      true;
+
+    try {
+      const snapshot =
+        await getDocs(
+          daybookCollection
+        );
+
+      const batch =
+        writeBatch(db);
+
+      snapshot.forEach(
+        docSnap => {
+          batch.delete(
+            docSnap.ref
+          );
+        }
+      );
+
+      await batch.commit();
+
+      daybookPrintedOnce =
+        false;
+    } catch (err) {
+      console.error(err);
+
+      alert(
+        "Failed to delete daybook."
+      );
+    } finally {
+      isDaybookBusy =
+        false;
+    }
+  };
+
+/* ================================
+   FIREBASE LISTENERS
+================================ */
+onSnapshot(
+  billsQuery,
+  snapshot => {
+    incomingBillCache = {};
+
+    snapshot.forEach(
+      docSnap => {
+        incomingBillCache[
+          docSnap.id
+        ] =
+          docSnap.data();
+      }
+    );
+
+    renderIncomingBills();
+  }
+);
+
+onSnapshot(
+  daybookQuery,
+  snapshot => {
+    daybookCache = {};
+
+    snapshot.forEach(
+      docSnap => {
+        daybookCache[
+          docSnap.id
+        ] =
+          docSnap.data();
+      }
+    );
+
+    renderDaybook();
+  }
+);
+
+/* ================================
+   RECEIVER ACTIONS
+================================ */
+window.viewReceivedBill =
+  function(docId) {
+    const bill =
+      incomingBillCache[
+        docId
+      ];
+
+    if (!bill) {
+      return;
+    }
+
+    previewReceipt(
+      bill
+    );
+  };
+
+window.reprintReceivedBill =
+  function(docId) {
+    const bill =
+      incomingBillCache[
+        docId
+      ];
+
+    if (!bill) {
+      return;
+    }
+
+    printReceipt(
+      bill
+    );
+  };
+
+window.printReceivedBill =
+  async function(docId) {
+    if (
+      isReceiverBusy
+    ) {
+      return;
+    }
+
+    isReceiverBusy =
+      true;
+
+    try {
+      const billRef =
+        doc(
+          db,
+          "bills",
+          docId
+        );
+
+      const finalBill =
+        await runTransaction(
+          db,
+          async transaction => {
+            const billSnap =
+              await transaction.get(
+                billRef
+              );
+
+            if (
+              !billSnap.exists()
+            ) {
+              throw new Error(
+                "Bill not found."
+              );
+            }
+
+            const bill =
+              billSnap.data();
+
+            if (
+              bill.status !==
+              "pending"
+            ) {
+              throw new Error(
+                "Bill already processed."
+              );
+            }
+
+            const serialSnap =
+              await transaction.get(
+                serialDocRef
+              );
+
+            if (
+              !serialSnap.exists()
+            ) {
+              throw new Error(
+                "Serial document missing."
+              );
+            }
+
+            const serialData =
+              serialSnap.data();
+
+            const keys =
+              getModeKeys(
+                bill.mode
+              );
+
+            const counter =
+              serialData[
+                keys.counterKey
+              ] || 0;
+
+            const active = [
+              ...new Set(
+                serialData[
+                  keys.activeKey
+                ] || []
+              )
+            ];
+
+            let reusable = [
+              ...new Set(
+                serialData[
+                  keys.reusableKey
+                ] || []
+              )
+            ];
+
+            reusable =
+              reusable.filter(
+                s =>
+                  !active.includes(
+                    s
+                  )
+              );
+
+            const allocation =
+              getLowestAvailableSerial(
+                counter,
+                reusable,
+                active
+              );
+
+            if (
+              !allocation
+            ) {
+              throw new Error(
+                "No serials available."
+              );
+            }
+
+            const updates = {
+              [keys.activeKey]:
+                [
+                  ...active,
+                  allocation.serial
+                ]
+            };
+
+            if (
+              allocation.source ===
+              "reusable"
+            ) {
+              updates[
+                keys.reusableKey
+              ] =
+                reusable.filter(
+                  s =>
+                    s !==
+                    allocation.serial
+                );
+            } else {
+              updates[
+                keys.counterKey
+              ] =
+                allocation.serial;
+            }
+
+            transaction.update(
+              serialDocRef,
+              updates
+            );
+
+            transaction.update(
+              billRef,
+              {
+                status:
+                  "printed",
+                serialNumber:
+                  allocation.serial
+              }
+            );
+
+            return {
+              ...bill,
+              status:
+                "printed",
+              serialNumber:
+                allocation.serial
+            };
+          }
+        );
+
+      printReceipt(
+        finalBill
+      );
+    } catch (err) {
+      console.error(err);
+
+      alert(
+        "Failed to print: " +
+          err.message
+      );
+    } finally {
+      isReceiverBusy =
+        false;
+    }
+  };
+
+window.doneReceivedBill =
+  async function(docId) {
+    if (
+      isReceiverBusy
+    ) {
+      return;
+    }
+
+    if (
+      !requireAdminPassword()
+    ) {
+      return;
+    }
+
+    isReceiverBusy =
+      true;
+
+    try {
+      const billRef =
+        doc(
+          db,
+          "bills",
+          docId
+        );
+
+      await runTransaction(
+        db,
+        async transaction => {
+          const billSnap =
+            await transaction.get(
+              billRef
+            );
+
+          if (
+            !billSnap.exists()
+          ) {
+            throw new Error(
+              "Bill not found."
+            );
+          }
+
+          const bill =
+            billSnap.data();
+
+          if (
+            bill.status !==
+            "printed"
+          ) {
+            throw new Error(
+              "Bill must be printed first."
+            );
+          }
+
+          const serialSnap =
+            await transaction.get(
+              serialDocRef
+            );
+
+          if (
+            !serialSnap.exists()
+          ) {
+            throw new Error(
+              "Serial document missing."
+            );
+          }
+
+          const serialData =
+            serialSnap.data();
+
+          const keys =
+            getModeKeys(
+              bill.mode
+            );
+
+          let active = [
+            ...new Set(
+              serialData[
+                keys.activeKey
+              ] || []
+            )
+          ];
+
+          active =
+            active.filter(
+              s =>
+                s !==
+                bill.serialNumber
+            );
+
+          transaction.update(
+            serialDocRef,
+            {
+              [keys.activeKey]:
+                active
+            }
+          );
+
+          transaction.set(
+            doc(
+              daybookCollection
+            ),
+            {
+              date:
+                bill.date,
+              serialNumber:
+                bill.serialNumber,
+              customerName:
+                bill.customerName,
+              amount:
+                bill.grandTotal,
+              createdAt:
+                serverTimestamp()
+            }
+          );
+
+          transaction.delete(
+            billRef
+          );
+        }
+      );
+    } catch (err) {
+      console.error(err);
+
+      alert(
+        "Failed to complete bill."
+      );
+    } finally {
+      isReceiverBusy =
+        false;
+    }
+  };
