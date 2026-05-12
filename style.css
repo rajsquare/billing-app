@@ -456,10 +456,9 @@ button {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
   position: relative;
 }
-
 .print-customer {
   width: 100%;
   font-size: 14px;
@@ -476,8 +475,10 @@ button {
   line-height: 1.15;
   white-space: nowrap;
   text-align: left;
+  margin-top: 1px;
 }
 
+Tiny visual polis
 .print-serial {
   position: absolute;
   right: 0;
