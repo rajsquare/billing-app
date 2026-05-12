@@ -173,7 +173,7 @@
   {
     "sr": 20,
     "productName": "Jalebi Thal up to 24 inch",
-    "wPrice": 1000,
+    "wPrice": 1020,
     "priceType": "KG",
     "rPrice": 1200,
     "material": "Brass",
@@ -182,7 +182,7 @@
   {
     "sr": 21,
     "productName": "Jalebi Thal 24 inch and above",
-    "wPrice": 1020,
+    "wPrice": 1040,
     "priceType": "KG",
     "rPrice": 1200,
     "material": "Brass",
@@ -2054,18 +2054,18 @@
   {
     "sr": 229,
     "productName": "Top Joint Bottom",
-    "wPrice": 1100,
+    "wPrice": 1120,
     "priceType": "KG",
-    "rPrice": 1150,
+    "rPrice": 1200,
     "material": "Brass",
     "": null
   },
   {
     "sr": 230,
     "productName": "Langdi Joint Bottom",
-    "wPrice": 1120,
+    "wPrice": 1140,
     "priceType": "KG",
-    "rPrice": 1150,
+    "rPrice": 1220,
     "material": "Brass",
     "": null
   },
@@ -3664,7 +3664,7 @@
   },
   {
     "sr": 408,
-    "productName": "Full Hammered Serving Spoon Small",
+    "productName": "Full Hammered Serving Spoon S",
     "wPrice": 350,
     "priceType": "PP",
     "rPrice": 400,
@@ -3673,7 +3673,7 @@
   },
   {
     "sr": 409,
-    "productName": "Full Hammered Serving Spoon Medium",
+    "productName": "Full Hammered Serving Spoon M",
     "wPrice": 400,
     "priceType": "PP",
     "rPrice": 450,
@@ -3682,7 +3682,7 @@
   },
   {
     "sr": 410,
-    "productName": "Full Hammered Serving Spoon Big",
+    "productName": "Full Hammered Serving Spoon L",
     "wPrice": 450,
     "priceType": "PP",
     "rPrice": 550,
