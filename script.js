@@ -70,7 +70,7 @@ let daybookCache = {};
 let isReceiverBusy = false;
 let isSendingBill = false;
 let isDaybookBusy = false;
-let daybookPrintedOnce = false;
+
 
 /* ================================
    DOM
@@ -1567,7 +1567,7 @@ window.printBill =
           printInvoice.innerHTML =
             "";
         },
-        500
+        2000
       );
 
       const billRef =
@@ -1675,32 +1675,25 @@ window.markDone =
             }
           );
 
-          tx.set(
-            serialDocRef,
-            {
-              ...serialData,
-              [
-                keys.activeKey
-              ]:
-                active.filter(
-                  n =>
-                    n !==
-                    bill.serialNumber
-                ),
-              [
-                keys.reusableKey
-              ]:
-                reusable.includes(
-                  bill.serialNumber
-                )
-                  ? reusable
-                  : [
-                      ...reusable,
-                      bill.serialNumber
-                    ]
-            }
-          );
-
+ tx.set(
+  serialDocRef,
+  {
+    [keys.activeKey]: active.filter(
+      n => n !== bill.serialNumber
+    ),
+    [keys.reusableKey]: reusable.includes(
+      bill.serialNumber
+    )
+      ? reusable
+      : [
+          ...reusable,
+          bill.serialNumber
+        ]
+  },
+  {
+    merge: true
+  }
+);
           tx.set(
             addDocRef(),
             {
@@ -2068,7 +2061,7 @@ window.printDaybook =
           printInvoice.innerHTML =
             "";
         },
-        500
+        2000
       );
     } finally {
       isDaybookBusy =
@@ -2118,4 +2111,5 @@ window.clearDaybook =
       );
     }
   };
+
 
