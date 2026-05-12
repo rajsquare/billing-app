@@ -321,7 +321,7 @@ button {
 }
 
 /* ================================
-   MODALS
+   MODALS + PREVIEW
 ================================ */
 .modal-overlay {
   position: fixed;
@@ -365,9 +365,6 @@ button {
   font-size: 16px;
 }
 
-/* ================================
-   PREVIEW
-================================ */
 .preview-card {
   max-height: 90vh;
   display: flex;
@@ -432,6 +429,10 @@ button {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+}
+
+/* only invoice copies force page breaks */
+.receipt-copy {
   page-break-after: always;
 }
 
@@ -453,7 +454,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-bottom: 8px;
+  margin-bottom: 14px;
   position: relative;
 }
 
@@ -464,6 +465,7 @@ button {
   line-height: 1.15;
   text-align: left;
   word-break: break-word;
+  text-transform: uppercase;
 }
 
 .print-date {
@@ -548,7 +550,7 @@ button {
   margin-top: 10px;
   padding: 6px 8px;
   border: 1px solid #000;
-  text-align: right;
+  text-align: left;
   font-size: 18px;
   font-weight: 800;
   line-height: 1.1;
