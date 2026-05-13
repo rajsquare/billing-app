@@ -1619,7 +1619,7 @@ function getModeKeys(
 }
 
 const MAX_ITEMS_PER_DL_PAGE =
-  20;
+  25;
 
 function chunkItems(
   items,
@@ -1705,9 +1705,10 @@ function buildSingleCopyPage(
   let rows = "";
 
   itemsChunk.forEach(
-    item => {
+    (item, idx) => {
       rows += `
         <tr>
+          <td>${idx + 1}</td>
           <td>${item.productName}${item.note ? `<br><span class="print-item-note">${item.note}</span>` : ""}</td>
           <td>${shortMaterialName(item.material)}</td>
           <td>${roundQty(item.qty)}</td>
@@ -1761,6 +1762,7 @@ function buildSingleCopyPage(
       <table class="print-table">
         <thead>
           <tr>
+            <th>S</th>
             <th>Product</th>
             <th>Mat</th>
             <th>Qty</th>
@@ -1994,7 +1996,7 @@ function renderIncomingBills() {
   const ids =
     Object.keys(
       incomingBillCache
-    );
+    ).reverse();
 
   if (!ids.length) {
     incomingBills.innerHTML = `
