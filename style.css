@@ -961,9 +961,16 @@ input {
   color: #333;
 }
 
-.receiver-name-box-large {
+.receiver-section-divider {
   margin-top: auto;
-  padding-top: 10px;
+  margin-left: -2mm;
+  margin-right: -2mm;
+  border-top: 1px solid #000;
+}
+
+.receiver-name-box-large {
+  margin-top: 0;
+  padding-top: 6px;
 }
 
 .receiver-line-large {
