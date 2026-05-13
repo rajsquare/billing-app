@@ -750,6 +750,7 @@ input {
 }
 
 .print-wrapper {
+  position: relative;
   width: 100%;
   padding: 3mm 2mm 3mm 2mm;
   border: 1px solid #000;
@@ -759,6 +760,22 @@ input {
   font-family: Arial, sans-serif;
   box-sizing: border-box;
   display: block;
+}
+
+.bill-page-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  font-weight: 200;
+  color: #000;
+  opacity: 0.08;
+  font-family: Arial, sans-serif;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
 }
 
 /* only invoice copies force page breaks */
