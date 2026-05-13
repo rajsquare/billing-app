@@ -85,6 +85,7 @@ let daybookPrintedOnce = false;
 let liveDraftActive = false;
 let liveDraftsCache = {};
 let liveDraftViewedSessionId = null;
+let qtyDirty = false;
 
 /* ================================
    DOM
@@ -1481,6 +1482,7 @@ window.selectProduct =
     updateGrandTotal();
     saveDraft();
     syncLiveDraft();
+    qtyDirty = false;
 
     searchBox.value = "";
     suggestions.innerHTML =
@@ -1569,6 +1571,8 @@ function renderBill() {
               value="${safeQty}"
               data-qty-index="${index}"
               oninput="updateQty(${index}, this.value)"
+              onblur="commitQty()"
+              onkeydown="if(event.key==='Enter'){commitQty()}"
             >
 
             <input
@@ -1643,6 +1647,7 @@ window.updateQty =
 
     updateGrandTotal();
     saveDraft();
+    qtyDirty = true;
 
     const totalEl =
       billItemsDiv.querySelectorAll(
@@ -1656,6 +1661,16 @@ window.updateQty =
       totalEl.innerText =
         `${isDiscountItem(item) ? "-" : ""}₹${formatIndianMoney(Math.abs(item.total))}`;
     }
+  };
+
+window.commitQty =
+  function() {
+    if (!qtyDirty) {
+      return;
+    }
+
+    qtyDirty = false;
+    syncLiveDraft();
   };
 
 window.updatePrice =
