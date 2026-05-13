@@ -43,9 +43,10 @@
       <div class="header-row">
         <h1>Billing App</h1>
 
-        <button id="modeToggle">
-          W
-        </button>
+        <div class="header-controls">
+          <button id="liveBtn">LIVE (0)</button>
+          <button id="modeToggle">W</button>
+        </div>
       </div>
 
       <div class="search-wrapper">
@@ -193,6 +194,29 @@
         </button>
       </div>
 
+    </div>
+  </div>
+
+  <!-- LIVE DRAFT MONITOR MODAL -->
+  <div
+    id="liveDraftModal"
+    class="modal-overlay"
+    style="display:none;"
+  >
+    <div class="live-modal-card">
+      <div class="live-modal-header">
+        <div class="modal-title">Live Drafts</div>
+        <button id="closeLiveDraftModal" class="live-close-btn">✕</button>
+      </div>
+
+      <div id="liveDraftListView">
+        <div id="liveDraftCards" class="live-draft-list"></div>
+      </div>
+
+      <div id="liveDraftDetailView" style="display:none;">
+        <button id="liveDraftBackBtn" class="live-back-btn">← Back</button>
+        <div id="liveDraftDetailContent" class="live-detail-content"></div>
+      </div>
     </div>
   </div>
 
