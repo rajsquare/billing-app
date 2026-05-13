@@ -59,6 +59,10 @@ const DISCOUNT_PRODUCTS = new Set([
   "Discount (Less)"
 ]);
 
+const EDITABLE_NAME_PRODUCTS = new Set([
+  "Utensils"
+]);
+
 /* ================================
    STATE
 ================================ */
@@ -186,7 +190,7 @@ function requireAdminPassword() {
 function getIndiaDateInfo() {
   const now = new Date();
 
-  const formatter =
+  const dateFmt =
     new Intl.DateTimeFormat("en-IN", {
       timeZone: "Asia/Kolkata",
       day: "2-digit",
@@ -194,9 +198,17 @@ function getIndiaDateInfo() {
       year: "numeric"
     });
 
+  const timeFmt =
+    new Intl.DateTimeFormat("en-IN", {
+      timeZone: "Asia/Kolkata",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    });
+
   return {
-    displayDate:
-      formatter.format(now)
+    displayDate: dateFmt.format(now),
+    displayTime: timeFmt.format(now)
   };
 }
 
@@ -262,6 +274,12 @@ function isDiscountItem(item) {
   );
 }
 
+function isEditableNameItem(item) {
+  return EDITABLE_NAME_PRODUCTS.has(
+    item.product.productName
+  );
+}
+
 function computeLineTotal(item, price, qty) {
   const raw = Math.round(price * qty * 100) / 100;
   return isDiscountItem(item) ? -raw : raw;
@@ -295,7 +313,11 @@ function saveDraft() {
           price:
             item.price,
           qty:
-            item.qty
+            item.qty,
+          note:
+            item.note || "",
+          displayName:
+            item.displayName || ""
         }))
     };
 
@@ -390,7 +412,12 @@ function restoreDraft() {
               "W",
             price,
             qty,
-            total: 0
+            total: 0,
+            note:
+              savedItem.note || "",
+            displayName:
+              savedItem.displayName ||
+              product.productName
           };
           restoredItem.total =
             computeLineTotal(
@@ -1048,7 +1075,10 @@ window.selectProduct =
           product
         ) || 0,
       qty: "",
-      total: 0
+      total: 0,
+      note: "",
+      displayName:
+        product.productName
     });
 
     renderBill();
@@ -1094,10 +1124,26 @@ function renderBill() {
           item.price
         );
 
+      const safeDisplayName =
+        escapeAttr(
+          item.displayName ||
+          item.product.productName
+        );
+
       html += `
         <div class="bill-card">
           <div class="bill-title">
-            ${item.product.productName}
+            ${
+              isEditableNameItem(item)
+                ? `<input
+                    class="bill-name-input"
+                    type="text"
+                    value="${safeDisplayName}"
+                    placeholder="Product name"
+                    oninput="updateDisplayName(${index}, this.value)"
+                  >`
+                : (item.displayName || item.product.productName)
+            }
           </div>
 
           <div class="badge-row">
@@ -1138,6 +1184,18 @@ function renderBill() {
             >
 
           </div>
+
+          ${
+            isDiscountItem(item)
+              ? `<input
+                  class="bill-input discount-note-input"
+                  type="text"
+                  placeholder="Note (optional)"
+                  value="${escapeAttr(item.note || '')}"
+                  oninput="updateNote(${index}, this.value)"
+                >`
+              : ""
+          }
 
           <div class="bill-bottom">
             <div class="line-total" ${isDiscountItem(item) ? 'style="color:#d65353;"' : ''}>
@@ -1262,6 +1320,20 @@ window.deleteItem =
 
     renderBill();
     updateGrandTotal();
+    saveDraft();
+  };
+
+window.updateNote =
+  function(index, value) {
+    if (!billItems[index]) return;
+    billItems[index].note = value;
+    saveDraft();
+  };
+
+window.updateDisplayName =
+  function(index, value) {
+    if (!billItems[index]) return;
+    billItems[index].displayName = value;
     saveDraft();
   };
 
@@ -1417,6 +1489,9 @@ function createBillData() {
     date:
       indiaDate.displayDate,
 
+    time:
+      indiaDate.displayTime,
+
     customerName:
       currentMode === "W"
         ? customerName.value.trim()
@@ -1437,8 +1512,8 @@ function createBillData() {
       billItems.map(
         item => ({
           productName:
-            item.product
-              .productName,
+            item.displayName ||
+            item.product.productName,
 
           material:
             item.product
@@ -1451,7 +1526,10 @@ function createBillData() {
             item.price,
 
           total:
-            item.total
+            item.total,
+
+          note:
+            item.note || ""
         })
       )
   };
@@ -1621,7 +1699,7 @@ function buildSingleCopyPage(
     item => {
       rows += `
         <tr>
-          <td>${item.productName}</td>
+          <td>${item.productName}${item.note ? `<br><span class="print-item-note">${item.note}</span>` : ""}</td>
           <td>${shortMaterialName(item.material)}</td>
           <td>${roundQty(item.qty)}</td>
           <td>${formatIndianMoney(item.price)}</td>
@@ -1642,8 +1720,7 @@ function buildSingleCopyPage(
         ? `<div class="print-balance print-balance-large">Balance HV</div>`
         : `
           <div class="receiver-name-box-large">
-            <div class="receiver-line-large"></div>
-            <div class="receiver-label-large">Receiver’s Name</div>
+            <div class="receiver-label-large">Receiver’s Name:</div>
           </div>
         `
       : "";
@@ -1653,14 +1730,18 @@ function buildSingleCopyPage(
       <div class="copy-label">${label}</div>
 
       <div class="print-header-row">
-        <div class="print-customer">
-          ${billData.customerName}
-        </div>
+        ${billData.customerName && billData.customerName !== "Retail Bill"
+          ? `<div class="print-customer">${billData.customerName}</div>`
+          : ""}
 
         <div class="print-date-serial-row">
           <span class="print-date">${billData.date}</span>
           <span class="print-serial">${billData.serialNumber ? "#" + billData.serialNumber : ""}</span>
         </div>
+
+        ${!isCustomerCopy && billData.time
+          ? `<div class="print-office-time">${billData.time}</div>`
+          : ""}
       </div>
 
       <table class="print-table">
@@ -1788,24 +1869,70 @@ function buildDaybookPrintHTML() {
       daybookCache
     );
 
-  let rows = "";
-  let total = 0;
+  const wEntries =
+    entries.filter(
+      e => (e.mode || "W") === "W"
+    );
 
-  entries.forEach(
-    entry => {
-      total +=
-        entry.amount;
+  const rEntries =
+    entries.filter(
+      e => (e.mode || "W") === "R"
+    );
 
-      rows += `
+  const wTotal =
+    wEntries.reduce(
+      (sum, e) => sum + e.amount,
+      0
+    );
+
+  const rTotal =
+    rEntries.reduce(
+      (sum, e) => sum + e.amount,
+      0
+    );
+
+  const total = wTotal + rTotal;
+
+  function buildRows(group) {
+    return group
+      .map(entry => `
         <tr>
           <td>${entry.date}</td>
           <td>#${entry.serialNumber}</td>
           <td>${entry.customerName}</td>
           <td>₹${formatIndianMoneyWhole(entry.amount)}</td>
         </tr>
-      `;
-    }
-  );
+      `)
+      .join("");
+  }
+
+  let tbody = "";
+
+  if (wEntries.length) {
+    tbody += `
+        <tr class="daybook-group-row">
+          <th colspan="4">W Bills</th>
+        </tr>
+        ${buildRows(wEntries)}
+        <tr class="daybook-subtotal-row">
+          <td colspan="3">W Total</td>
+          <td>₹${formatIndianMoneyWhole(wTotal)}</td>
+        </tr>
+    `;
+  }
+
+  if (rEntries.length) {
+    tbody += `
+        <tr class="daybook-group-row">
+          <th colspan="4">R Bills</th>
+        </tr>
+        ${buildRows(rEntries)}
+        <tr class="daybook-subtotal-row">
+          <td colspan="3">R Total</td>
+          <td>₹${formatIndianMoneyWhole(rTotal)}</td>
+        </tr>
+    `;
+  }
 
   return `
     <div class="print-wrapper">
@@ -1819,7 +1946,7 @@ function buildDaybookPrintHTML() {
             <th>Amount</th>
           </tr>
         </thead>
-        <tbody>${rows}</tbody>
+        <tbody>${tbody}</tbody>
       </table>
       <div class="daybook-print-total">
         TOTAL: ₹${formatIndianMoneyWhole(total)}
@@ -1975,16 +2102,29 @@ function renderDaybook() {
     return;
   }
 
-  const total =
-    entries.reduce(
-      (
-        sum,
-        entry
-      ) =>
-        sum +
-        entry.amount,
+  const wEntries =
+    entries.filter(
+      e => (e.mode || "W") === "W"
+    );
+
+  const rEntries =
+    entries.filter(
+      e => (e.mode || "W") === "R"
+    );
+
+  const wTotal =
+    wEntries.reduce(
+      (sum, e) => sum + e.amount,
       0
     );
+
+  const rTotal =
+    rEntries.reduce(
+      (sum, e) => sum + e.amount,
+      0
+    );
+
+  const total = wTotal + rTotal;
 
   daybookSummary.innerHTML =
     `Total: ₹${formatIndianMoneyWhole(total)}`;
@@ -2018,28 +2158,50 @@ function renderDaybook() {
     `;
   }
 
+  function entryCard(entry) {
+    return `
+      <div class="daybook-entry">
+        <div class="daybook-date">
+          ${entry.date} |
+          #${entry.serialNumber}
+        </div>
+
+        <div class="daybook-name">
+          ${entry.customerName}
+        </div>
+
+        <div class="daybook-amount">
+          ₹${formatIndianMoneyWhole(entry.amount)}
+        </div>
+      </div>
+    `;
+  }
+
   let html = "";
 
-  entries.forEach(
-    entry => {
-      html += `
-        <div class="daybook-entry">
-          <div class="daybook-date">
-            ${entry.date} |
-            #${entry.serialNumber}
-          </div>
+  if (wEntries.length) {
+    html +=
+      `<div class="daybook-group-label">W Bills</div>`;
 
-          <div class="daybook-name">
-            ${entry.customerName}
-          </div>
+    wEntries.forEach(
+      entry => { html += entryCard(entry); }
+    );
 
-          <div class="daybook-amount">
-            ₹${formatIndianMoneyWhole(entry.amount)}
-          </div>
-        </div>
-      `;
-    }
-  );
+    html +=
+      `<div class="daybook-subtotal">W Total: ₹${formatIndianMoneyWhole(wTotal)}</div>`;
+  }
+
+  if (rEntries.length) {
+    html +=
+      `<div class="daybook-group-label">R Bills</div>`;
+
+    rEntries.forEach(
+      entry => { html += entryCard(entry); }
+    );
+
+    html +=
+      `<div class="daybook-subtotal">R Total: ₹${formatIndianMoneyWhole(rTotal)}</div>`;
+  }
 
   daybookEntries.innerHTML =
     html;
@@ -2470,6 +2632,8 @@ window.doneReceivedBill =
                 bill.customerName,
               amount:
                 bill.grandTotal,
+              mode:
+                bill.mode || "W",
               createdAt:
                 serverTimestamp()
             }
