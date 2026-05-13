@@ -5,6 +5,8 @@ import {
   addDoc,
   onSnapshot,
   doc,
+  setDoc,
+  deleteDoc,
   serverTimestamp,
   query,
   orderBy,
@@ -30,6 +32,7 @@ const db = getFirestore(app);
 
 const billsCollection = collection(db, "bills");
 const daybookCollection = collection(db, "daybook");
+const liveDraftBillsCollection = collection(db, "liveDraftBills");
 
 const billsQuery = query(
   billsCollection,
@@ -78,6 +81,10 @@ let isReceiverBusy = false;
 let isSendingBill = false;
 let isDaybookBusy = false;
 let daybookPrintedOnce = false;
+
+let liveDraftActive = false;
+let liveDraftsCache = {};
+let liveDraftViewedSessionId = null;
 
 /* ================================
    DOM
@@ -144,6 +151,23 @@ const daybookEntries =
 
 const materialFilterDiv =
   document.getElementById("materialFilter");
+
+const liveBtn =
+  document.getElementById("liveBtn");
+const liveDraftModal =
+  document.getElementById("liveDraftModal");
+const closeLiveDraftModal =
+  document.getElementById("closeLiveDraftModal");
+const liveDraftListView =
+  document.getElementById("liveDraftListView");
+const liveDraftDetailView =
+  document.getElementById("liveDraftDetailView");
+const liveDraftCards =
+  document.getElementById("liveDraftCards");
+const liveDraftDetailContent =
+  document.getElementById("liveDraftDetailContent");
+const liveDraftBackBtn =
+  document.getElementById("liveDraftBackBtn");
 
 /* ================================
    HELPERS
@@ -480,6 +504,378 @@ function focusQtyInput(
     input.focus();
     input.select();
   });
+}
+
+/* ================================
+   LIVE DRAFT HELPERS
+================================ */
+function getOrCreateSessionId() {
+  let id =
+    localStorage.getItem(
+      "billingSessionId"
+    );
+
+  if (!id) {
+    id =
+      crypto.randomUUID();
+
+    localStorage.setItem(
+      "billingSessionId",
+      id
+    );
+  }
+
+  return id;
+}
+
+const sessionId =
+  getOrCreateSessionId();
+
+function buildDraftPayload() {
+  const items =
+    billItems.map(item => ({
+      productName:
+        item.displayName ||
+        item.product.productName,
+      material:
+        item.product.material ||
+        "",
+      qty:
+        roundQty(item.qty) || 0,
+      price:
+        item.price || 0,
+      total:
+        item.total || 0
+    }));
+
+  const subtotal =
+    billItems.reduce(
+      (sum, item) =>
+        sum + (item.total || 0),
+      0
+    );
+
+  return {
+    sessionId,
+    customerName:
+      customerName.value.trim() ||
+      "WALK-IN",
+    mode: currentMode,
+    items,
+    subtotal:
+      Math.round(subtotal),
+    itemCount:
+      billItems.length,
+    updatedAt:
+      serverTimestamp()
+  };
+}
+
+async function syncLiveDraft() {
+  console.log("SYNC START");
+
+  if (!billItems.length) {
+    if (
+      liveDraftActive ||
+      liveDraftsCache[sessionId]
+    ) {
+      await deleteLiveDraft();
+    }
+    return;
+  }
+
+  const payload =
+    buildDraftPayload();
+
+  console.log("SYNC PAYLOAD", payload);
+
+  const draftRef =
+    doc(
+      db,
+      "liveDraftBills",
+      sessionId
+    );
+
+  try {
+    await setDoc(
+      draftRef,
+      payload
+    );
+
+    console.log("SYNC SUCCESS");
+
+    liveDraftActive = true;
+  } catch (err) {
+    console.error("SYNC FAILURE", err);
+  }
+}
+
+async function deleteLiveDraft() {
+  try {
+    const draftRef =
+      doc(
+        db,
+        "liveDraftBills",
+        sessionId
+      );
+
+    await deleteDoc(draftRef);
+    liveDraftActive = false;
+  } catch (err) {
+    console.error(
+      "Live draft delete failed:",
+      err
+    );
+  }
+}
+
+function isDraftStale(draft) {
+  if (!draft.updatedAt) {
+    return false;
+  }
+
+  const ms =
+    typeof draft.updatedAt.toMillis ===
+    "function"
+      ? draft.updatedAt.toMillis()
+      : 0;
+
+  return (
+    Date.now() - ms > 120000
+  );
+}
+
+function getActiveDrafts() {
+  return Object.entries(
+    liveDraftsCache
+  )
+    .map(
+      ([id, draft]) => ({
+        ...draft,
+        _id: id
+      })
+    )
+    .filter(
+      draft => !isDraftStale(draft)
+    );
+}
+
+function renderLiveCount() {
+  const count =
+    getActiveDrafts().length;
+
+  console.log("RENDER COUNT", count);
+
+  if (liveBtn) {
+    liveBtn.textContent =
+      `LIVE (${count})`;
+
+    liveBtn.classList.toggle(
+      "live-btn-active",
+      count > 0
+    );
+  }
+}
+
+function renderLiveDraftDetail(
+  id
+) {
+  if (!liveDraftDetailContent) {
+    return;
+  }
+
+  const draft =
+    liveDraftsCache[id];
+
+  if (!draft) {
+    liveDraftDetailContent.innerHTML =
+      `<div class="receiver-subtitle">Draft no longer available.</div>`;
+    return;
+  }
+
+  const items =
+    draft.items || [];
+
+  const rows =
+    items
+      .map(
+        item => `
+        <tr>
+          <td>${item.productName}</td>
+          <td>${shortMaterialName(item.material)}</td>
+          <td>${item.qty > 0 ? item.qty : "—"}</td>
+          <td>${item.price > 0 ? "₹" + formatIndianMoneyWhole(item.price) : "—"}</td>
+          <td>${item.qty > 0 && item.price > 0 ? "₹" + formatIndianMoneyWhole(Math.abs(item.total)) : "—"}</td>
+        </tr>
+      `
+      )
+      .join("");
+
+  liveDraftDetailContent.innerHTML =
+    `
+    <div class="live-detail-header">
+      <div class="live-detail-name">
+        ${draft.customerName || "WALK-IN"}
+      </div>
+      <div class="live-detail-meta">
+        ${
+          draft.mode === "W"
+            ? "Wholesale"
+            : "Retail"
+        } · ${draft.itemCount} item${
+          draft.itemCount !== 1
+            ? "s"
+            : ""
+        }
+      </div>
+    </div>
+
+    <table class="live-detail-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Mat</th>
+          <th>Qty</th>
+          <th>Rate</th>
+          <th>Amt</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+
+    <div class="live-detail-total">
+      Current Total: ₹${formatIndianMoneyWhole(
+        draft.subtotal
+      )}
+    </div>
+  `;
+}
+
+function renderLiveDraftList() {
+  if (!liveDraftCards) {
+    return;
+  }
+
+  const active =
+    getActiveDrafts();
+
+  if (!active.length) {
+    liveDraftCards.innerHTML =
+      `<div class="receiver-subtitle" style="padding:16px 0;">No active drafts</div>`;
+    return;
+  }
+
+  liveDraftCards.innerHTML =
+    active
+      .map(
+        draft => `
+        <div
+          class="live-draft-card"
+          onclick="openLiveDraftDetail('${draft._id}')"
+        >
+          <div class="live-draft-name">
+            ${draft.customerName || "WALK-IN"}
+          </div>
+          <div class="live-draft-meta">
+            <span>${
+              draft.mode === "W"
+                ? "Wholesale"
+                : "Retail"
+            }</span>
+            <span>${draft.itemCount} item${
+              draft.itemCount !== 1
+                ? "s"
+                : ""
+            }</span>
+          </div>
+          <div class="live-draft-subtotal">
+            ₹${formatIndianMoneyWhole(
+              draft.subtotal
+            )}
+          </div>
+        </div>
+      `
+      )
+      .join("");
+}
+
+function showLiveDraftListView() {
+  liveDraftViewedSessionId =
+    null;
+
+  if (liveDraftListView) {
+    liveDraftListView.style.display =
+      "block";
+  }
+
+  if (liveDraftDetailView) {
+    liveDraftDetailView.style.display =
+      "none";
+  }
+}
+
+window.openLiveDraftDetail =
+  function(id) {
+    liveDraftViewedSessionId =
+      id;
+
+    renderLiveDraftDetail(id);
+
+    if (liveDraftListView) {
+      liveDraftListView.style.display =
+        "none";
+    }
+
+    if (liveDraftDetailView) {
+      liveDraftDetailView.style.display =
+        "block";
+    }
+  };
+
+function subscribeToLiveDrafts() {
+  console.log("LISTENER ATTACHED");
+
+  onSnapshot(
+    liveDraftBillsCollection,
+    snapshot => {
+      console.log("SNAPSHOT RECEIVED", snapshot.size);
+
+      liveDraftsCache = {};
+
+      snapshot.forEach(
+        docSnap => {
+          liveDraftsCache[
+            docSnap.id
+          ] = docSnap.data();
+        }
+      );
+
+      renderLiveCount();
+
+      if (
+        !liveDraftModal ||
+        liveDraftModal.style.display ===
+          "none"
+      ) {
+        return;
+      }
+
+      if (
+        liveDraftViewedSessionId &&
+        liveDraftsCache[liveDraftViewedSessionId]
+      ) {
+        renderLiveDraftDetail(
+          liveDraftViewedSessionId
+        );
+      } else {
+        showLiveDraftListView();
+        renderLiveDraftList();
+      }
+    },
+    err => {
+      console.error("LISTENER ERROR", err);
+    }
+  );
 }
 
 /* ================================
@@ -1084,6 +1480,7 @@ window.selectProduct =
     renderBill();
     updateGrandTotal();
     saveDraft();
+    syncLiveDraft();
 
     searchBox.value = "";
     suggestions.innerHTML =
@@ -1202,12 +1599,14 @@ function renderBill() {
               ${isDiscountItem(item) ? "-" : ""}₹${formatIndianMoney(Math.abs(item.total))}
             </div>
 
-            <button
-              class="delete-btn"
-              onclick="deleteItem(${index})"
-            >
-              Remove
-            </button>
+            <div class="bill-row-actions">
+              <button
+                class="delete-btn"
+                onclick="deleteItem(${index})"
+              >
+                Remove
+              </button>
+            </div>
           </div>
         </div>
       `;
@@ -1321,6 +1720,10 @@ window.deleteItem =
     renderBill();
     updateGrandTotal();
     saveDraft();
+
+    if (!billItems.length) {
+      deleteLiveDraft();
+    }
   };
 
 window.updateNote =
@@ -1467,6 +1870,34 @@ closePreview.addEventListener(
   }
 );
 
+liveBtn.addEventListener(
+  "click",
+  () => {
+    showLiveDraftListView();
+    renderLiveDraftList();
+    liveDraftModal.style.display =
+      "flex";
+  }
+);
+
+closeLiveDraftModal.addEventListener(
+  "click",
+  () => {
+    liveDraftModal.style.display =
+      "none";
+    liveDraftViewedSessionId =
+      null;
+  }
+);
+
+liveDraftBackBtn.addEventListener(
+  "click",
+  () => {
+    showLiveDraftListView();
+    renderLiveDraftList();
+  }
+);
+
 function createBillData() {
   const grandTotal =
     billItems.reduce(
@@ -1579,6 +2010,7 @@ confirmSend.addEventListener(
       renderBill();
       updateGrandTotal();
       clearDraft();
+      deleteLiveDraft();
 
       printModal.style.display =
         "none";
@@ -1734,6 +2166,7 @@ function buildSingleCopyPage(
       ? isCustomerCopy
         ? `<div class="print-balance print-balance-large">${customerFooterText}</div>`
         : `
+          <div class="receiver-section-divider"></div>
           <div class="receiver-name-box-large">
             <div class="receiver-label-large">Receiver’s Name:</div>
           </div>
@@ -2293,6 +2726,8 @@ window.deleteDaybookNow =
 /* ================================
    FIREBASE LISTENERS
 ================================ */
+subscribeToLiveDrafts();
+
 onSnapshot(
   billsQuery,
   snapshot => {
