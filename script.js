@@ -1482,9 +1482,16 @@ function createBillData() {
   const indiaDate =
     getIndiaDateInfo();
 
+  const isCashOverride =
+    currentMode === "W" &&
+    customerName.value.trim().toLowerCase() === "cash";
+
+  const effectiveMode =
+    isCashOverride ? "R" : currentMode;
+
   return {
     mode:
-      currentMode,
+      effectiveMode,
 
     date:
       indiaDate.displayDate,
@@ -1493,7 +1500,7 @@ function createBillData() {
       indiaDate.displayTime,
 
     customerName:
-      currentMode === "W"
+      effectiveMode === "W"
         ? customerName.value.trim()
         : "Retail Bill",
 
@@ -1714,12 +1721,17 @@ function buildSingleCopyPage(
   const isCustomerCopy =
     label === "CUSTOMER COPY";
 
+  const customerFooterText =
+    billData.grandTotal < 0
+      ? "Return HV"
+      : "Balance HV";
+
   const wholesaleExtras =
     billData.mode ===
       "W" &&
     isLastPage
       ? isCustomerCopy
-        ? `<div class="print-balance print-balance-large">Balance HV</div>`
+        ? `<div class="print-balance print-balance-large">${customerFooterText}</div>`
         : `
           <div class="receiver-name-box-large">
             <div class="receiver-label-large">Receiver’s Name:</div>
