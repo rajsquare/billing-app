@@ -1954,7 +1954,7 @@
   },
   {
     "sr": 218,
-    "productName": "Top Kalai +Polish +H 8-11",
+    "productName": "Top Kalai +Polish +H 8-12",
     "wPrice": 1350,
     "priceType": "KG",
     "rPrice": 1500,
@@ -1963,7 +1963,7 @@
   },
   {
     "sr": 219,
-    "productName": "Top Kalai +Polish +H 12 and above",
+    "productName": "Top Kalai +Polish +H 13 and above",
     "wPrice": 1250,
     "priceType": "KG",
     "rPrice": 1500,
@@ -3178,7 +3178,7 @@
   },
   {
     "sr": 354,
-    "productName": "Thali Rose",
+    "productName": "Thali / Bowl Rose",
     "wPrice": 1550,
     "priceType": "KG",
     "rPrice": 1700,
@@ -4119,6 +4119,15 @@
     "priceType": "KG",
     "rPrice": 1550,
     "material": "Brass",
+    "": null
+  },
+  {
+    "sr": 459,
+    "productName": "Hammered Lota 8",
+    "wPrice": 700,
+    "priceType": "PP",
+    "rPrice": 800,
+    "material": "Copper",
     "": null
   }
 ]
