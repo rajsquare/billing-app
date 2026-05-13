@@ -1691,7 +1691,9 @@ function buildSingleCopyPage(
   billData,
   label,
   itemsChunk,
-  isLastPage
+  isLastPage,
+  pageNum,
+  totalPages
 ) {
   let rows = "";
 
@@ -1765,6 +1767,10 @@ function buildSingleCopyPage(
       </div>
 
       ${wholesaleExtras}
+
+      ${totalPages > 1
+        ? `<div class="bill-page-watermark">${pageNum} / ${totalPages}</div>`
+        : ""}
     </div>
   `;
 }
@@ -1778,6 +1784,9 @@ function buildReceiptPrintHTML(
       MAX_ITEMS_PER_DL_PAGE
     );
 
+  const totalPages =
+    chunks.length;
+
   let html = "";
 
   chunks.forEach(
@@ -1790,9 +1799,9 @@ function buildReceiptPrintHTML(
           billData,
           "CUSTOMER COPY",
           chunk,
-          index ===
-            chunks.length -
-              1
+          index === totalPages - 1,
+          index + 1,
+          totalPages
         );
     }
   );
@@ -1807,9 +1816,9 @@ function buildReceiptPrintHTML(
           billData,
           "OFFICE COPY",
           chunk,
-          index ===
-            chunks.length -
-              1
+          index === totalPages - 1,
+          index + 1,
+          totalPages
         );
     }
   );
