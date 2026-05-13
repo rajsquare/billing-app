@@ -862,34 +862,41 @@ input {
 
 .print-table th:nth-child(1),
 .print-table td:nth-child(1) {
-  width: 46%;
-  text-align: left;
-  word-break: break-word;
-}
-
-.print-table th:nth-child(2),
-.print-table td:nth-child(2) {
-  width: 8%;
+  width: 5%;
   text-align: center;
   white-space: nowrap;
 }
 
+.print-table th:nth-child(2),
+.print-table td:nth-child(2) {
+  width: 44%;
+  text-align: left;
+  word-break: break-word;
+}
+
 .print-table th:nth-child(3),
 .print-table td:nth-child(3) {
-  width: 10%;
+  width: 8%;
   text-align: center;
   white-space: nowrap;
 }
 
 .print-table th:nth-child(4),
 .print-table td:nth-child(4) {
-  width: 16%;
-  text-align: right;
+  width: 9%;
+  text-align: center;
   white-space: nowrap;
 }
 
 .print-table th:nth-child(5),
 .print-table td:nth-child(5) {
+  width: 14%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.print-table th:nth-child(6),
+.print-table td:nth-child(6) {
   width: 20%;
   text-align: right;
   white-space: nowrap;
@@ -1110,11 +1117,12 @@ input {
    * transform-origin: center center keeps the transform within each copy's own
    * layout box — robust regardless of whether the browser resolves the origin in
    * element or page coordinates (< 1mm discrepancy either way).
-   * Page-break layout uses the un-transformed 158mm height — pagination unaffected.
-   * Visual clearances from paper edge: left/right ~12.76mm, top ~30mm, bottom ~50mm.
+   * Page-break layout uses the un-transformed min-height — pagination unaffected.
+   * min-height 184mm = 158mm base + 26mm (5 rows × 5.16mm/row) for +5 item capacity.
+   * Content area: 200mm; layout spare: 16mm; visual bottom ~181mm < 208mm printable end.
    */
   .receipt-copy {
-    min-height: 158mm;
+    min-height: 184mm;
     transform: scale(0.88);
     transform-origin: center center;
   }
