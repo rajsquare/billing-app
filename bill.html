@@ -38,6 +38,8 @@
   <!-- BILLING VIEW -->
   <div id="billingView">
 
+    <div id="revisionBanner" class="revision-banner" style="display:none;"></div>
+
     <div class="search-container">
 
       <div class="header-row">
@@ -178,6 +180,27 @@
 
       <div class="modal-title">
         Bill Preview
+      </div>
+
+      <div
+        id="revisionViewTabs"
+        class="revision-view-tabs"
+        style="display:none;"
+      >
+        <button
+          id="revisionViewOriginalBtn"
+          class="revision-view-tab"
+          onclick="switchRevisionView('original')"
+        >
+          View Original
+        </button>
+        <button
+          id="revisionViewRevisedBtn"
+          class="revision-view-tab"
+          onclick="switchRevisionView('revised')"
+        >
+          View Revised
+        </button>
       </div>
 
       <div
