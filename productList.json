@@ -28,7 +28,7 @@
   },
   {
     "sr": 4,
-    "productName": "Nirmal Mathar Saucepan + lid",
+    "productName": "Nirmal Mathar Saucepan + Lid",
     "wPrice": 1400,
     "priceType": "KG",
     "rPrice": 1700,
@@ -100,7 +100,7 @@
   },
   {
     "sr": 12,
-    "productName": "Chirag Pawali 1-8",
+    "productName": "Chirag Pawali 1-6",
     "wPrice": 1600,
     "priceType": "KG",
     "rPrice": 1900,
@@ -163,7 +163,7 @@
   },
   {
     "sr": 19,
-    "productName": "Print Tilak Thal 26 inch and above",
+    "productName": "Print Tilak Thal 27 inch and above",
     "wPrice": 1050,
     "priceType": "KG",
     "rPrice": 1150,
@@ -181,7 +181,7 @@
   },
   {
     "sr": 21,
-    "productName": "Jalebi Thal 24 inch and above",
+    "productName": "Jalebi Thal 25 inch and above",
     "wPrice": 1040,
     "priceType": "KG",
     "rPrice": 1200,
@@ -1406,18 +1406,18 @@
   {
     "sr": 157,
     "productName": "Idli Pot Small",
-    "wPrice": 4700,
+    "wPrice": 4900,
     "priceType": "PP",
-    "rPrice": 5200,
+    "rPrice": 5500,
     "material": "Brass",
     "": null
   },
   {
     "sr": 158,
     "productName": "Idli Pot Big",
-    "wPrice": 6000,
+    "wPrice": 6200,
     "priceType": "PP",
-    "rPrice": 6200,
+    "rPrice": 6800,
     "material": "Brass",
     "": null
   },
@@ -1442,9 +1442,9 @@
   {
     "sr": 161,
     "productName": "Basket Oval",
-    "wPrice": 1600,
+    "wPrice": 1700,
     "priceType": "KG",
-    "rPrice": 1900,
+    "rPrice": 2000,
     "material": "Brass",
     "": null
   },
@@ -2936,9 +2936,9 @@
   {
     "sr": 327,
     "productName": "Glass Big",
-    "wPrice": 700,
+    "wPrice": 800,
     "priceType": "PP",
-    "rPrice": 800,
+    "rPrice": 1000,
     "material": "Kansa",
     "": null
   },
@@ -4128,6 +4128,51 @@
     "priceType": "PP",
     "rPrice": 800,
     "material": "Copper",
+    "": null
+  },
+  {
+    "sr": 460,
+    "productName": "Satari Lota",
+    "wPrice": 2500,
+    "priceType": "PP",
+    "rPrice": 2900,
+    "material": "Kansa",
+    "": null
+  },
+  {
+    "sr": 461,
+    "productName": "Baby Set",
+    "wPrice": 3500,
+    "priceType": "PP",
+    "rPrice": 4000,
+    "material": "Kansa",
+    "": null
+  },
+  {
+    "sr": 462,
+    "productName": "Donga (4)",
+    "wPrice": 7400,
+    "priceType": "PP",
+    "rPrice": 8500,
+    "material": "Kansa",
+    "": null
+  },
+  {
+    "sr": 463,
+    "productName": "Donga (5)",
+    "wPrice": 8000,
+    "priceType": "PP",
+    "rPrice": 9200,
+    "material": "Kansa",
+    "": null
+  },
+  {
+    "sr": 464,
+    "productName": "Donga (6)",
+    "wPrice": 10400,
+    "priceType": "PP",
+    "rPrice": 12000,
+    "material": "Kansa",
     "": null
   }
 ]
