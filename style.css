@@ -1381,3 +1381,173 @@ input {
   color: #14532d;
   text-align: right;
 }
+
+/* ================================
+   REVISION
+================================ */
+.revision-banner {
+  background: #7c3aed;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.revision-banner button {
+  padding: 6px 12px;
+  border-radius: 7px;
+  background: rgba(255,255,255,0.18);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.revision-banner button:hover {
+  background: rgba(255,255,255,0.28);
+}
+
+.revise-btn {
+  background: #7c3aed;
+  color: white;
+  flex: 1;
+  min-width: 100px;
+  padding: 14px;
+  border-radius: 11px;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgba(124,58,237,0.2);
+}
+
+.revise-btn:hover {
+  background: #6d28d9;
+  box-shadow: 0 3px 8px rgba(124,58,237,0.3);
+}
+
+.revise-btn:active {
+  transform: scale(0.98);
+}
+
+.live-revision-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(124,58,237,0.15);
+  color: #7c3aed;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* ================================
+   REVISION VIEW TABS
+================================ */
+.revision-view-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0 4px;
+  flex-shrink: 0;
+}
+
+.revision-view-tab {
+  flex: 1;
+  padding: 9px 14px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1.5px solid #e2e8f0;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.revision-view-tab:hover {
+  background: #e2e8f0;
+  color: #374151;
+}
+
+.revision-view-tab-active {
+  background: #7c3aed;
+  color: white;
+  border-color: #7c3aed;
+}
+
+.revision-view-tab-active:hover {
+  background: #6d28d9;
+}
+
+/* ================================
+   PRINT AUDIT STYLES
+================================ */
+.print-revised-wm-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  padding: 10mm 0;
+}
+
+.print-revised-wm-overlay span {
+  display: block;
+  transform: rotate(-35deg);
+  font-size: 16px;
+  font-weight: 900;
+  color: rgba(0, 0, 0, 0.09);
+  letter-spacing: 0.2em;
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-family: Arial, sans-serif;
+}
+
+.print-revised-meta {
+  margin-top: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  color: #333;
+  border-top: 1px solid #000;
+  padding-top: 3px;
+  font-family: Arial, sans-serif;
+}
+
+.print-revised-summary {
+  font-size: 9px;
+  font-weight: 400;
+  color: #555;
+  font-style: italic;
+  margin-top: 2px;
+  font-family: Arial, sans-serif;
+}
+
+.print-row-removed td {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.print-row-added td {
+  background: #efefef;
+}
+
+.print-cell-changed {
+  background: #efefef !important;
+}
+
+.print-cell-changed-block {
+  background: #efefef;
+  padding: 1px 3px;
+}
