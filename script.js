@@ -55,6 +55,7 @@ const serialDocRef = doc(
 ================================ */
 const ADMIN_PASSWORD = "1110";
 const BILL_DRAFT_KEY = "billingAppDraftV4";
+const DAYBOOK_PRINTED_KEY = "daybookPrintedOnce";
 const DRAFT_MAX_AGE_MS =
   24 * 60 * 60 * 1000;
 
@@ -80,12 +81,20 @@ let daybookCache = {};
 let isReceiverBusy = false;
 let isSendingBill = false;
 let isDaybookBusy = false;
-let daybookPrintedOnce = false;
+let daybookPrintedOnce =
+  localStorage.getItem(DAYBOOK_PRINTED_KEY) === "true";
 
 let liveDraftActive = false;
 let liveDraftsCache = {};
 let liveDraftViewedSessionId = null;
 let qtyDirty = false;
+
+let revisionMode = false;
+let revisionSourceBillId = null;
+let revisionParentBillId = null;
+let revisionEmployeeName = "";
+let currentRevisionPreviewDocId = null;
+let revisionDiffCache = {};
 
 /* ================================
    DOM
@@ -464,13 +473,7 @@ function restoreDraft() {
     currentMode =
       draft.currentMode || "W";
 
-    modeToggle.innerText =
-      currentMode;
-
-    modeToggle.style.background =
-      currentMode === "W"
-        ? "#2f3f64"
-        : "#d65353";
+    applyModeStyle(currentMode);
 
     customerName.value =
       draft.customerName || "";
@@ -556,6 +559,13 @@ function buildDraftPayload() {
       0
     );
 
+  const sourceSerial =
+    revisionMode &&
+    revisionSourceBillId &&
+    incomingBillCache[revisionSourceBillId]
+      ? incomingBillCache[revisionSourceBillId].serialNumber
+      : null;
+
   return {
     sessionId,
     customerName:
@@ -568,13 +578,15 @@ function buildDraftPayload() {
     itemCount:
       billItems.length,
     updatedAt:
-      serverTimestamp()
+      serverTimestamp(),
+    revisionLabel:
+      revisionMode
+        ? "REVISION" + (sourceSerial ? " #" + sourceSerial : "")
+        : null
   };
 }
 
 async function syncLiveDraft() {
-  console.log("SYNC START");
-
   if (!billItems.length) {
     if (
       liveDraftActive ||
@@ -588,8 +600,6 @@ async function syncLiveDraft() {
   const payload =
     buildDraftPayload();
 
-  console.log("SYNC PAYLOAD", payload);
-
   const draftRef =
     doc(
       db,
@@ -602,8 +612,6 @@ async function syncLiveDraft() {
       draftRef,
       payload
     );
-
-    console.log("SYNC SUCCESS");
 
     liveDraftActive = true;
   } catch (err) {
@@ -665,8 +673,6 @@ function renderLiveCount() {
   const count =
     getActiveDrafts().length;
 
-  console.log("RENDER COUNT", count);
-
   if (liveBtn) {
     liveBtn.textContent =
       `LIVE (${count})`;
@@ -702,7 +708,7 @@ function renderLiveDraftDetail(
       .map(
         item => `
         <tr>
-          <td>${item.productName}</td>
+          <td>${escapeAttr(item.productName)}</td>
           <td>${shortMaterialName(item.material)}</td>
           <td>${item.qty > 0 ? item.qty : "—"}</td>
           <td>${item.price > 0 ? "₹" + formatIndianMoneyWhole(item.price) : "—"}</td>
@@ -716,7 +722,7 @@ function renderLiveDraftDetail(
     `
     <div class="live-detail-header">
       <div class="live-detail-name">
-        ${draft.customerName || "WALK-IN"}
+        ${escapeAttr(draft.customerName || "WALK-IN")}
       </div>
       <div class="live-detail-meta">
         ${
@@ -729,6 +735,9 @@ function renderLiveDraftDetail(
             : ""
         }
       </div>
+      ${draft.revisionLabel
+        ? `<div class="live-revision-tag">${escapeAttr(draft.revisionLabel)}</div>`
+        : ""}
     </div>
 
     <table class="live-detail-table">
@@ -775,8 +784,11 @@ function renderLiveDraftList() {
           onclick="openLiveDraftDetail('${draft._id}')"
         >
           <div class="live-draft-name">
-            ${draft.customerName || "WALK-IN"}
+            ${escapeAttr(draft.customerName || "WALK-IN")}
           </div>
+          ${draft.revisionLabel
+            ? `<div class="live-revision-tag">${escapeAttr(draft.revisionLabel)}</div>`
+            : ""}
           <div class="live-draft-meta">
             <span>${
               draft.mode === "W"
@@ -834,20 +846,22 @@ window.openLiveDraftDetail =
   };
 
 function subscribeToLiveDrafts() {
-  console.log("LISTENER ATTACHED");
-
   onSnapshot(
     liveDraftBillsCollection,
     snapshot => {
-      console.log("SNAPSHOT RECEIVED", snapshot.size);
-
-      liveDraftsCache = {};
-
-      snapshot.forEach(
-        docSnap => {
-          liveDraftsCache[
-            docSnap.id
-          ] = docSnap.data();
+      snapshot.docChanges().forEach(
+        change => {
+          if (
+            change.type === "removed"
+          ) {
+            delete liveDraftsCache[
+              change.doc.id
+            ];
+          } else {
+            liveDraftsCache[
+              change.doc.id
+            ] = change.doc.data();
+          }
         }
       );
 
@@ -878,6 +892,671 @@ function subscribeToLiveDrafts() {
     }
   );
 }
+
+/* ================================
+   REVISION HELPERS
+================================ */
+function buildRevisionSummary() {
+  const count = billItems.length;
+  const total = Math.round(
+    billItems.reduce((s, i) => s + i.total, 0)
+  );
+  return `${count} item${count !== 1 ? "s" : ""}, ₹${total}`;
+}
+
+function exitRevisionMode() {
+  revisionMode = false;
+  revisionSourceBillId = null;
+  revisionParentBillId = null;
+  revisionEmployeeName = "";
+  renderRevisionBanner();
+}
+
+function renderRevisionBanner() {
+  const banner =
+    document.getElementById(
+      "revisionBanner"
+    );
+
+  if (!banner) return;
+
+  if (!revisionMode) {
+    banner.style.display = "none";
+    return;
+  }
+
+  const sourceBill =
+    incomingBillCache[revisionSourceBillId];
+
+  const serialStr =
+    sourceBill && sourceBill.serialNumber
+      ? " · #" + sourceBill.serialNumber
+      : "";
+
+  banner.style.display = "flex";
+  banner.innerHTML = `
+    <span>REVISION MODE — ${escapeAttr(revisionEmployeeName)}${serialStr}</span>
+    <button onclick="cancelRevision()">Cancel</button>
+  `;
+}
+
+function getBillChainIds(docId) {
+  const bill = incomingBillCache[docId];
+
+  if (!bill) return [docId];
+
+  const originalId =
+    bill.isOriginal === false
+      ? bill.parentBillId
+      : docId;
+
+  if (!originalId) return [docId];
+
+  const ids = new Set([originalId]);
+
+  Object.entries(incomingBillCache).forEach(
+    ([id, b]) => {
+      if (b.parentBillId === originalId) {
+        ids.add(id);
+      }
+    }
+  );
+
+  return [...ids];
+}
+
+/* ================================
+   REVISION DIFF + PRINT BUILDERS
+================================ */
+function buildRevisionDiff(
+  originalBill,
+  revisedBill
+) {
+  const origItems =
+    originalBill.items || [];
+  const revItems =
+    revisedBill.items || [];
+
+  const origMap = new Map();
+  origItems.forEach(item => {
+    const key =
+      item.productName +
+      "||" +
+      (item.material || "");
+    origMap.set(key, item);
+  });
+
+  const revMap = new Map();
+  revItems.forEach(item => {
+    const key =
+      item.productName +
+      "||" +
+      (item.material || "");
+    revMap.set(key, item);
+  });
+
+  const added = [];
+  const removed = [];
+  const changed = [];
+  const unchanged = [];
+
+  origItems.forEach(origItem => {
+    const key =
+      origItem.productName +
+      "||" +
+      (origItem.material || "");
+    const revItem = revMap.get(key);
+
+    if (!revItem) {
+      removed.push(origItem);
+    } else {
+      const qtyChanged =
+        roundQty(origItem.qty) !==
+        roundQty(revItem.qty);
+      const priceChanged =
+        parseFloat(origItem.price) !==
+        parseFloat(revItem.price);
+
+      if (qtyChanged || priceChanged) {
+        changed.push({
+          originalItem: origItem,
+          revisedItem: revItem,
+          qtyChanged,
+          priceChanged
+        });
+      } else {
+        unchanged.push(revItem);
+      }
+    }
+  });
+
+  revItems.forEach(revItem => {
+    const key =
+      revItem.productName +
+      "||" +
+      (revItem.material || "");
+    if (!origMap.has(key)) {
+      added.push(revItem);
+    }
+  });
+
+  const customerNameChanged =
+    (originalBill.customerName || "") !==
+    (revisedBill.customerName || "");
+
+  return {
+    added,
+    removed,
+    changed,
+    unchanged,
+    customerNameChanged,
+    originalCustomerName:
+      originalBill.customerName,
+    revisedCustomerName:
+      revisedBill.customerName
+  };
+}
+
+function buildDiffSummary(diff) {
+  const hasAdded =
+    diff.added.length > 0;
+  const hasRemoved =
+    diff.removed.length > 0;
+  const hasPriceChange =
+    diff.changed.some(
+      c => c.priceChanged
+    );
+  const hasQtyChange =
+    diff.changed.some(
+      c => c.qtyChanged
+    );
+  const hasAdjusted =
+    hasPriceChange || hasQtyChange;
+
+  const a = diff.added.length;
+  const r = diff.removed.length;
+
+  if (hasAdded && hasRemoved && hasAdjusted) {
+    return "Items added, removed, and adjusted";
+  }
+  if (hasAdded && hasRemoved) {
+    return `${a} item${a !== 1 ? "s" : ""} added, ${r} removed`;
+  }
+  if (hasAdded && hasAdjusted) {
+    return `${a} item${a !== 1 ? "s" : ""} added and adjusted`;
+  }
+  if (hasRemoved && hasAdjusted) {
+    return `${r} item${r !== 1 ? "s" : ""} removed and adjusted`;
+  }
+  if (hasAdded) {
+    return `${a} item${a !== 1 ? "s" : ""} added`;
+  }
+  if (hasRemoved) {
+    return `${r} item${r !== 1 ? "s" : ""} removed`;
+  }
+  if (hasPriceChange && hasQtyChange) {
+    return "Prices and quantities adjusted";
+  }
+  if (hasPriceChange) {
+    return "Prices adjusted";
+  }
+  if (hasQtyChange) {
+    return "Quantities adjusted";
+  }
+  if (diff.customerNameChanged) {
+    return "Customer name changed";
+  }
+  return "No changes";
+}
+
+function buildMergedOfficeItems(
+  originalBill,
+  revisedBill,
+  diff
+) {
+  const removedKeys = new Set(
+    diff.removed.map(
+      item =>
+        item.productName +
+        "||" +
+        (item.material || "")
+    )
+  );
+
+  const changedMap = new Map();
+  diff.changed.forEach(c => {
+    const key =
+      c.revisedItem.productName +
+      "||" +
+      (c.revisedItem.material || "");
+    changedMap.set(key, c);
+  });
+
+  const origChron =
+    [...(originalBill.items || [])].reverse();
+
+  const revItemsByKey = new Map();
+  (revisedBill.items || []).forEach(item => {
+    const key =
+      item.productName +
+      "||" +
+      (item.material || "");
+    revItemsByKey.set(key, item);
+  });
+
+  const merged = [];
+
+  origChron.forEach(origItem => {
+    const key =
+      origItem.productName +
+      "||" +
+      (origItem.material || "");
+
+    if (removedKeys.has(key)) {
+      merged.push({
+        ...origItem,
+        _removed: true
+      });
+    } else if (changedMap.has(key)) {
+      const c = changedMap.get(key);
+      merged.push({
+        ...c.revisedItem,
+        _qtyChanged: c.qtyChanged,
+        _priceChanged: c.priceChanged
+      });
+    } else {
+      const revItem =
+        revItemsByKey.get(key);
+      merged.push({
+        ...(revItem || origItem)
+      });
+    }
+  });
+
+  const addedChron =
+    [...diff.added].reverse();
+
+  addedChron.forEach(item => {
+    merged.push({
+      ...item,
+      _added: true
+    });
+  });
+
+  return merged;
+}
+
+function buildRevisionOfficeSinglePage(
+  revisedBill,
+  originalBill,
+  mergedChunk,
+  diff,
+  isLastPage,
+  pageNum,
+  totalPages
+) {
+  let rowIdx = 0;
+  let rows = "";
+
+  mergedChunk.forEach(item => {
+    if (item._removed) {
+      rows += `
+        <tr class="print-row-removed">
+          <td>-</td>
+          <td>${escapeAttr(item.productName)}${item.note ? `<br><span class="print-item-note">${escapeAttr(item.note)}</span>` : ""}</td>
+          <td>${shortMaterialName(item.material)}</td>
+          <td>${roundQty(item.qty)}</td>
+          <td>${formatIndianMoney(item.price)}</td>
+          <td>${formatIndianMoney(item.total)}</td>
+        </tr>
+      `;
+    } else {
+      const n = ++rowIdx;
+
+      const qtyCell =
+        item._qtyChanged
+          ? `<td class="print-cell-changed">${roundQty(item.qty)}</td>`
+          : `<td>${roundQty(item.qty)}</td>`;
+
+      const priceCell =
+        item._priceChanged
+          ? `<td class="print-cell-changed">${formatIndianMoney(item.price)}</td>`
+          : `<td>${formatIndianMoney(item.price)}</td>`;
+
+      const trClass =
+        item._added
+          ? ' class="print-row-added"'
+          : "";
+
+      rows += `
+        <tr${trClass}>
+          <td>${n}</td>
+          <td>${escapeAttr(item.productName)}${item.note ? `<br><span class="print-item-note">${escapeAttr(item.note)}</span>` : ""}</td>
+          <td>${shortMaterialName(item.material)}</td>
+          ${qtyCell}
+          ${priceCell}
+          <td>${formatIndianMoney(item.total)}</td>
+        </tr>
+      `;
+    }
+  });
+
+  const custName =
+    revisedBill.customerName &&
+    revisedBill.customerName !== "Retail Bill"
+      ? diff.customerNameChanged
+        ? `<div class="print-customer print-cell-changed-block">${escapeAttr(revisedBill.customerName)}</div>`
+        : `<div class="print-customer">${escapeAttr(revisedBill.customerName)}</div>`
+      : "";
+
+  const wholesaleExtras =
+    revisedBill.mode === "W" && isLastPage
+      ? `
+        <div class="receiver-section-divider"></div>
+        <div class="receiver-name-box-large">
+          <div class="receiver-label-large">Receiver's Name:</div>
+        </div>
+      `
+      : "";
+
+  const revMeta = isLastPage
+    ? `
+      <div class="print-revised-meta">
+        Revised by: ${escapeAttr(revisedBill.revisedBy || "—")}${revisedBill.time ? " | " + escapeAttr(revisedBill.time) : ""}
+      </div>
+      <div class="print-revised-summary">(${buildDiffSummary(diff)})</div>
+    `
+    : "";
+
+  return `
+    <div class="print-wrapper receipt-copy" style="position:relative;">
+      <div class="copy-label">OFFICE COPY</div>
+
+      <div class="print-revised-wm-overlay">
+        <span>REVISED BILL</span>
+        <span>REVISED BILL</span>
+        <span>REVISED BILL</span>
+        <span>REVISED BILL</span>
+      </div>
+
+      <div class="print-header-row">
+        ${custName}
+        <div class="print-date-serial-row">
+          <span class="print-date">${escapeAttr(revisedBill.date)}</span>
+          <span class="print-serial">${revisedBill.serialNumber ? "#" + escapeAttr(revisedBill.serialNumber) : ""}</span>
+        </div>
+        ${revisedBill.time
+          ? `<div class="print-office-time">${escapeAttr(revisedBill.time)}</div>`
+          : ""}
+      </div>
+
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th>S</th>
+            <th>Product</th>
+            <th>Mat</th>
+            <th>Qty</th>
+            <th>Rate</th>
+            <th>Amt</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+
+      <div class="print-total">
+        Grand Total: ₹${formatIndianMoneyWhole(revisedBill.grandTotal)}/-
+      </div>
+
+      ${revMeta}
+      ${wholesaleExtras}
+
+      ${totalPages > 1
+        ? `<div class="bill-page-watermark">${pageNum} / ${totalPages}</div>`
+        : ""}
+    </div>
+  `;
+}
+
+function buildRevisionAuditPreviewHTML(
+  revisedBill,
+  originalBill,
+  diff
+) {
+  const mergedItems =
+    buildMergedOfficeItems(
+      originalBill,
+      revisedBill,
+      diff
+    );
+
+  const chunks =
+    chunkItems(
+      mergedItems,
+      MAX_ITEMS_PER_DL_PAGE
+    );
+
+  const totalPages = chunks.length;
+  let html = "";
+
+  chunks.forEach((chunk, index) => {
+    html += buildRevisionOfficeSinglePage(
+      revisedBill,
+      originalBill,
+      chunk,
+      diff,
+      index === totalPages - 1,
+      index + 1,
+      totalPages
+    );
+  });
+
+  return html;
+}
+
+function buildRevisionReceiptPrintHTML(
+  revisedBill,
+  originalBill
+) {
+  const diff =
+    buildRevisionDiff(
+      originalBill,
+      revisedBill
+    );
+
+  const customerItems =
+    [...revisedBill.items].reverse();
+
+  const customerChunks =
+    chunkItems(
+      customerItems,
+      MAX_ITEMS_PER_DL_PAGE
+    );
+
+  const mergedItems =
+    buildMergedOfficeItems(
+      originalBill,
+      revisedBill,
+      diff
+    );
+
+  const officeChunks =
+    chunkItems(
+      mergedItems,
+      MAX_ITEMS_PER_DL_PAGE
+    );
+
+  let html = "";
+
+  customerChunks.forEach((chunk, index) => {
+    html += buildSingleCopyPage(
+      revisedBill,
+      "CUSTOMER COPY",
+      chunk,
+      index === customerChunks.length - 1,
+      index + 1,
+      customerChunks.length
+    );
+  });
+
+  officeChunks.forEach((chunk, index) => {
+    html += buildRevisionOfficeSinglePage(
+      revisedBill,
+      originalBill,
+      chunk,
+      diff,
+      index === officeChunks.length - 1,
+      index + 1,
+      officeChunks.length
+    );
+  });
+
+  return html;
+}
+
+function printRevisionReceipt(
+  revisedBill,
+  originalBill
+) {
+  printInvoice.innerHTML =
+    buildRevisionReceiptPrintHTML(
+      revisedBill,
+      originalBill
+    );
+
+  window.print();
+}
+
+function openRevisionPreview(
+  docId,
+  mode
+) {
+  const bill =
+    incomingBillCache[docId];
+
+  if (!bill) return;
+
+  currentRevisionPreviewDocId = docId;
+
+  const tabs =
+    document.getElementById(
+      "revisionViewTabs"
+    );
+  const origBtn =
+    document.getElementById(
+      "revisionViewOriginalBtn"
+    );
+  const revBtn =
+    document.getElementById(
+      "revisionViewRevisedBtn"
+    );
+
+  if (tabs) {
+    tabs.style.display = "flex";
+    if (origBtn) {
+      origBtn.classList.toggle(
+        "revision-view-tab-active",
+        mode === "original"
+      );
+    }
+    if (revBtn) {
+      revBtn.classList.toggle(
+        "revision-view-tab-active",
+        mode === "revised"
+      );
+    }
+  }
+
+  const originalBill =
+    incomingBillCache[bill.parentBillId];
+
+  if (mode === "original") {
+    if (!originalBill) {
+      const chunks =
+        chunkItems(
+          [...bill.items].reverse(),
+          MAX_ITEMS_PER_DL_PAGE
+        );
+      let html = "";
+      chunks.forEach((chunk, index) => {
+        html += buildSingleCopyPage(
+          bill,
+          "VIEW",
+          chunk,
+          index === chunks.length - 1,
+          index + 1,
+          chunks.length
+        );
+      });
+      previewContent.innerHTML = html;
+    } else {
+      const chunks =
+        chunkItems(
+          [...originalBill.items].reverse(),
+          MAX_ITEMS_PER_DL_PAGE
+        );
+      let html = "";
+      chunks.forEach((chunk, index) => {
+        html += buildSingleCopyPage(
+          originalBill,
+          "VIEW",
+          chunk,
+          index === chunks.length - 1,
+          index + 1,
+          chunks.length
+        );
+      });
+      previewContent.innerHTML = html;
+    }
+  } else {
+    if (!originalBill) {
+      const chunks =
+        chunkItems(
+          [...bill.items].reverse(),
+          MAX_ITEMS_PER_DL_PAGE
+        );
+      let html = "";
+      chunks.forEach((chunk, index) => {
+        html += buildSingleCopyPage(
+          bill,
+          "VIEW",
+          chunk,
+          index === chunks.length - 1,
+          index + 1,
+          chunks.length
+        );
+      });
+      previewContent.innerHTML = html;
+    } else {
+      if (!revisionDiffCache[docId]) {
+        revisionDiffCache[docId] =
+          buildRevisionDiff(
+            originalBill,
+            bill
+          );
+      }
+      previewContent.innerHTML =
+        buildRevisionAuditPreviewHTML(
+          bill,
+          originalBill,
+          revisionDiffCache[docId]
+        );
+    }
+  }
+
+  previewModal.style.display = "flex";
+}
+
+window.switchRevisionView =
+  function(mode) {
+    if (!currentRevisionPreviewDocId) {
+      return;
+    }
+    openRevisionPreview(
+      currentRevisionPreviewDocId,
+      mode
+    );
+  };
 
 /* ================================
    PRODUCTS
@@ -1277,24 +1956,18 @@ daybookTab.addEventListener(
 /* ================================
    MODE + SEARCH UI
 ================================ */
+function applyModeStyle(mode) {
+  modeToggle.innerText = mode;
+  modeToggle.style.background =
+    mode === "W" ? "#2f3f64" : "#d65353";
+}
+
 modeToggle.addEventListener(
   "click",
   () => {
-    if (
-      currentMode === "W"
-    ) {
-      currentMode = "R";
-      modeToggle.innerText =
-        "R";
-      modeToggle.style.background =
-        "#d65353";
-    } else {
-      currentMode = "W";
-      modeToggle.innerText =
-        "W";
-      modeToggle.style.background =
-        "#2f3f64";
-    }
+    currentMode =
+      currentMode === "W" ? "R" : "W";
+    applyModeStyle(currentMode);
 
     if (
       searchBox.value.trim()
@@ -1416,7 +2089,7 @@ function renderSuggestions(
         >
           <div class="suggestion-top">
             <div class="suggestion-name">
-              ${product.productName}
+              ${escapeAttr(product.productName)}
             </div>
 
             <div class="suggestion-price">
@@ -1426,14 +2099,14 @@ function renderSuggestions(
 
           <div class="badge-row">
             <div class="unit">
-              ${product.priceType || ""}
+              ${escapeAttr(product.priceType || "")}
             </div>
 
             ${
               product.material
                 ? `
                   <div class="unit ${getMaterialClass(product.material)}">
-                    ${product.material}
+                    ${escapeAttr(product.material)}
                   </div>
                 `
                 : ""
@@ -1541,7 +2214,7 @@ function renderBill() {
                     placeholder="Product name"
                     oninput="updateDisplayName(${index}, this.value)"
                   >`
-                : (item.displayName || item.product.productName)
+                : escapeAttr(item.displayName || item.product.productName)
             }
           </div>
 
@@ -1852,6 +2525,18 @@ function openSendModal() {
     return;
   }
 
+  const modalTitle =
+    printModal.querySelector(
+      ".modal-title"
+    );
+
+  if (modalTitle) {
+    modalTitle.textContent =
+      revisionMode
+        ? "Send Revision"
+        : "Send Details";
+  }
+
   customerGroup.style.display =
     currentMode === "W"
       ? "block"
@@ -1882,6 +2567,20 @@ closePreview.addEventListener(
 
     previewContent.innerHTML =
       "";
+
+    const revTabs =
+      document.getElementById(
+        "revisionViewTabs"
+      );
+
+    if (revTabs) {
+      revTabs.style.display = "none";
+    }
+
+    currentRevisionPreviewDocId =
+      null;
+
+    revisionDiffCache = {};
   }
 );
 
@@ -1961,6 +2660,35 @@ function createBillData() {
     serialNumber:
       null,
 
+    isOriginal:
+      !revisionMode,
+
+    parentBillId:
+      revisionMode
+        ? revisionParentBillId
+        : null,
+
+    effectiveVersion:
+      true,
+
+    isLocked:
+      false,
+
+    revisedBy:
+      revisionMode
+        ? revisionEmployeeName
+        : null,
+
+    revisedAt:
+      revisionMode
+        ? serverTimestamp()
+        : null,
+
+    revisionSummary:
+      revisionMode
+        ? buildRevisionSummary()
+        : null,
+
     items:
       billItems.map(
         item => ({
@@ -2013,10 +2741,65 @@ confirmSend.addEventListener(
       billData.createdAt =
         serverTimestamp();
 
-      await addDoc(
-        billsCollection,
-        billData
-      );
+      if (revisionMode) {
+        const sourceRef =
+          doc(
+            db,
+            "bills",
+            revisionSourceBillId
+          );
+
+        const newRevRef =
+          doc(billsCollection);
+
+        await runTransaction(
+          db,
+          async transaction => {
+            const sourceSnap =
+              await transaction.get(
+                sourceRef
+              );
+
+            if (
+              !sourceSnap.exists()
+            ) {
+              throw new Error(
+                "Source bill no longer exists."
+              );
+            }
+
+            const sourceData =
+              sourceSnap.data();
+
+            if (sourceData.serialNumber) {
+              billData.serialNumber =
+                sourceData.serialNumber;
+              billData.status =
+                "printed";
+            }
+
+            transaction.set(
+              newRevRef,
+              billData
+            );
+
+            transaction.update(
+              sourceRef,
+              {
+                effectiveVersion:
+                  false
+              }
+            );
+          }
+        );
+
+        exitRevisionMode();
+      } else {
+        await addDoc(
+          billsCollection,
+          billData
+        );
+      }
 
       billItems = [];
       customerName.value =
@@ -2046,6 +2829,167 @@ confirmSend.addEventListener(
     }
   }
 );
+
+/* ================================
+   REVISION ACTIONS
+================================ */
+window.reviseBill =
+  async function(docId) {
+    const bill =
+      incomingBillCache[docId];
+
+    if (!bill) return;
+
+    if (bill.isLocked === true) {
+      alert(
+        "This bill is locked and cannot be revised."
+      );
+      return;
+    }
+
+    const empInput =
+      prompt(
+        "Enter Employee ID"
+      );
+
+    if (empInput === null) return;
+
+    if (!empInput.trim()) {
+      alert(
+        "Employee ID is required."
+      );
+      return;
+    }
+
+    const parentId =
+      bill.isOriginal === false
+        ? bill.parentBillId
+        : docId;
+
+    const restoredItems =
+      (bill.items || []).map(
+        savedItem => {
+          let product =
+            products.find(
+              p =>
+                p.productName ===
+                  savedItem.productName &&
+                (!savedItem.material ||
+                  p.material ===
+                    savedItem.material)
+            );
+
+          if (!product) {
+            product = {
+              sr: -1,
+              productName:
+                savedItem.productName,
+              material:
+                savedItem.material || "",
+              priceType: "",
+              wPrice:
+                savedItem.price,
+              rPrice:
+                savedItem.price,
+              searchableText:
+                normalize(
+                  savedItem.productName
+                ),
+              searchableTokens:
+                tokenize(
+                  savedItem.productName
+                )
+            };
+          }
+
+          const price =
+            parseFloat(
+              savedItem.price
+            ) || 0;
+
+          const qty =
+            String(
+              savedItem.qty || ""
+            );
+
+          const qtyNum =
+            parseFloat(qty) || 0;
+
+          const item = {
+            product,
+            mode:
+              bill.mode || "W",
+            price,
+            qty,
+            note:
+              savedItem.note || "",
+            displayName:
+              savedItem.productName ||
+              product.productName,
+            total: 0
+          };
+
+          item.total =
+            computeLineTotal(
+              item,
+              price,
+              qtyNum
+            );
+
+          return item;
+        }
+      );
+
+    revisionMode = true;
+    revisionSourceBillId = docId;
+    revisionParentBillId = parentId;
+    revisionEmployeeName =
+      empInput.trim();
+
+    currentMode =
+      bill.mode || "W";
+
+    applyModeStyle(currentMode);
+
+    if (
+      currentMode === "W" &&
+      bill.customerName &&
+      bill.customerName !== "Retail Bill"
+    ) {
+      customerName.value =
+        bill.customerName;
+    } else {
+      customerName.value = "";
+    }
+
+    billItems = restoredItems;
+    renderBill();
+    updateGrandTotal();
+    saveDraft();
+    syncLiveDraft();
+
+    renderRevisionBanner();
+    activateView("billing");
+  };
+
+window.cancelRevision =
+  function() {
+    if (
+      !confirm(
+        "Cancel revision? Changes will be lost."
+      )
+    ) {
+      return;
+    }
+
+    exitRevisionMode();
+    billItems = [];
+    customerName.value = "";
+    renderBill();
+    updateGrandTotal();
+    clearDraft();
+    deleteLiveDraft();
+  };
 
 /* ================================
    RECEIVER / DAYBOOK
@@ -2112,6 +3056,9 @@ function getLowestAvailableSerial(
     };
   }
 
+  const activeSet =
+    new Set(active);
+
   for (
     let i = 1;
     i <= 100;
@@ -2125,7 +3072,7 @@ function getLowestAvailableSerial(
       1;
 
     if (
-      !active.includes(
+      !activeSet.has(
         candidate
       )
     ) {
@@ -2156,7 +3103,7 @@ function buildSingleCopyPage(
       rows += `
         <tr>
           <td>${idx + 1}</td>
-          <td>${item.productName}${item.note ? `<br><span class="print-item-note">${item.note}</span>` : ""}</td>
+          <td>${escapeAttr(item.productName)}${item.note ? `<br><span class="print-item-note">${escapeAttr(item.note)}</span>` : ""}</td>
           <td>${shortMaterialName(item.material)}</td>
           <td>${roundQty(item.qty)}</td>
           <td>${formatIndianMoney(item.price)}</td>
@@ -2194,16 +3141,16 @@ function buildSingleCopyPage(
 
       <div class="print-header-row">
         ${billData.customerName && billData.customerName !== "Retail Bill"
-          ? `<div class="print-customer">${billData.customerName}</div>`
+          ? `<div class="print-customer">${escapeAttr(billData.customerName)}</div>`
           : ""}
 
         <div class="print-date-serial-row">
-          <span class="print-date">${billData.date}</span>
-          <span class="print-serial">${billData.serialNumber ? "#" + billData.serialNumber : ""}</span>
+          <span class="print-date">${escapeAttr(billData.date)}</span>
+          <span class="print-serial">${billData.serialNumber ? "#" + escapeAttr(billData.serialNumber) : ""}</span>
         </div>
 
         ${!isCustomerCopy && billData.time
-          ? `<div class="print-office-time">${billData.time}</div>`
+          ? `<div class="print-office-time">${escapeAttr(billData.time)}</div>`
           : ""}
       </div>
 
@@ -2242,7 +3189,7 @@ function buildReceiptPrintHTML(
 ) {
   const chunks =
     chunkItems(
-      billData.items,
+      [...billData.items].reverse(),
       MAX_ITEMS_PER_DL_PAGE
     );
 
@@ -2293,7 +3240,7 @@ function previewReceipt(
 ) {
   const chunks =
     chunkItems(
-      billData.items,
+      [...billData.items].reverse(),
       MAX_ITEMS_PER_DL_PAGE
     );
 
@@ -2368,9 +3315,9 @@ function buildDaybookPrintHTML() {
     return group
       .map(entry => `
         <tr>
-          <td>${entry.date}</td>
-          <td>#${entry.serialNumber}</td>
-          <td>${entry.customerName}</td>
+          <td>${escapeAttr(entry.date)}</td>
+          <td>#${escapeAttr(entry.serialNumber)}</td>
+          <td>${escapeAttr(entry.customerName)}</td>
           <td>₹${formatIndianMoneyWhole(entry.amount)}</td>
         </tr>
       `)
@@ -2434,6 +3381,11 @@ function printDaybook() {
   daybookPrintedOnce =
     true;
 
+  localStorage.setItem(
+    DAYBOOK_PRINTED_KEY,
+    "true"
+  );
+
   renderDaybook();
 }
 
@@ -2444,7 +3396,12 @@ function renderIncomingBills() {
   const ids =
     Object.keys(
       incomingBillCache
-    ).reverse();
+    )
+    .filter(id => {
+      const b = incomingBillCache[id];
+      return b.effectiveVersion !== false;
+    })
+    .reverse();
 
   if (!ids.length) {
     incomingBills.innerHTML = `
@@ -2460,6 +3417,21 @@ function renderIncomingBills() {
   ids.forEach(id => {
     const bill =
       incomingBillCache[id];
+
+    const isLocked =
+      bill.isLocked === true;
+
+    const reviseBtnHtml =
+      isLocked
+        ? ""
+        : `
+          <button
+            class="revise-btn"
+            onclick="reviseBill('${id}')"
+          >
+            Revise Bill
+          </button>
+        `;
 
     let buttons = "";
 
@@ -2481,6 +3453,8 @@ function renderIncomingBills() {
         >
           Print
         </button>
+
+        ${reviseBtnHtml}
       `;
     } else {
       buttons = `
@@ -2498,6 +3472,8 @@ function renderIncomingBills() {
           Reprint
         </button>
 
+        ${reviseBtnHtml}
+
         <button
           class="send-btn"
           onclick="doneReceivedBill('${id}')"
@@ -2510,23 +3486,23 @@ function renderIncomingBills() {
     html += `
       <div class="bill-card">
         <div class="bill-title">
-          ${bill.customerName}
+          ${escapeAttr(bill.customerName)}
         </div>
 
         <div class="badge-row">
           <div class="unit">
-            ${bill.date}
+            ${escapeAttr(bill.date)}
           </div>
 
           <div class="unit">
-            ${bill.mode}
+            ${escapeAttr(bill.mode)}
           </div>
 
           ${
             bill.serialNumber
               ? `
                 <div class="unit">
-                  #${bill.serialNumber}
+                  #${escapeAttr(bill.serialNumber)}
                 </div>
               `
               : ""
@@ -2633,12 +3609,12 @@ function renderDaybook() {
     return `
       <div class="daybook-entry">
         <div class="daybook-date">
-          ${entry.date} |
-          #${entry.serialNumber}
+          ${escapeAttr(entry.date)} |
+          #${escapeAttr(entry.serialNumber)}
         </div>
 
         <div class="daybook-name">
-          ${entry.customerName}
+          ${escapeAttr(entry.customerName)}
         </div>
 
         <div class="daybook-amount">
@@ -2726,6 +3702,10 @@ window.deleteDaybookNow =
 
       daybookPrintedOnce =
         false;
+
+      localStorage.removeItem(
+        DAYBOOK_PRINTED_KEY
+      );
     } catch (err) {
       console.error(err);
 
@@ -2746,14 +3726,24 @@ subscribeToLiveDrafts();
 onSnapshot(
   billsQuery,
   snapshot => {
-    incomingBillCache = {};
-
-    snapshot.forEach(
-      docSnap => {
-        incomingBillCache[
-          docSnap.id
-        ] =
-          docSnap.data();
+    snapshot.docChanges().forEach(
+      change => {
+        if (
+          change.type === "removed"
+        ) {
+          delete incomingBillCache[
+            change.doc.id
+          ];
+        } else {
+          incomingBillCache[
+            change.doc.id
+          ] =
+            change.doc.data();
+        }
+        // Invalidate memoized diff if this bill's data changed.
+        delete revisionDiffCache[
+          change.doc.id
+        ];
       }
     );
 
@@ -2764,14 +3754,20 @@ onSnapshot(
 onSnapshot(
   daybookQuery,
   snapshot => {
-    daybookCache = {};
-
-    snapshot.forEach(
-      docSnap => {
-        daybookCache[
-          docSnap.id
-        ] =
-          docSnap.data();
+    snapshot.docChanges().forEach(
+      change => {
+        if (
+          change.type === "removed"
+        ) {
+          delete daybookCache[
+            change.doc.id
+          ];
+        } else {
+          daybookCache[
+            change.doc.id
+          ] =
+            change.doc.data();
+        }
       }
     );
 
@@ -2785,33 +3781,61 @@ onSnapshot(
 window.viewReceivedBill =
   function(docId) {
     const bill =
-      incomingBillCache[
-        docId
-      ];
+      incomingBillCache[docId];
 
-    if (!bill) {
+    if (!bill) return;
+
+    if (
+      bill.isOriginal === false &&
+      bill.parentBillId
+    ) {
+      openRevisionPreview(
+        docId,
+        "revised"
+      );
       return;
     }
 
-    previewReceipt(
-      bill
-    );
+    const revTabs =
+      document.getElementById(
+        "revisionViewTabs"
+      );
+
+    if (revTabs) {
+      revTabs.style.display = "none";
+    }
+
+    currentRevisionPreviewDocId = null;
+
+    previewReceipt(bill);
   };
 
 window.reprintReceivedBill =
   function(docId) {
     const bill =
-      incomingBillCache[
-        docId
-      ];
+      incomingBillCache[docId];
 
-    if (!bill) {
-      return;
+    if (!bill) return;
+
+    if (
+      bill.isOriginal === false &&
+      bill.parentBillId
+    ) {
+      const originalBill =
+        incomingBillCache[
+          bill.parentBillId
+        ];
+
+      if (originalBill) {
+        printRevisionReceipt(
+          bill,
+          originalBill
+        );
+        return;
+      }
     }
 
-    printReceipt(
-      bill
-    );
+    printReceipt(bill);
   };
 
 window.printReceivedBill =
@@ -2979,9 +4003,26 @@ window.printReceivedBill =
           }
         );
 
-      printReceipt(
-        finalBill
-      );
+      if (
+        finalBill.isOriginal === false &&
+        finalBill.parentBillId
+      ) {
+        const originalBill =
+          incomingBillCache[
+            finalBill.parentBillId
+          ];
+
+        if (originalBill) {
+          printRevisionReceipt(
+            finalBill,
+            originalBill
+          );
+        } else {
+          printReceipt(finalBill);
+        }
+      } else {
+        printReceipt(finalBill);
+      }
     } catch (err) {
       console.error(err);
 
@@ -3012,14 +4053,24 @@ window.doneReceivedBill =
     isReceiverBusy =
       true;
 
-    try {
-      const billRef =
-        doc(
-          db,
-          "bills",
-          docId
-        );
+    const billRef =
+      doc(
+        db,
+        "bills",
+        docId
+      );
 
+    // Resolve chain members from cache before entering the transaction.
+    // Ancestor bills (effectiveVersion:false) are immutable — safe to read from cache.
+    const chainIds =
+      getBillChainIds(docId);
+
+    const chainToLock =
+      chainIds.filter(
+        id => id !== docId
+      );
+
+    try {
       await runTransaction(
         db,
         async transaction => {
@@ -3069,6 +4120,7 @@ window.doneReceivedBill =
               bill.mode
             );
 
+          // Remove freed serial from active and return it to the reusable pool.
           let active = [
             ...new Set(
               serialData[
@@ -3084,11 +4136,25 @@ window.doneReceivedBill =
                 bill.serialNumber
             );
 
+          let reusable = [
+            ...new Set(
+              serialData[
+                keys.reusableKey
+              ] || []
+            )
+          ];
+
+          reusable.push(
+            bill.serialNumber
+          );
+
           transaction.update(
             serialDocRef,
             {
               [keys.activeKey]:
-                active
+                active,
+              [keys.reusableKey]:
+                reusable
             }
           );
 
@@ -3115,13 +4181,23 @@ window.doneReceivedBill =
           transaction.delete(
             billRef
           );
+
+          // Lock ancestor revision chain atomically.
+          // If locking fails, the entire transaction rolls back — no partial success.
+          chainToLock.forEach(id => {
+            transaction.update(
+              doc(db, "bills", id),
+              { isLocked: true }
+            );
+          });
         }
       );
     } catch (err) {
       console.error(err);
 
       alert(
-        "Failed to complete bill."
+        "Failed to complete bill: " +
+          err.message
       );
     } finally {
       isReceiverBusy =
