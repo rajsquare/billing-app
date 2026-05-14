@@ -246,6 +246,15 @@ function getIndiaDateInfo() {
   };
 }
 
+function getIndiaTodayDate() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date());
+}
+
 function getCurrentPrice(product) {
   return currentMode === "W"
     ? product.wPrice
@@ -1283,7 +1292,7 @@ function buildRevisionOfficeSinglePage(
         ${custName}
         <div class="print-date-serial-row">
           <span class="print-date">${escapeAttr(revisedBill.date)}</span>
-          <span class="print-serial">${revisedBill.serialNumber ? "#" + escapeAttr(revisedBill.serialNumber) : ""}</span>
+          <span class="print-serial">${revisedBill.serialNumber ? (revisedBill.isFirstOfDay ? "① " : "") + "#" + escapeAttr(revisedBill.serialNumber) : ""}</span>
         </div>
         ${revisedBill.time
           ? `<div class="print-office-time">${escapeAttr(revisedBill.time)}</div>`
@@ -2778,6 +2787,15 @@ confirmSend.addEventListener(
                 "printed";
             }
 
+            billData.isFirstOfDay =
+              sourceData.isFirstOfDay || false;
+            billData.firstOfDayMode =
+              sourceData.firstOfDayMode || null;
+            billData.firstOfDayDate =
+              sourceData.firstOfDayDate || null;
+            billData.firstOfDayTimezone =
+              sourceData.firstOfDayTimezone || null;
+
             transaction.set(
               newRevRef,
               billData
@@ -3005,7 +3023,10 @@ function getModeKeys(
       "Reusable",
     activeKey:
       mode +
-      "Active"
+      "Active",
+    firstOfDayKey:
+      mode +
+      "FirstOfDayDate"
   };
 }
 
@@ -3146,7 +3167,7 @@ function buildSingleCopyPage(
 
         <div class="print-date-serial-row">
           <span class="print-date">${escapeAttr(billData.date)}</span>
-          <span class="print-serial">${billData.serialNumber ? "#" + escapeAttr(billData.serialNumber) : ""}</span>
+          <span class="print-serial">${billData.serialNumber ? (!isCustomerCopy && billData.isFirstOfDay ? "① " : "") + "#" + escapeAttr(billData.serialNumber) : ""}</span>
         </div>
 
         ${!isCustomerCopy && billData.time
@@ -3951,6 +3972,13 @@ window.printReceivedBill =
               );
             }
 
+            const todayDate =
+              getIndiaTodayDate();
+
+            const isFirstOfDay =
+              serialData[keys.firstOfDayKey] !==
+              todayDate;
+
             const updates = {
               [keys.activeKey]:
                 [
@@ -3978,27 +4006,39 @@ window.printReceivedBill =
                 allocation.serial;
             }
 
+            if (isFirstOfDay) {
+              updates[keys.firstOfDayKey] =
+                todayDate;
+            }
+
             transaction.update(
               serialDocRef,
               updates
             );
 
+            const billUpdate = {
+              status:
+                "printed",
+              serialNumber:
+                allocation.serial,
+              isFirstOfDay:
+                isFirstOfDay,
+              firstOfDayMode:
+                isFirstOfDay ? bill.mode : null,
+              firstOfDayDate:
+                isFirstOfDay ? todayDate : null,
+              firstOfDayTimezone:
+                isFirstOfDay ? "Asia/Kolkata" : null
+            };
+
             transaction.update(
               billRef,
-              {
-                status:
-                  "printed",
-                serialNumber:
-                  allocation.serial
-              }
+              billUpdate
             );
 
             return {
               ...bill,
-              status:
-                "printed",
-              serialNumber:
-                allocation.serial
+              ...billUpdate
             };
           }
         );
