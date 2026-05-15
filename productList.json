@@ -1649,7 +1649,7 @@
   {
     "sr": 184,
     "productName": "Tadka Pan 1",
-    "wPrice": 2230,
+    "wPrice": 2200,
     "priceType": "PP",
     "rPrice": 850,
     "material": "Brass",
@@ -1658,18 +1658,18 @@
   {
     "sr": 185,
     "productName": "Tadka Pan 2",
-    "wPrice": 2230,
+    "wPrice": 2200,
     "priceType": "PP",
-    "rPrice": 960,
+    "rPrice": 950,
     "material": "Brass",
     "": null
   },
   {
     "sr": 186,
     "productName": "Tadka Pan 3",
-    "wPrice": 2230,
+    "wPrice": 2200,
     "priceType": "PP",
-    "rPrice": 1080,
+    "rPrice": 1050,
     "material": "Brass",
     "": null
   },
@@ -1685,7 +1685,7 @@
   {
     "sr": 188,
     "productName": "Coffee Davara Plain / Matte",
-    "wPrice": 270,
+    "wPrice": 260,
     "priceType": "PP",
     "rPrice": 320,
     "material": "Brass",
@@ -1694,7 +1694,7 @@
   {
     "sr": 189,
     "productName": "Coffee Davara E / H",
-    "wPrice": 320,
+    "wPrice": 310,
     "priceType": "PP",
     "rPrice": 370,
     "material": "Brass",
@@ -1955,7 +1955,7 @@
   {
     "sr": 218,
     "productName": "Top Kalai +Polish +H 8-12",
-    "wPrice": 1370,
+    "wPrice": 1380,
     "priceType": "KG",
     "rPrice": 1500,
     "material": "Brass",
@@ -1964,7 +1964,7 @@
   {
     "sr": 219,
     "productName": "Top Kalai +Polish +H 13 and above",
-    "wPrice": 1270,
+    "wPrice": 1280,
     "priceType": "KG",
     "rPrice": 1500,
     "material": "Brass",
@@ -2000,43 +2000,43 @@
   {
     "sr": 223,
     "productName": "Tasla Kadhai 6-7",
-    "wPrice": 1190,
+    "wPrice": 1200,
     "priceType": "KG",
-    "rPrice": 1320,
+    "rPrice": 1330,
     "material": "Brass",
     "": null
   },
   {
     "sr": 224,
     "productName": "Tasla Kadhai 8-14",
-    "wPrice": 1090,
+    "wPrice": 1100,
     "priceType": "KG",
-    "rPrice": 1220,
+    "rPrice": 1230,
     "material": "Brass",
     "": null
   },
   {
     "sr": 225,
     "productName": "Tasla Kadhai 15-24",
-    "wPrice": 1240,
+    "wPrice": 1250,
     "priceType": "KG",
-    "rPrice": 1340,
+    "rPrice": 1350,
     "material": "Brass",
     "": null
   },
   {
     "sr": 226,
     "productName": "Tasla Kadhai 26-29",
-    "wPrice": 1340,
+    "wPrice": 1350,
     "priceType": "KG",
-    "rPrice": 1420,
+    "rPrice": 1450,
     "material": "Brass",
     "": null
   },
   {
     "sr": 227,
     "productName": "Tasla Kadhai K+P 6-7",
-    "wPrice": 1240,
+    "wPrice": 1250,
     "priceType": "KG",
     "rPrice": 1440,
     "material": "Brass",
@@ -2045,9 +2045,9 @@
   {
     "sr": 228,
     "productName": "Tasla Kadhai K+P 8-14",
-    "wPrice": 1140,
+    "wPrice": 1150,
     "priceType": "KG",
-    "rPrice": 1320,
+    "rPrice": 1330,
     "material": "Brass",
     "": null
   },
@@ -2531,7 +2531,7 @@
   {
     "sr": 282,
     "productName": "Hammered Glass Pendi",
-    "wPrice": 270,
+    "wPrice": 260,
     "priceType": "PP",
     "rPrice": 320,
     "material": "Brass",
@@ -2540,7 +2540,7 @@
   {
     "sr": 283,
     "productName": "Etching Glass Pendi",
-    "wPrice": 270,
+    "wPrice": 260,
     "priceType": "PP",
     "rPrice": 320,
     "material": "Brass",
@@ -2900,7 +2900,7 @@
   {
     "sr": 323,
     "productName": "Glass ST",
-    "wPrice": 160,
+    "wPrice": 150,
     "priceType": "PP",
     "rPrice": 190,
     "material": "Copper",
@@ -3638,16 +3638,16 @@
   {
     "sr": 405,
     "productName": "Serving Spoon Sheet Small",
-    "wPrice": 1860,
+    "wPrice": 1800,
     "priceType": "PP",
-    "rPrice": 370,
+    "rPrice": 380,
     "material": "Brass",
     "": null
   },
   {
     "sr": 406,
     "productName": "Serving Spoon Sheet Medium",
-    "wPrice": 1860,
+    "wPrice": 1800,
     "priceType": "PP",
     "rPrice": 430,
     "material": "Brass",
@@ -3656,7 +3656,7 @@
   {
     "sr": 407,
     "productName": "Serving Spoon Sheet Big",
-    "wPrice": 1860,
+    "wPrice": 1800,
     "priceType": "PP",
     "rPrice": 480,
     "material": "Brass",
