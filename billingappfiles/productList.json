@@ -92,9 +92,9 @@
   {
     "sr": 11,
     "productName": "Chirag Navrang",
-    "wPrice": 0,
+    "wPrice": null,
     "priceType": "KG",
-    "rPrice": 0,
+    "rPrice": null,
     "material": null,
     "": null
   },
@@ -137,9 +137,9 @@
   {
     "sr": 16,
     "productName": "Chirag Nashik Kalsi",
-    "wPrice": 0,
+    "wPrice": null,
     "priceType": "KG",
-    "rPrice": 0,
+    "rPrice": null,
     "material": null,
     "": null
   },
@@ -866,9 +866,9 @@
   {
     "sr": 97,
     "productName": "Discount (Less)",
-    "wPrice": 0,
+    "wPrice": null,
     "priceType": "PP",
-    "rPrice": 0,
+    "rPrice": null,
     "material": null,
     "": null
   },
@@ -1154,7 +1154,7 @@
   {
     "sr": 129,
     "productName": "Lucknowee Sipri 1-4",
-    "wPrice": 1320,
+    "wPrice": 1330,
     "priceType": "KG",
     "rPrice": 1500,
     "material": "Brass",
@@ -1163,7 +1163,7 @@
   {
     "sr": 130,
     "productName": "Lucknowee Sipri 5-6",
-    "wPrice": 1340,
+    "wPrice": 1350,
     "priceType": "KG",
     "rPrice": 1520,
     "material": "Brass",
@@ -1784,9 +1784,9 @@
   {
     "sr": 199,
     "productName": "Chalni",
-    "wPrice": 0,
+    "wPrice": null,
     "priceType": "PP",
-    "rPrice": 0,
+    "rPrice": null,
     "material": "Brass",
     "": null
   },
@@ -1928,7 +1928,7 @@
   {
     "sr": 215,
     "productName": "Top 38-42",
-    "wPrice": 1300,
+    "wPrice": 1320,
     "priceType": "KG",
     "rPrice": 1340,
     "material": "Brass",
@@ -1937,7 +1937,7 @@
   {
     "sr": 216,
     "productName": "Top 44-48",
-    "wPrice": 1310,
+    "wPrice": 1330,
     "priceType": "KG",
     "rPrice": 1320,
     "material": "Brass",
@@ -1946,7 +1946,7 @@
   {
     "sr": 217,
     "productName": "Top 50-52",
-    "wPrice": 1330,
+    "wPrice": 1350,
     "priceType": "KG",
     "rPrice": 1420,
     "material": "Brass",
@@ -2549,9 +2549,9 @@
   {
     "sr": 284,
     "productName": "15 No Glass",
-    "wPrice": 0,
+    "wPrice": null,
     "priceType": "PP",
-    "rPrice": 0,
+    "rPrice": null,
     "material": "Brass",
     "": null
   },
@@ -2675,9 +2675,9 @@
   {
     "sr": 298,
     "productName": "Utensils",
-    "wPrice": 0,
+    "wPrice": null,
     "priceType": "KG",
-    "rPrice": 0,
+    "rPrice": null,
     "material": null,
     "": null
   },
@@ -3154,7 +3154,7 @@
     "productName": "Banana Leaf Thali",
     "wPrice": 1530,
     "priceType": "KG",
-    "rPrice": 1700,
+    "rPrice": 1800,
     "material": "Brass",
     "": null
   },
@@ -4016,9 +4016,9 @@
   {
     "sr": 447,
     "productName": "Checked Dabba set of 3",
-    "wPrice": 1910,
+    "wPrice": 1900,
     "priceType": "PP",
-    "rPrice": 2340,
+    "rPrice": 2200,
     "material": "Brass",
     "": null
   },
@@ -4070,9 +4070,9 @@
   {
     "sr": 453,
     "productName": "Checked Dabba 3 x 3",
-    "wPrice": 2120,
+    "wPrice": 2100,
     "priceType": "PP",
-    "rPrice": 2500,
+    "rPrice": 2400,
     "material": "Brass",
     "": null
   },
