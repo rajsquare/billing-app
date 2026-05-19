@@ -1921,7 +1921,7 @@
     "productName": "Top 29-36",
     "wPrice": 1170,
     "priceType": "KG",
-    "rPrice": 1220,
+    "rPrice": 1300,
     "material": "Brass",
     "": null
   },
@@ -1930,25 +1930,25 @@
     "productName": "Top 38-42",
     "wPrice": 1320,
     "priceType": "KG",
-    "rPrice": 1340,
+    "rPrice": 1400,
     "material": "Brass",
     "": null
   },
   {
     "sr": 216,
     "productName": "Top 44-48",
-    "wPrice": 1330,
+    "wPrice": 1340,
     "priceType": "KG",
-    "rPrice": 1320,
+    "rPrice": 1400,
     "material": "Brass",
     "": null
   },
   {
     "sr": 217,
     "productName": "Top 50-52",
-    "wPrice": 1350,
+    "wPrice": 1360,
     "priceType": "KG",
-    "rPrice": 1420,
+    "rPrice": 1450,
     "material": "Brass",
     "": null
   },
@@ -1991,7 +1991,7 @@
   {
     "sr": 222,
     "productName": "Langdi K+P",
-    "wPrice": 1270,
+    "wPrice": 1280,
     "priceType": "KG",
     "rPrice": 1500,
     "material": "Brass",
@@ -2891,9 +2891,9 @@
   {
     "sr": 322,
     "productName": "Glass Special",
-    "wPrice": 2150,
+    "wPrice": 2200,
     "priceType": "KG",
-    "rPrice": 2400,
+    "rPrice": 2500,
     "material": "Copper",
     "": null
   },
@@ -2918,9 +2918,9 @@
   {
     "sr": 325,
     "productName": "Utensils Mix",
-    "wPrice": 2600,
+    "wPrice": 2800,
     "priceType": "KG",
-    "rPrice": 3000,
+    "rPrice": 3200,
     "material": "Kansa",
     "": null
   },
