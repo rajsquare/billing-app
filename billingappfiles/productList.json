@@ -136,11 +136,11 @@
   },
   {
     "sr": 16,
-    "productName": "Chirag Nashik Kalsi",
-    "wPrice": null,
+    "productName": "Dessert bowl",
+    "wPrice": 1400,
     "priceType": "KG",
-    "rPrice": null,
-    "material": null,
+    "rPrice": 1700,
+    "material": "Brass",
     "": null
   },
   {
@@ -1783,10 +1783,10 @@
   },
   {
     "sr": 199,
-    "productName": "Chalni",
-    "wPrice": null,
-    "priceType": "PP",
-    "rPrice": null,
+    "productName": "Sheet Kadhai",
+    "wPrice": 1150,
+    "priceType": "KG",
+    "rPrice": 1400,
     "material": "Brass",
     "": null
   },
@@ -1919,7 +1919,7 @@
   {
     "sr": 214,
     "productName": "Top 29-36",
-    "wPrice": 1160,
+    "wPrice": 1170,
     "priceType": "KG",
     "rPrice": 1220,
     "material": "Brass",
