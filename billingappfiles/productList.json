@@ -280,10 +280,10 @@
   },
   {
     "sr": 32,
-    "productName": "Kalchul",
-    "wPrice": 1020,
+    "productName": "Kalchul / Golchi",
+    "wPrice": 1150,
     "priceType": "KG",
-    "rPrice": 1340,
+    "rPrice": 1400,
     "material": "Brass",
     "": null
   },
@@ -2359,10 +2359,10 @@
   },
   {
     "sr": 263,
-    "productName": "Deg Sipri Heavy K+P",
-    "wPrice": 1950,
+    "productName": "Deg / Sipri Heavy K+P",
+    "wPrice": 2000,
     "priceType": "KG",
-    "rPrice": 2040,
+    "rPrice": 2200,
     "material": "Copper",
     "": null
   },
