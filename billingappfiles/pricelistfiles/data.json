@@ -190,7 +190,7 @@
   },
   {
     "sr": 22,
-    "productName": "Plain Thali (Bhaiya) 10.5 inch",
+    "productName": "Plain Thali 10.5 inch",
     "wPrice": 1100,
     "priceType": "KG",
     "rPrice": 1220,
@@ -199,7 +199,7 @@
   },
   {
     "sr": 23,
-    "productName": "Plain Thali (Bhaiya)",
+    "productName": "Plain Thali",
     "wPrice": 1050,
     "priceType": "KG",
     "rPrice": 1240,
@@ -253,7 +253,7 @@
   },
   {
     "sr": 29,
-    "productName": "Katora",
+    "productName": "Katora (Wati)",
     "wPrice": 1070,
     "priceType": "KG",
     "rPrice": 1220,
@@ -1874,9 +1874,9 @@
   {
     "sr": 209,
     "productName": "Parampara Lagan ",
-    "wPrice": 1900,
+    "wPrice": 2000,
     "priceType": "KG",
-    "rPrice": 2240,
+    "rPrice": 2300,
     "material": "Copper",
     "": null
   },
@@ -2972,7 +2972,7 @@
   {
     "sr": 331,
     "productName": "Thali Khumcha 8-14",
-    "wPrice": 1360,
+    "wPrice": 1380,
     "priceType": "KG",
     "rPrice": 1600,
     "material": "Brass",
@@ -3970,7 +3970,7 @@
   },
   {
     "sr": 442,
-    "productName": "Katora",
+    "productName": "Katora (Wati)",
     "wPrice": 2050,
     "priceType": "KG",
     "rPrice": 2340,
