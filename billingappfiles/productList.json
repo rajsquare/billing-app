@@ -344,9 +344,9 @@
   {
     "sr": 39,
     "productName": "Shubh Vivah Kalsa Set",
-    "wPrice": 2650,
+    "wPrice": 2600,
     "priceType": "PP",
-    "rPrice": 3000,
+    "rPrice": 2900,
     "material": "Brass",
     "": null
   },
@@ -487,7 +487,7 @@
   },
   {
     "sr": 55,
-    "productName": "Rolex Dabba 1-3",
+    "productName": "Rolex Dabba",
     "wPrice": 1850,
     "priceType": "KG",
     "rPrice": 2240,
@@ -677,9 +677,9 @@
   {
     "sr": 76,
     "productName": "Coffee Filter Stand Tap Set",
-    "wPrice": 6360,
+    "wPrice": 6300,
     "priceType": "PP",
-    "rPrice": 7440,
+    "rPrice": 6900,
     "material": "Brass",
     "": null
   },
@@ -1045,7 +1045,7 @@
   },
   {
     "sr": 117,
-    "productName": "Joint Degchi",
+    "productName": "Joint Degchi / Nirmal Degchi",
     "wPrice": 1680,
     "priceType": "KG",
     "rPrice": 1880,
@@ -1460,7 +1460,7 @@
   {
     "sr": 163,
     "productName": "Khalbatta Regular",
-    "wPrice": 1150,
+    "wPrice": 1200,
     "priceType": "KG",
     "rPrice": 1360,
     "material": "Brass",
@@ -1469,7 +1469,7 @@
   {
     "sr": 164,
     "productName": "Khalbatta Medical",
-    "wPrice": 1250,
+    "wPrice": 1300,
     "priceType": "KG",
     "rPrice": 1500,
     "material": "Brass",
@@ -1739,16 +1739,16 @@
   {
     "sr": 194,
     "productName": "Bucket 18-24",
-    "wPrice": 1220,
+    "wPrice": 1230,
     "priceType": "KG",
-    "rPrice": 1320,
+    "rPrice": 1340,
     "material": "Brass",
     "": null
   },
   {
     "sr": 195,
     "productName": "Bucket 14-16",
-    "wPrice": 1240,
+    "wPrice": 1250,
     "priceType": "KG",
     "rPrice": 1340,
     "material": "Brass",
@@ -3233,18 +3233,18 @@
   {
     "sr": 360,
     "productName": "Handmade",
-    "wPrice": 3800,
+    "wPrice": 4000,
     "priceType": "KG",
-    "rPrice": 4400,
+    "rPrice": 4600,
     "material": "Kansa",
     "": null
   },
   {
     "sr": 361,
     "productName": "Handmade Set Pure",
-    "wPrice": 5300,
+    "wPrice": 5500,
     "priceType": "PP",
-    "rPrice": 5700,
+    "rPrice": 6300,
     "material": "Kansa",
     "": null
   },
@@ -4052,9 +4052,9 @@
   {
     "sr": 451,
     "productName": "Unbreakable Set Plain",
-    "wPrice": 7700,
+    "wPrice": null,
     "priceType": "PP",
-    "rPrice": 7700,
+    "rPrice": null,
     "material": "Kansa",
     "": null
   },
@@ -4178,6 +4178,15 @@
   {
     "sr": 465,
     "productName": "Handmade Double Polished",
+    "wPrice": 4200,
+    "priceType": "KG",
+    "rPrice": 4800,
+    "material": "Kansa",
+    "": null
+  },
+  {
+    "sr": 466,
+    "productName": "Kadhai / Saucepan / Frypan",
     "wPrice": 4000,
     "priceType": "KG",
     "rPrice": 4600,
