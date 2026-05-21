@@ -2836,7 +2836,7 @@
   },
   {
     "sr": 316,
-    "productName": "Jug Lily",
+    "productName": "Lily Jar / Jug",
     "wPrice": 950,
     "priceType": "PP",
     "rPrice": 1160,
@@ -2845,7 +2845,7 @@
   },
   {
     "sr": 317,
-    "productName": "Jug Rose",
+    "productName": "Rose Jar / Jug",
     "wPrice": 850,
     "priceType": "PP",
     "rPrice": 1060,
@@ -3241,7 +3241,7 @@
   },
   {
     "sr": 361,
-    "productName": "Handmade Set Pure",
+    "productName": "Set Pure",
     "wPrice": 5500,
     "priceType": "PP",
     "rPrice": 6300,
@@ -3304,11 +3304,11 @@
   },
   {
     "sr": 368,
-    "productName": "Handmade Special",
-    "wPrice": 3800,
-    "priceType": "KG",
-    "rPrice": 4400,
-    "material": "Kansa",
+    "productName": null,
+    "wPrice": null,
+    "priceType": null,
+    "rPrice": null,
+    "material": null,
     "": null
   },
   {
