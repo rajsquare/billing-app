@@ -253,7 +253,7 @@
   },
   {
     "sr": 29,
-    "productName": "Katora (Wati)",
+    "productName": "Katora / Wati",
     "wPrice": 1070,
     "priceType": "KG",
     "rPrice": 1220,
@@ -1037,9 +1037,9 @@
   {
     "sr": 116,
     "productName": "Ring Patiya ",
-    "wPrice": 1850,
+    "wPrice": 1900,
     "priceType": "KG",
-    "rPrice": 2240,
+    "rPrice": 2200,
     "material": "Copper",
     "": null
   },
@@ -2999,9 +2999,9 @@
   {
     "sr": 334,
     "productName": "ST Dalda",
-    "wPrice": 1270,
+    "wPrice": 1300,
     "priceType": "KG",
-    "rPrice": 1500,
+    "rPrice": 1600,
     "material": "Brass",
     "": null
   },
@@ -3188,7 +3188,7 @@
   {
     "sr": 355,
     "productName": "Thali Set Sanskriti Glossy",
-    "wPrice": 2330,
+    "wPrice": 2300,
     "priceType": "PP",
     "rPrice": 2700,
     "material": "Brass",
@@ -3970,7 +3970,7 @@
   },
   {
     "sr": 442,
-    "productName": "Katora (Wati)",
+    "productName": "Katora / Wati",
     "wPrice": 2050,
     "priceType": "KG",
     "rPrice": 2340,
@@ -4034,9 +4034,9 @@
   {
     "sr": 449,
     "productName": "Thali Set Sanskriti Matte",
-    "wPrice": 2120,
+    "wPrice": 2300,
     "priceType": "PP",
-    "rPrice": 2600,
+    "rPrice": 2700,
     "material": "Brass",
     "": null
   },
