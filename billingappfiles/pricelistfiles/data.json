@@ -253,7 +253,7 @@
   },
   {
     "sr": 29,
-    "productName": "Katora / Wati",
+    "productName": "Katora",
     "wPrice": 1070,
     "priceType": "KG",
     "rPrice": 1220,
@@ -1631,7 +1631,7 @@
   {
     "sr": 182,
     "productName": "Dosa Tawa Set",
-    "wPrice": 2650,
+    "wPrice": 2600,
     "priceType": "PP",
     "rPrice": 3000,
     "material": "Brass",
@@ -1640,9 +1640,9 @@
   {
     "sr": 183,
     "productName": "Gol Deg",
-    "wPrice": 1850,
+    "wPrice": 2000,
     "priceType": "KG",
-    "rPrice": 2240,
+    "rPrice": 2300,
     "material": "Copper",
     "": null
   },
@@ -2054,7 +2054,7 @@
   {
     "sr": 229,
     "productName": "Top Joint Bottom",
-    "wPrice": 1140,
+    "wPrice": 1160,
     "priceType": "KG",
     "rPrice": 1220,
     "material": "Brass",
@@ -2063,7 +2063,7 @@
   {
     "sr": 230,
     "productName": "Langdi Joint Bottom",
-    "wPrice": 1160,
+    "wPrice": 1180,
     "priceType": "KG",
     "rPrice": 1240,
     "material": "Brass",
@@ -2368,8 +2368,8 @@
   },
   {
     "sr": 264,
-    "productName": "Lucknowee 10-12",
-    "wPrice": 1750,
+    "productName": "Lucknowee 10",
+    "wPrice": 1780,
     "priceType": "KG",
     "rPrice": 1860,
     "material": "Copper",
@@ -2377,10 +2377,10 @@
   },
   {
     "sr": 265,
-    "productName": "Lucknowee 13-24",
-    "wPrice": 1700,
+    "productName": "Lucknowee 12-24",
+    "wPrice": 1725,
     "priceType": "KG",
-    "rPrice": 1860,
+    "rPrice": 1885,
     "material": "Copper",
     "": null
   },
@@ -2450,9 +2450,9 @@
   {
     "sr": 273,
     "productName": "Sheet Top",
-    "wPrice": 1270,
+    "wPrice": 1300,
     "priceType": "KG",
-    "rPrice": 1500,
+    "rPrice": 1600,
     "material": "Brass",
     "": null
   },
@@ -3071,9 +3071,9 @@
   {
     "sr": 342,
     "productName": "China Plate",
-    "wPrice": 1405,
+    "wPrice": 1430,
     "priceType": "KG",
-    "rPrice": 1740,
+    "rPrice": 1700,
     "material": "Brass",
     "": null
   },
@@ -3161,7 +3161,7 @@
   {
     "sr": 352,
     "productName": "Maharaja Thali",
-    "wPrice": 1430,
+    "wPrice": 1700,
     "priceType": "KG",
     "rPrice": 1700,
     "material": "Brass",
@@ -3890,7 +3890,7 @@
   {
     "sr": 433,
     "productName": "Casting Wati Etched Hammered",
-    "wPrice": 1270,
+    "wPrice": 1350,
     "priceType": "KG",
     "rPrice": 1600,
     "material": "Brass",
@@ -3971,7 +3971,7 @@
   {
     "sr": 442,
     "productName": "Katora / Wati",
-    "wPrice": 2050,
+    "wPrice": 2100,
     "priceType": "KG",
     "rPrice": 2340,
     "material": "Copper",
