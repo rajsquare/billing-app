@@ -1549,8 +1549,8 @@
   },
   {
     "sr": 173,
-    "productName": "Tiffin Small",
-    "wPrice": 2440,
+    "productName": "Tiffin (2)",
+    "wPrice": 2800,
     "priceType": "PP",
     "rPrice": 2700,
     "material": "Brass",
@@ -1558,8 +1558,8 @@
   },
   {
     "sr": 174,
-    "productName": "Tiffin Medium",
-    "wPrice": 2650,
+    "productName": "Tiffin (3)",
+    "wPrice": 3600,
     "priceType": "PP",
     "rPrice": 2900,
     "material": "Brass",
@@ -1567,8 +1567,8 @@
   },
   {
     "sr": 175,
-    "productName": "Tiffin Big",
-    "wPrice": 3180,
+    "productName": "Tiffin (4)",
+    "wPrice": 4300,
     "priceType": "PP",
     "rPrice": 3600,
     "material": "Brass",
@@ -3304,11 +3304,11 @@
   },
   {
     "sr": 368,
-    "productName": null,
-    "wPrice": null,
-    "priceType": null,
-    "rPrice": null,
-    "material": null,
+    "productName": "Lotus Bowl",
+    "wPrice": 1600,
+    "priceType": "KG",
+    "rPrice": 1850,
+    "material": "Brass",
     "": null
   },
   {
