@@ -5,8 +5,7 @@
     "wPrice": 1580,
     "priceType": "KG",
     "rPrice": 1830,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 2,
@@ -14,8 +13,7 @@
     "wPrice": 1370,
     "priceType": "KG",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 3,
@@ -23,8 +21,7 @@
     "wPrice": 1480,
     "priceType": "KG",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 4,
@@ -32,8 +29,7 @@
     "wPrice": 1430,
     "priceType": "KG",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 5,
@@ -41,8 +37,7 @@
     "wPrice": 1480,
     "priceType": "KG",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 6,
@@ -50,8 +45,7 @@
     "wPrice": 1430,
     "priceType": "KG",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 7,
@@ -59,8 +53,7 @@
     "wPrice": 1430,
     "priceType": "KG",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 8,
@@ -68,8 +61,7 @@
     "wPrice": 1750,
     "priceType": "KG",
     "rPrice": 2100,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 9,
@@ -77,8 +69,7 @@
     "wPrice": 1720,
     "priceType": "KG",
     "rPrice": 1960,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 10,
@@ -86,8 +77,7 @@
     "wPrice": 1800,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 11,
@@ -95,8 +85,7 @@
     "wPrice": null,
     "priceType": "KG",
     "rPrice": null,
-    "material": null,
-    "": null
+    "material": null
   },
   {
     "sr": 12,
@@ -104,8 +93,7 @@
     "wPrice": 1650,
     "priceType": "KG",
     "rPrice": 1960,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 13,
@@ -113,8 +101,7 @@
     "wPrice": 1670,
     "priceType": "KG",
     "rPrice": 1950,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 14,
@@ -122,8 +109,7 @@
     "wPrice": 1720,
     "priceType": "KG",
     "rPrice": 1960,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 15,
@@ -131,8 +117,7 @@
     "wPrice": 1680,
     "priceType": "KG",
     "rPrice": 2000,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 16,
@@ -140,8 +125,7 @@
     "wPrice": 1400,
     "priceType": "KG",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 17,
@@ -149,8 +133,7 @@
     "wPrice": 1000,
     "priceType": "KG",
     "rPrice": 1120,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 18,
@@ -158,8 +141,7 @@
     "wPrice": 1020,
     "priceType": "KG",
     "rPrice": 1120,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 19,
@@ -167,8 +149,7 @@
     "wPrice": 1070,
     "priceType": "KG",
     "rPrice": 1200,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 20,
@@ -176,8 +157,7 @@
     "wPrice": 1040,
     "priceType": "KG",
     "rPrice": 1240,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 21,
@@ -185,8 +165,7 @@
     "wPrice": 1060,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 22,
@@ -194,8 +173,7 @@
     "wPrice": 1100,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 23,
@@ -203,8 +181,7 @@
     "wPrice": 1050,
     "priceType": "KG",
     "rPrice": 1240,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 24,
@@ -212,8 +189,7 @@
     "wPrice": 1120,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 25,
@@ -221,8 +197,7 @@
     "wPrice": 1070,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 26,
@@ -230,8 +205,7 @@
     "wPrice": 1100,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 27,
@@ -239,8 +213,7 @@
     "wPrice": 1150,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 28,
@@ -248,8 +221,7 @@
     "wPrice": 2330,
     "priceType": "PP",
     "rPrice": 2700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 29,
@@ -257,8 +229,7 @@
     "wPrice": 1070,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 30,
@@ -266,8 +237,7 @@
     "wPrice": 1090,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 31,
@@ -275,8 +245,7 @@
     "wPrice": 1020,
     "priceType": "KG",
     "rPrice": 1340,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 32,
@@ -284,8 +253,7 @@
     "wPrice": 1150,
     "priceType": "KG",
     "rPrice": 1400,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 33,
@@ -293,8 +261,7 @@
     "wPrice": 80,
     "priceType": "PP",
     "rPrice": 100,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 34,
@@ -302,8 +269,7 @@
     "wPrice": 110,
     "priceType": "PP",
     "rPrice": 170,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 35,
@@ -311,8 +277,7 @@
     "wPrice": 100,
     "priceType": "PP",
     "rPrice": 160,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 36,
@@ -320,8 +285,7 @@
     "wPrice": 110,
     "priceType": "PP",
     "rPrice": 220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 37,
@@ -329,8 +293,7 @@
     "wPrice": 1020,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 38,
@@ -338,8 +301,7 @@
     "wPrice": 1070,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 39,
@@ -347,8 +309,7 @@
     "wPrice": 2600,
     "priceType": "PP",
     "rPrice": 2900,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 40,
@@ -356,8 +317,7 @@
     "wPrice": 1430,
     "priceType": "KG",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 41,
@@ -365,8 +325,7 @@
     "wPrice": 1780,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 42,
@@ -374,8 +333,7 @@
     "wPrice": 1880,
     "priceType": "KG",
     "rPrice": 2100,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 43,
@@ -383,8 +341,7 @@
     "wPrice": 970,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 44,
@@ -392,8 +349,7 @@
     "wPrice": 1020,
     "priceType": "KG",
     "rPrice": 1340,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 45,
@@ -401,8 +357,7 @@
     "wPrice": 1530,
     "priceType": "KG",
     "rPrice": 1840,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 46,
@@ -410,8 +365,7 @@
     "wPrice": 110,
     "priceType": "PP",
     "rPrice": 170,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 47,
@@ -419,8 +373,7 @@
     "wPrice": 1830,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 48,
@@ -428,8 +381,7 @@
     "wPrice": 740,
     "priceType": "PP",
     "rPrice": 950,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 49,
@@ -437,8 +389,7 @@
     "wPrice": 1830,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 50,
@@ -446,8 +397,7 @@
     "wPrice": 1730,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 51,
@@ -455,8 +405,7 @@
     "wPrice": 1830,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 52,
@@ -464,8 +413,7 @@
     "wPrice": 1800,
     "priceType": "PP",
     "rPrice": 2100,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 53,
@@ -473,8 +421,7 @@
     "wPrice": 2440,
     "priceType": "PP",
     "rPrice": 2700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 54,
@@ -482,8 +429,7 @@
     "wPrice": 2970,
     "priceType": "PP",
     "rPrice": 3400,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 55,
@@ -491,8 +437,7 @@
     "wPrice": 1850,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 56,
@@ -500,8 +445,7 @@
     "wPrice": 1730,
     "priceType": "KG",
     "rPrice": 1940,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 57,
@@ -509,8 +453,7 @@
     "wPrice": 1730,
     "priceType": "KG",
     "rPrice": 1940,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 58,
@@ -518,8 +461,7 @@
     "wPrice": 1630,
     "priceType": "KG",
     "rPrice": 1940,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 59,
@@ -527,8 +469,7 @@
     "wPrice": 1730,
     "priceType": "KG",
     "rPrice": 1940,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 60,
@@ -536,8 +477,7 @@
     "wPrice": 2440,
     "priceType": "PP",
     "rPrice": 2800,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 61,
@@ -545,8 +485,7 @@
     "wPrice": 2970,
     "priceType": "PP",
     "rPrice": 3400,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 62,
@@ -554,8 +493,7 @@
     "wPrice": 3500,
     "priceType": "PP",
     "rPrice": 3920,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 63,
@@ -563,8 +501,7 @@
     "wPrice": 1800,
     "priceType": "PP",
     "rPrice": 2000,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 64,
@@ -572,8 +509,7 @@
     "wPrice": 2010,
     "priceType": "PP",
     "rPrice": 2340,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 65,
@@ -581,8 +517,7 @@
     "wPrice": 1060,
     "priceType": "PP",
     "rPrice": 1260,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 66,
@@ -590,8 +525,7 @@
     "wPrice": 1270,
     "priceType": "PP",
     "rPrice": 1500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 67,
@@ -599,8 +533,7 @@
     "wPrice": 1480,
     "priceType": "PP",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 68,
@@ -608,8 +541,7 @@
     "wPrice": 1060,
     "priceType": "PP",
     "rPrice": 1260,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 69,
@@ -617,8 +549,7 @@
     "wPrice": 1270,
     "priceType": "PP",
     "rPrice": 1500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 70,
@@ -626,8 +557,7 @@
     "wPrice": 1480,
     "priceType": "PP",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 71,
@@ -635,8 +565,7 @@
     "wPrice": 1680,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 72,
@@ -644,8 +573,7 @@
     "wPrice": 640,
     "priceType": "PP",
     "rPrice": 850,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 73,
@@ -653,8 +581,7 @@
     "wPrice": 740,
     "priceType": "PP",
     "rPrice": 950,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 74,
@@ -662,8 +589,7 @@
     "wPrice": 900,
     "priceType": "PP",
     "rPrice": 1060,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 75,
@@ -671,8 +597,7 @@
     "wPrice": 1010,
     "priceType": "PP",
     "rPrice": 1260,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 76,
@@ -680,8 +605,7 @@
     "wPrice": 6300,
     "priceType": "PP",
     "rPrice": 6900,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 77,
@@ -689,8 +613,7 @@
     "wPrice": 690,
     "priceType": "PP",
     "rPrice": 850,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 78,
@@ -698,8 +621,7 @@
     "wPrice": 800,
     "priceType": "PP",
     "rPrice": 960,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 79,
@@ -707,8 +629,7 @@
     "wPrice": 900,
     "priceType": "PP",
     "rPrice": 1060,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 80,
@@ -716,8 +637,7 @@
     "wPrice": 1010,
     "priceType": "PP",
     "rPrice": 1160,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 81,
@@ -725,8 +645,7 @@
     "wPrice": 1110,
     "priceType": "PP",
     "rPrice": 1260,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 82,
@@ -734,8 +653,7 @@
     "wPrice": 1380,
     "priceType": "PP",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 83,
@@ -743,8 +661,7 @@
     "wPrice": 3500,
     "priceType": "PP",
     "rPrice": 3920,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 84,
@@ -752,8 +669,7 @@
     "wPrice": 2970,
     "priceType": "PP",
     "rPrice": 3400,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 85,
@@ -761,8 +677,7 @@
     "wPrice": 5720,
     "priceType": "PP",
     "rPrice": 6300,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 86,
@@ -770,8 +685,7 @@
     "wPrice": 4030,
     "priceType": "PP",
     "rPrice": 4500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 87,
@@ -779,8 +693,7 @@
     "wPrice": 2230,
     "priceType": "PP",
     "rPrice": 2340,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 88,
@@ -788,8 +701,7 @@
     "wPrice": 2010,
     "priceType": "PP",
     "rPrice": 2100,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 89,
@@ -797,8 +709,7 @@
     "wPrice": 5720,
     "priceType": "PP",
     "rPrice": 6300,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 90,
@@ -806,8 +717,7 @@
     "wPrice": 3180,
     "priceType": "PP",
     "rPrice": 3820,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 91,
@@ -815,8 +725,7 @@
     "wPrice": 2760,
     "priceType": "PP",
     "rPrice": 3200,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 92,
@@ -824,8 +733,7 @@
     "wPrice": 1430,
     "priceType": "KG",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 93,
@@ -833,8 +741,7 @@
     "wPrice": 740,
     "priceType": "PP",
     "rPrice": 840,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 94,
@@ -842,8 +749,7 @@
     "wPrice": 850,
     "priceType": "PP",
     "rPrice": 960,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 95,
@@ -851,8 +757,7 @@
     "wPrice": 950,
     "priceType": "PP",
     "rPrice": 1040,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 96,
@@ -860,8 +765,7 @@
     "wPrice": 1060,
     "priceType": "PP",
     "rPrice": 1260,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 97,
@@ -869,8 +773,7 @@
     "wPrice": null,
     "priceType": "PP",
     "rPrice": null,
-    "material": null,
-    "": null
+    "material": null
   },
   {
     "sr": 98,
@@ -878,8 +781,7 @@
     "wPrice": 1010,
     "priceType": "PP",
     "rPrice": 1160,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 99,
@@ -887,8 +789,7 @@
     "wPrice": 1270,
     "priceType": "PP",
     "rPrice": 1500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 100,
@@ -896,8 +797,7 @@
     "wPrice": 1480,
     "priceType": "PP",
     "rPrice": 1700,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 101,
@@ -905,8 +805,7 @@
     "wPrice": 1750,
     "priceType": "PP",
     "rPrice": 1900,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 102,
@@ -914,8 +813,7 @@
     "wPrice": 1960,
     "priceType": "PP",
     "rPrice": 2340,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 103,
@@ -923,8 +821,7 @@
     "wPrice": 2230,
     "priceType": "PP",
     "rPrice": 2500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 104,
@@ -932,8 +829,7 @@
     "wPrice": 2760,
     "priceType": "PP",
     "rPrice": 3200,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 105,
@@ -941,8 +837,7 @@
     "wPrice": 3070,
     "priceType": "PP",
     "rPrice": 3600,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 106,
@@ -950,8 +845,7 @@
     "wPrice": 3390,
     "priceType": "PP",
     "rPrice": 3920,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 107,
@@ -959,8 +853,7 @@
     "wPrice": 4240,
     "priceType": "PP",
     "rPrice": 5000,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 108,
@@ -968,8 +861,7 @@
     "wPrice": 6000,
     "priceType": "PP",
     "rPrice": 6400,
-    "material": null,
-    "": null
+    "material": null
   },
   {
     "sr": 109,
@@ -977,8 +869,7 @@
     "wPrice": 1270,
     "priceType": "PP",
     "rPrice": 1360,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 110,
@@ -986,8 +877,7 @@
     "wPrice": 1750,
     "priceType": "PP",
     "rPrice": 1900,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 111,
@@ -995,8 +885,7 @@
     "wPrice": 800,
     "priceType": "PP",
     "rPrice": 1020,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 112,
@@ -1004,8 +893,7 @@
     "wPrice": 850,
     "priceType": "PP",
     "rPrice": 1100,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 113,
@@ -1013,8 +901,7 @@
     "wPrice": 900,
     "priceType": "PP",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 114,
@@ -1022,8 +909,7 @@
     "wPrice": 1010,
     "priceType": "PP",
     "rPrice": 1340,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 115,
@@ -1031,8 +917,7 @@
     "wPrice": 1530,
     "priceType": "KG",
     "rPrice": 1840,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 116,
@@ -1040,8 +925,7 @@
     "wPrice": 1900,
     "priceType": "KG",
     "rPrice": 2200,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 117,
@@ -1049,8 +933,7 @@
     "wPrice": 1680,
     "priceType": "KG",
     "rPrice": 1880,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 118,
@@ -1058,8 +941,7 @@
     "wPrice": 1730,
     "priceType": "KG",
     "rPrice": 1940,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 119,
@@ -1067,8 +949,7 @@
     "wPrice": 1630,
     "priceType": "KG",
     "rPrice": 1940,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 120,
@@ -1076,8 +957,7 @@
     "wPrice": 1950,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 121,
@@ -1085,8 +965,7 @@
     "wPrice": 1830,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 122,
@@ -1094,8 +973,7 @@
     "wPrice": 2050,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 123,
@@ -1103,8 +981,7 @@
     "wPrice": 1680,
     "priceType": "KG",
     "rPrice": 1920,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 124,
@@ -1112,8 +989,7 @@
     "wPrice": 1950,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 125,
@@ -1121,8 +997,7 @@
     "wPrice": 2050,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 126,
@@ -1130,8 +1005,7 @@
     "wPrice": 580,
     "priceType": "PP",
     "rPrice": 740,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 127,
@@ -1139,8 +1013,7 @@
     "wPrice": 690,
     "priceType": "PP",
     "rPrice": 850,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 128,
@@ -1148,8 +1021,7 @@
     "wPrice": 800,
     "priceType": "PP",
     "rPrice": 1060,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 129,
@@ -1157,8 +1029,7 @@
     "wPrice": 1330,
     "priceType": "KG",
     "rPrice": 1500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 130,
@@ -1166,8 +1037,7 @@
     "wPrice": 1350,
     "priceType": "KG",
     "rPrice": 1520,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 131,
@@ -1175,8 +1045,7 @@
     "wPrice": 1750,
     "priceType": "KG",
     "rPrice": 2100,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 132,
@@ -1184,8 +1053,7 @@
     "wPrice": 1770,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 133,
@@ -1193,8 +1061,7 @@
     "wPrice": 1480,
     "priceType": "KG",
     "rPrice": 1800,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 134,
@@ -1202,8 +1069,7 @@
     "wPrice": 1405,
     "priceType": "KG",
     "rPrice": 1740,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 135,
@@ -1211,8 +1077,7 @@
     "wPrice": 1530,
     "priceType": "KG",
     "rPrice": 1800,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 136,
@@ -1220,8 +1085,7 @@
     "wPrice": 1900,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 137,
@@ -1229,8 +1093,7 @@
     "wPrice": 1530,
     "priceType": "KG",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 138,
@@ -1238,8 +1101,7 @@
     "wPrice": 1850,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 139,
@@ -1247,8 +1109,7 @@
     "wPrice": 4240,
     "priceType": "PP",
     "rPrice": 4800,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 140,
@@ -1256,8 +1117,7 @@
     "wPrice": 1270,
     "priceType": "PP",
     "rPrice": 1500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 141,
@@ -1265,8 +1125,7 @@
     "wPrice": 1480,
     "priceType": "PP",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 142,
@@ -1274,8 +1133,7 @@
     "wPrice": 1700,
     "priceType": "PP",
     "rPrice": 2000,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 143,
@@ -1283,8 +1141,7 @@
     "wPrice": 1480,
     "priceType": "PP",
     "rPrice": 1800,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 144,
@@ -1292,8 +1149,7 @@
     "wPrice": 1700,
     "priceType": "PP",
     "rPrice": 2000,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 145,
@@ -1301,8 +1157,7 @@
     "wPrice": 1910,
     "priceType": "PP",
     "rPrice": 2340,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 146,
@@ -1310,8 +1165,7 @@
     "wPrice": 1060,
     "priceType": "PP",
     "rPrice": 1260,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 147,
@@ -1319,8 +1173,7 @@
     "wPrice": 1330,
     "priceType": "PP",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 148,
@@ -1328,8 +1181,7 @@
     "wPrice": 1540,
     "priceType": "PP",
     "rPrice": 1900,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 149,
@@ -1337,8 +1189,7 @@
     "wPrice": 1750,
     "priceType": "PP",
     "rPrice": 2100,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 150,
@@ -1346,8 +1197,7 @@
     "wPrice": 850,
     "priceType": "PP",
     "rPrice": 1000,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 151,
@@ -1355,8 +1205,7 @@
     "wPrice": 640,
     "priceType": "PP",
     "rPrice": 750,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 152,
@@ -1364,8 +1213,7 @@
     "wPrice": 800,
     "priceType": "PP",
     "rPrice": 1020,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 153,
@@ -1373,8 +1221,7 @@
     "wPrice": 1410,
     "priceType": "KG",
     "rPrice": 1640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 154,
@@ -1382,8 +1229,7 @@
     "wPrice": 1460,
     "priceType": "KG",
     "rPrice": 1640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 155,
@@ -1391,8 +1237,7 @@
     "wPrice": 1730,
     "priceType": "KG",
     "rPrice": 1940,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 156,
@@ -1400,8 +1245,7 @@
     "wPrice": 1710,
     "priceType": "KG",
     "rPrice": 1920,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 157,
@@ -1409,8 +1253,7 @@
     "wPrice": 4900,
     "priceType": "PP",
     "rPrice": 5500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 158,
@@ -1418,8 +1261,7 @@
     "wPrice": 6200,
     "priceType": "PP",
     "rPrice": 7200,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 159,
@@ -1427,8 +1269,7 @@
     "wPrice": 420,
     "priceType": "PP",
     "rPrice": 530,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 160,
@@ -1436,8 +1277,7 @@
     "wPrice": 530,
     "priceType": "PP",
     "rPrice": 740,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 161,
@@ -1445,8 +1285,7 @@
     "wPrice": 1730,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 162,
@@ -1454,8 +1293,7 @@
     "wPrice": 1730,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 163,
@@ -1463,8 +1301,7 @@
     "wPrice": 1200,
     "priceType": "KG",
     "rPrice": 1360,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 164,
@@ -1472,8 +1309,7 @@
     "wPrice": 1300,
     "priceType": "KG",
     "rPrice": 1500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 165,
@@ -1481,8 +1317,7 @@
     "wPrice": 1630,
     "priceType": "KG",
     "rPrice": 1940,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 166,
@@ -1490,8 +1325,7 @@
     "wPrice": 420,
     "priceType": "PP",
     "rPrice": 530,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 167,
@@ -1499,8 +1333,7 @@
     "wPrice": 420,
     "priceType": "PP",
     "rPrice": 530,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 168,
@@ -1508,8 +1341,7 @@
     "wPrice": 580,
     "priceType": "PP",
     "rPrice": 630,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 169,
@@ -1517,8 +1349,7 @@
     "wPrice": 1330,
     "priceType": "KG",
     "rPrice": 1520,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 170,
@@ -1526,8 +1357,7 @@
     "wPrice": 1680,
     "priceType": "KG",
     "rPrice": 1920,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 171,
@@ -1535,8 +1365,7 @@
     "wPrice": 1650,
     "priceType": "KG",
     "rPrice": 1960,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 172,
@@ -1544,8 +1373,7 @@
     "wPrice": 1900,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 173,
@@ -1553,8 +1381,7 @@
     "wPrice": 2800,
     "priceType": "PP",
     "rPrice": 2700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 174,
@@ -1562,8 +1389,7 @@
     "wPrice": 3600,
     "priceType": "PP",
     "rPrice": 2900,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 175,
@@ -1571,8 +1397,7 @@
     "wPrice": 4300,
     "priceType": "PP",
     "rPrice": 3600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 176,
@@ -1580,8 +1405,7 @@
     "wPrice": 2330,
     "priceType": "PP",
     "rPrice": 2700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 177,
@@ -1589,8 +1413,7 @@
     "wPrice": 2540,
     "priceType": "PP",
     "rPrice": 2900,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 178,
@@ -1598,8 +1421,7 @@
     "wPrice": 1880,
     "priceType": "KG",
     "rPrice": 2200,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 179,
@@ -1607,8 +1429,7 @@
     "wPrice": 1270,
     "priceType": "KG",
     "rPrice": 1500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 180,
@@ -1616,8 +1437,7 @@
     "wPrice": 1170,
     "priceType": "KG",
     "rPrice": 1500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 181,
@@ -1625,8 +1445,7 @@
     "wPrice": 1330,
     "priceType": "KG",
     "rPrice": 1520,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 182,
@@ -1634,8 +1453,7 @@
     "wPrice": 2600,
     "priceType": "PP",
     "rPrice": 3000,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 183,
@@ -1643,8 +1461,7 @@
     "wPrice": 2000,
     "priceType": "KG",
     "rPrice": 2300,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 184,
@@ -1652,8 +1469,7 @@
     "wPrice": 2200,
     "priceType": "PP",
     "rPrice": 850,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 185,
@@ -1661,8 +1477,7 @@
     "wPrice": 2200,
     "priceType": "PP",
     "rPrice": 950,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 186,
@@ -1670,8 +1485,7 @@
     "wPrice": 2200,
     "priceType": "PP",
     "rPrice": 1050,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 187,
@@ -1679,8 +1493,7 @@
     "wPrice": 1830,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 188,
@@ -1688,8 +1501,7 @@
     "wPrice": 260,
     "priceType": "PP",
     "rPrice": 320,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 189,
@@ -1697,8 +1509,7 @@
     "wPrice": 310,
     "priceType": "PP",
     "rPrice": 370,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 190,
@@ -1706,8 +1517,7 @@
     "wPrice": 420,
     "priceType": "PP",
     "rPrice": 530,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 191,
@@ -1715,8 +1525,7 @@
     "wPrice": 370,
     "priceType": "PP",
     "rPrice": 480,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 192,
@@ -1724,8 +1533,7 @@
     "wPrice": 370,
     "priceType": "PP",
     "rPrice": 530,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 193,
@@ -1733,8 +1541,7 @@
     "wPrice": 1430,
     "priceType": "KG",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 194,
@@ -1742,8 +1549,7 @@
     "wPrice": 1230,
     "priceType": "KG",
     "rPrice": 1340,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 195,
@@ -1751,8 +1557,7 @@
     "wPrice": 1250,
     "priceType": "KG",
     "rPrice": 1340,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 196,
@@ -1760,8 +1565,7 @@
     "wPrice": 1430,
     "priceType": "KG",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 197,
@@ -1769,8 +1573,7 @@
     "wPrice": 1380,
     "priceType": "KG",
     "rPrice": 1640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 198,
@@ -1778,8 +1581,7 @@
     "wPrice": 1020,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 199,
@@ -1787,8 +1589,7 @@
     "wPrice": 1150,
     "priceType": "KG",
     "rPrice": 1400,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 200,
@@ -1796,8 +1597,7 @@
     "wPrice": 320,
     "priceType": "PP",
     "rPrice": 430,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 201,
@@ -1805,8 +1605,7 @@
     "wPrice": 2650,
     "priceType": "PP",
     "rPrice": 3200,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 202,
@@ -1814,8 +1613,7 @@
     "wPrice": 3180,
     "priceType": "PP",
     "rPrice": 3700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 203,
@@ -1823,8 +1621,7 @@
     "wPrice": 3710,
     "priceType": "PP",
     "rPrice": 4200,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 204,
@@ -1832,8 +1629,7 @@
     "wPrice": 530,
     "priceType": "PP",
     "rPrice": 640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 205,
@@ -1841,8 +1637,7 @@
     "wPrice": 320,
     "priceType": "PP",
     "rPrice": 430,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 206,
@@ -1850,8 +1645,7 @@
     "wPrice": 320,
     "priceType": "PP",
     "rPrice": 430,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 207,
@@ -1859,8 +1653,7 @@
     "wPrice": 1530,
     "priceType": "KG",
     "rPrice": 1800,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 208,
@@ -1868,8 +1661,7 @@
     "wPrice": 1580,
     "priceType": "KG",
     "rPrice": 1830,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 209,
@@ -1877,8 +1669,7 @@
     "wPrice": 2000,
     "priceType": "KG",
     "rPrice": 2300,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 210,
@@ -1886,8 +1677,7 @@
     "wPrice": 2030,
     "priceType": "KG",
     "rPrice": 2340,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 211,
@@ -1895,8 +1685,7 @@
     "wPrice": 1270,
     "priceType": "KG",
     "rPrice": 1360,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 212,
@@ -1904,8 +1693,7 @@
     "wPrice": 1750,
     "priceType": "KG",
     "rPrice": 1860,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 213,
@@ -1913,8 +1701,7 @@
     "wPrice": 1150,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 214,
@@ -1922,8 +1709,7 @@
     "wPrice": 1170,
     "priceType": "KG",
     "rPrice": 1300,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 215,
@@ -1931,8 +1717,7 @@
     "wPrice": 1320,
     "priceType": "KG",
     "rPrice": 1400,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 216,
@@ -1940,8 +1725,7 @@
     "wPrice": 1340,
     "priceType": "KG",
     "rPrice": 1400,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 217,
@@ -1949,8 +1733,7 @@
     "wPrice": 1360,
     "priceType": "KG",
     "rPrice": 1450,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 218,
@@ -1958,8 +1741,7 @@
     "wPrice": 1380,
     "priceType": "KG",
     "rPrice": 1500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 219,
@@ -1967,8 +1749,7 @@
     "wPrice": 1280,
     "priceType": "KG",
     "rPrice": 1500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 220,
@@ -1976,8 +1757,7 @@
     "wPrice": 1120,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 221,
@@ -1985,8 +1765,7 @@
     "wPrice": 1170,
     "priceType": "KG",
     "rPrice": 1320,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 222,
@@ -1994,8 +1773,7 @@
     "wPrice": 1280,
     "priceType": "KG",
     "rPrice": 1500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 223,
@@ -2003,8 +1781,7 @@
     "wPrice": 1200,
     "priceType": "KG",
     "rPrice": 1330,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 224,
@@ -2012,8 +1789,7 @@
     "wPrice": 1100,
     "priceType": "KG",
     "rPrice": 1230,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 225,
@@ -2021,8 +1797,7 @@
     "wPrice": 1250,
     "priceType": "KG",
     "rPrice": 1350,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 226,
@@ -2030,35 +1805,31 @@
     "wPrice": 1350,
     "priceType": "KG",
     "rPrice": 1450,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 227,
     "productName": "Tasla Kadhai K+P 6-7",
-    "wPrice": 1250,
+    "wPrice": 1260,
     "priceType": "KG",
     "rPrice": 1440,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 228,
     "productName": "Tasla Kadhai K+P 8-14",
-    "wPrice": 1150,
+    "wPrice": 1160,
     "priceType": "KG",
     "rPrice": 1330,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 229,
     "productName": "Top Joint Bottom",
-    "wPrice": 1160,
+    "wPrice": 1170,
     "priceType": "KG",
-    "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "rPrice": 1230,
+    "material": "Brass"
   },
   {
     "sr": 230,
@@ -2066,8 +1837,7 @@
     "wPrice": 1180,
     "priceType": "KG",
     "rPrice": 1240,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 231,
@@ -2075,8 +1845,7 @@
     "wPrice": 1700,
     "priceType": "KG",
     "rPrice": 1800,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 232,
@@ -2084,8 +1853,7 @@
     "wPrice": 1750,
     "priceType": "KG",
     "rPrice": 2100,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 233,
@@ -2093,8 +1861,7 @@
     "wPrice": 1800,
     "priceType": "KG",
     "rPrice": 1960,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 234,
@@ -2102,8 +1869,7 @@
     "wPrice": 1480,
     "priceType": "KG",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 235,
@@ -2111,8 +1877,7 @@
     "wPrice": 1750,
     "priceType": "KG",
     "rPrice": 1860,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 236,
@@ -2120,8 +1885,7 @@
     "wPrice": 1850,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 237,
@@ -2129,8 +1893,7 @@
     "wPrice": 1850,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 238,
@@ -2138,8 +1901,7 @@
     "wPrice": 1355,
     "priceType": "KG",
     "rPrice": 1560,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 239,
@@ -2147,62 +1909,55 @@
     "wPrice": 1470,
     "priceType": "KG",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 240,
     "productName": "Parat 11-13",
-    "wPrice": 1160,
+    "wPrice": 1180,
     "priceType": "KG",
     "rPrice": 1320,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 241,
     "productName": "Parat 14",
-    "wPrice": 1160,
+    "wPrice": 1180,
     "priceType": "KG",
     "rPrice": 1320,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 242,
     "productName": "Parat 15",
-    "wPrice": 1080,
+    "wPrice": 1100,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 243,
     "productName": "Parat 16-24",
-    "wPrice": 1060,
+    "wPrice": 1080,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 244,
     "productName": "Parat 25-30",
-    "wPrice": 1110,
+    "wPrice": 1130,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 245,
     "productName": "Parat 32-36",
-    "wPrice": 1160,
+    "wPrice": 1180,
     "priceType": "KG",
     "rPrice": 1220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 246,
@@ -2210,8 +1965,7 @@
     "wPrice": 1700,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 247,
@@ -2219,8 +1973,7 @@
     "wPrice": 1700,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 248,
@@ -2228,8 +1981,7 @@
     "wPrice": 1850,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 249,
@@ -2237,8 +1989,7 @@
     "wPrice": 1750,
     "priceType": "KG",
     "rPrice": 2100,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 250,
@@ -2246,8 +1997,7 @@
     "wPrice": 1750,
     "priceType": "KG",
     "rPrice": 2100,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 251,
@@ -2255,8 +2005,7 @@
     "wPrice": 2000,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 252,
@@ -2264,8 +2013,7 @@
     "wPrice": 1850,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 253,
@@ -2273,8 +2021,7 @@
     "wPrice": 1950,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 254,
@@ -2282,8 +2029,7 @@
     "wPrice": 1850,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 255,
@@ -2291,8 +2037,7 @@
     "wPrice": 2050,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 256,
@@ -2300,8 +2045,7 @@
     "wPrice": 1850,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 257,
@@ -2309,8 +2053,7 @@
     "wPrice": 1700,
     "priceType": "KG",
     "rPrice": 1860,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 258,
@@ -2318,8 +2061,7 @@
     "wPrice": 1800,
     "priceType": "KG",
     "rPrice": 1960,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 259,
@@ -2327,8 +2069,7 @@
     "wPrice": 1750,
     "priceType": "KG",
     "rPrice": 2100,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 260,
@@ -2336,8 +2077,7 @@
     "wPrice": 1850,
     "priceType": "KG",
     "rPrice": 2160,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 261,
@@ -2345,8 +2085,7 @@
     "wPrice": 1700,
     "priceType": "KG",
     "rPrice": 1800,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 262,
@@ -2354,8 +2093,7 @@
     "wPrice": 1900,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 263,
@@ -2363,8 +2101,7 @@
     "wPrice": 2000,
     "priceType": "KG",
     "rPrice": 2200,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 264,
@@ -2372,8 +2109,7 @@
     "wPrice": 1780,
     "priceType": "KG",
     "rPrice": 1860,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 265,
@@ -2381,8 +2117,7 @@
     "wPrice": 1725,
     "priceType": "KG",
     "rPrice": 1885,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 266,
@@ -2390,8 +2125,7 @@
     "wPrice": 1800,
     "priceType": "KG",
     "rPrice": 1960,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 267,
@@ -2399,8 +2133,7 @@
     "wPrice": 1800,
     "priceType": "KG",
     "rPrice": 1960,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 268,
@@ -2408,8 +2141,7 @@
     "wPrice": 1850,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 269,
@@ -2417,8 +2149,7 @@
     "wPrice": 1750,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 270,
@@ -2426,8 +2157,7 @@
     "wPrice": 1850,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 271,
@@ -2435,8 +2165,7 @@
     "wPrice": 1120,
     "priceType": "KG",
     "rPrice": 1420,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 272,
@@ -2444,8 +2173,7 @@
     "wPrice": 1320,
     "priceType": "KG",
     "rPrice": 1500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 273,
@@ -2453,8 +2181,7 @@
     "wPrice": 1300,
     "priceType": "KG",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 274,
@@ -2462,8 +2189,7 @@
     "wPrice": 1330,
     "priceType": "KG",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 275,
@@ -2471,8 +2197,7 @@
     "wPrice": 1380,
     "priceType": "KG",
     "rPrice": 1640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 276,
@@ -2480,8 +2205,7 @@
     "wPrice": 1270,
     "priceType": "KG",
     "rPrice": 1420,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 277,
@@ -2489,8 +2213,7 @@
     "wPrice": 300,
     "priceType": "PP",
     "rPrice": 320,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 278,
@@ -2498,8 +2221,7 @@
     "wPrice": 320,
     "priceType": "PP",
     "rPrice": 370,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 279,
@@ -2507,8 +2229,7 @@
     "wPrice": 350,
     "priceType": "PP",
     "rPrice": 420,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 280,
@@ -2516,8 +2237,7 @@
     "wPrice": 110,
     "priceType": "PP",
     "rPrice": 170,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 281,
@@ -2525,8 +2245,7 @@
     "wPrice": 130,
     "priceType": "PP",
     "rPrice": 220,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 282,
@@ -2534,8 +2253,7 @@
     "wPrice": 260,
     "priceType": "PP",
     "rPrice": 320,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 283,
@@ -2543,8 +2261,7 @@
     "wPrice": 260,
     "priceType": "PP",
     "rPrice": 320,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 284,
@@ -2552,8 +2269,7 @@
     "wPrice": null,
     "priceType": "PP",
     "rPrice": null,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 285,
@@ -2561,8 +2277,7 @@
     "wPrice": 350,
     "priceType": "PP",
     "rPrice": 420,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 286,
@@ -2570,8 +2285,7 @@
     "wPrice": 420,
     "priceType": "PP",
     "rPrice": 530,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 287,
@@ -2579,8 +2293,7 @@
     "wPrice": 530,
     "priceType": "PP",
     "rPrice": 640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 288,
@@ -2588,8 +2301,7 @@
     "wPrice": 640,
     "priceType": "PP",
     "rPrice": 750,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 289,
@@ -2597,8 +2309,7 @@
     "wPrice": 740,
     "priceType": "PP",
     "rPrice": 840,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 290,
@@ -2606,8 +2317,7 @@
     "wPrice": 850,
     "priceType": "PP",
     "rPrice": 1060,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 291,
@@ -2615,8 +2325,7 @@
     "wPrice": 370,
     "priceType": "PP",
     "rPrice": 420,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 292,
@@ -2624,8 +2333,7 @@
     "wPrice": 370,
     "priceType": "PP",
     "rPrice": 420,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 293,
@@ -2633,8 +2341,7 @@
     "wPrice": 420,
     "priceType": "PP",
     "rPrice": 470,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 294,
@@ -2642,8 +2349,7 @@
     "wPrice": 1680,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 295,
@@ -2651,8 +2357,7 @@
     "wPrice": 280,
     "priceType": "PP",
     "rPrice": 320,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 296,
@@ -2660,8 +2365,7 @@
     "wPrice": 300,
     "priceType": "PP",
     "rPrice": 380,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 297,
@@ -2669,8 +2373,7 @@
     "wPrice": 480,
     "priceType": "PP",
     "rPrice": 640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 298,
@@ -2678,8 +2381,7 @@
     "wPrice": null,
     "priceType": "KG",
     "rPrice": null,
-    "material": null,
-    "": null
+    "material": null
   },
   {
     "sr": 299,
@@ -2687,8 +2389,7 @@
     "wPrice": 250,
     "priceType": "PP",
     "rPrice": 250,
-    "material": null,
-    "": null
+    "material": null
   },
   {
     "sr": 300,
@@ -2696,8 +2397,7 @@
     "wPrice": 300,
     "priceType": "PP",
     "rPrice": 380,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 301,
@@ -2705,8 +2405,7 @@
     "wPrice": 2970,
     "priceType": "PP",
     "rPrice": 3400,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 302,
@@ -2714,8 +2413,7 @@
     "wPrice": 3180,
     "priceType": "PP",
     "rPrice": 3700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 303,
@@ -2723,8 +2421,7 @@
     "wPrice": 1330,
     "priceType": "PP",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 304,
@@ -2732,8 +2429,7 @@
     "wPrice": 1430,
     "priceType": "PP",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 305,
@@ -2741,8 +2437,7 @@
     "wPrice": 1800,
     "priceType": "PP",
     "rPrice": 2100,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 306,
@@ -2750,8 +2445,7 @@
     "wPrice": 1910,
     "priceType": "PP",
     "rPrice": 2340,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 307,
@@ -2759,8 +2453,7 @@
     "wPrice": 1480,
     "priceType": "PP",
     "rPrice": 1800,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 308,
@@ -2768,8 +2461,7 @@
     "wPrice": 1480,
     "priceType": "PP",
     "rPrice": 1800,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 309,
@@ -2777,8 +2469,7 @@
     "wPrice": 1430,
     "priceType": "PP",
     "rPrice": 1640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 310,
@@ -2786,8 +2477,7 @@
     "wPrice": 1640,
     "priceType": "PP",
     "rPrice": 1900,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 311,
@@ -2795,8 +2485,7 @@
     "wPrice": 580,
     "priceType": "PP",
     "rPrice": 740,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 312,
@@ -2804,8 +2493,7 @@
     "wPrice": 740,
     "priceType": "PP",
     "rPrice": 840,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 313,
@@ -2813,8 +2501,7 @@
     "wPrice": 740,
     "priceType": "PP",
     "rPrice": 840,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 314,
@@ -2822,8 +2509,7 @@
     "wPrice": 690,
     "priceType": "PP",
     "rPrice": 850,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 315,
@@ -2831,8 +2517,7 @@
     "wPrice": 690,
     "priceType": "PP",
     "rPrice": 850,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 316,
@@ -2840,8 +2525,7 @@
     "wPrice": 950,
     "priceType": "PP",
     "rPrice": 1160,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 317,
@@ -2849,8 +2533,7 @@
     "wPrice": 850,
     "priceType": "PP",
     "rPrice": 1060,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 318,
@@ -2858,8 +2541,7 @@
     "wPrice": 1640,
     "priceType": "PP",
     "rPrice": 1900,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 319,
@@ -2867,8 +2549,7 @@
     "wPrice": 1860,
     "priceType": "PP",
     "rPrice": 2100,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 320,
@@ -2876,8 +2557,7 @@
     "wPrice": 1640,
     "priceType": "PP",
     "rPrice": 1900,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 321,
@@ -2885,8 +2565,7 @@
     "wPrice": 1860,
     "priceType": "PP",
     "rPrice": 2100,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 322,
@@ -2894,8 +2573,7 @@
     "wPrice": 2200,
     "priceType": "KG",
     "rPrice": 2500,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 323,
@@ -2903,8 +2581,7 @@
     "wPrice": 150,
     "priceType": "PP",
     "rPrice": 190,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 324,
@@ -2912,8 +2589,7 @@
     "wPrice": 640,
     "priceType": "PP",
     "rPrice": 850,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 325,
@@ -2921,8 +2597,7 @@
     "wPrice": 2800,
     "priceType": "KG",
     "rPrice": 3200,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 326,
@@ -2930,8 +2605,7 @@
     "wPrice": 500,
     "priceType": "PP",
     "rPrice": 600,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 327,
@@ -2939,8 +2613,7 @@
     "wPrice": 800,
     "priceType": "PP",
     "rPrice": 1000,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 328,
@@ -2948,8 +2621,7 @@
     "wPrice": 200,
     "priceType": "PP",
     "rPrice": 250,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 329,
@@ -2957,8 +2629,7 @@
     "wPrice": 250,
     "priceType": "PP",
     "rPrice": 300,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 330,
@@ -2966,8 +2637,7 @@
     "wPrice": 900,
     "priceType": "PP",
     "rPrice": 1100,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 331,
@@ -2975,8 +2645,7 @@
     "wPrice": 1380,
     "priceType": "KG",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 332,
@@ -2984,8 +2653,7 @@
     "wPrice": 1460,
     "priceType": "KG",
     "rPrice": 1640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 333,
@@ -2993,8 +2661,7 @@
     "wPrice": 1560,
     "priceType": "KG",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 334,
@@ -3002,8 +2669,7 @@
     "wPrice": 1300,
     "priceType": "KG",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 335,
@@ -3011,8 +2677,7 @@
     "wPrice": 1270,
     "priceType": "KG",
     "rPrice": 1500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 336,
@@ -3020,8 +2685,7 @@
     "wPrice": 1480,
     "priceType": "KG",
     "rPrice": 1800,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 337,
@@ -3029,8 +2693,7 @@
     "wPrice": 1380,
     "priceType": "KG",
     "rPrice": 1520,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 338,
@@ -3038,8 +2701,7 @@
     "wPrice": 1530,
     "priceType": "KG",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 339,
@@ -3047,8 +2709,7 @@
     "wPrice": 1530,
     "priceType": "KG",
     "rPrice": 1700,
-    "material": "Brass",
-    "": " "
+    "material": "Brass"
   },
   {
     "sr": 340,
@@ -3056,8 +2717,7 @@
     "wPrice": 1530,
     "priceType": "KG",
     "rPrice": 1840,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 341,
@@ -3065,8 +2725,7 @@
     "wPrice": 1650,
     "priceType": "KG",
     "rPrice": 1860,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 342,
@@ -3074,8 +2733,7 @@
     "wPrice": 1430,
     "priceType": "KG",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 343,
@@ -3083,8 +2741,7 @@
     "wPrice": 1930,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 344,
@@ -3092,8 +2749,7 @@
     "wPrice": 1550,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 345,
@@ -3101,8 +2757,7 @@
     "wPrice": 1950,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 346,
@@ -3110,8 +2765,7 @@
     "wPrice": 1950,
     "priceType": "KG",
     "rPrice": 2240,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 347,
@@ -3119,8 +2773,7 @@
     "wPrice": 1530,
     "priceType": "KG",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 348,
@@ -3128,26 +2781,23 @@
     "wPrice": 1800,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 349,
     "productName": "Thali 10-14",
-    "wPrice": 1800,
+    "wPrice": 1900,
     "priceType": "KG",
-    "rPrice": 2040,
-    "material": "Copper",
-    "": null
+    "rPrice": 2100,
+    "material": "Copper"
   },
   {
     "sr": 350,
     "productName": "Thali Big",
-    "wPrice": 2050,
+    "wPrice": 2100,
     "priceType": "KG",
-    "rPrice": 2240,
-    "material": "Copper",
-    "": null
+    "rPrice": 2300,
+    "material": "Copper"
   },
   {
     "sr": 351,
@@ -3155,8 +2805,7 @@
     "wPrice": 1530,
     "priceType": "KG",
     "rPrice": 1800,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 352,
@@ -3164,8 +2813,7 @@
     "wPrice": 1700,
     "priceType": "KG",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 353,
@@ -3173,8 +2821,7 @@
     "wPrice": 1530,
     "priceType": "KG",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 354,
@@ -3182,8 +2829,7 @@
     "wPrice": 1580,
     "priceType": "KG",
     "rPrice": 1740,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 355,
@@ -3191,8 +2837,7 @@
     "wPrice": 2300,
     "priceType": "PP",
     "rPrice": 2700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 356,
@@ -3200,8 +2845,7 @@
     "wPrice": 700,
     "priceType": "PP",
     "rPrice": 900,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 357,
@@ -3209,8 +2853,7 @@
     "wPrice": 800,
     "priceType": "PP",
     "rPrice": 1000,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 358,
@@ -3218,8 +2861,7 @@
     "wPrice": 900,
     "priceType": "PP",
     "rPrice": 1200,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 359,
@@ -3227,8 +2869,7 @@
     "wPrice": 400,
     "priceType": "PP",
     "rPrice": 500,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 360,
@@ -3236,8 +2877,7 @@
     "wPrice": 4000,
     "priceType": "KG",
     "rPrice": 4600,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 361,
@@ -3245,8 +2885,7 @@
     "wPrice": 5500,
     "priceType": "PP",
     "rPrice": 6300,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 362,
@@ -3254,8 +2893,7 @@
     "wPrice": 4000,
     "priceType": "KG",
     "rPrice": 4400,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 363,
@@ -3263,8 +2901,7 @@
     "wPrice": 2600,
     "priceType": "KG",
     "rPrice": 3000,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 364,
@@ -3272,8 +2909,7 @@
     "wPrice": 600,
     "priceType": "PP",
     "rPrice": 700,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 365,
@@ -3281,8 +2917,7 @@
     "wPrice": 800,
     "priceType": "PP",
     "rPrice": 1000,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 366,
@@ -3290,8 +2925,7 @@
     "wPrice": 2900,
     "priceType": "PP",
     "rPrice": 3200,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 367,
@@ -3299,8 +2933,7 @@
     "wPrice": 3000,
     "priceType": "PP",
     "rPrice": 3400,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 368,
@@ -3308,8 +2941,7 @@
     "wPrice": 1600,
     "priceType": "KG",
     "rPrice": 1850,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 369,
@@ -3317,8 +2949,7 @@
     "wPrice": 600,
     "priceType": "PP",
     "rPrice": 800,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 370,
@@ -3326,8 +2957,7 @@
     "wPrice": 3800,
     "priceType": "PP",
     "rPrice": 4400,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 371,
@@ -3335,8 +2965,7 @@
     "wPrice": 1430,
     "priceType": "KG",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 372,
@@ -3344,8 +2973,7 @@
     "wPrice": 1380,
     "priceType": "KG",
     "rPrice": 1640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 373,
@@ -3353,8 +2981,7 @@
     "wPrice": 1380,
     "priceType": "KG",
     "rPrice": 1640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 374,
@@ -3362,8 +2989,7 @@
     "wPrice": 1330,
     "priceType": "KG",
     "rPrice": 1640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 375,
@@ -3371,8 +2997,7 @@
     "wPrice": 1170,
     "priceType": "KG",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 376,
@@ -3380,8 +3005,7 @@
     "wPrice": 640,
     "priceType": "PP",
     "rPrice": 750,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 377,
@@ -3389,8 +3013,7 @@
     "wPrice": 690,
     "priceType": "PP",
     "rPrice": 850,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 378,
@@ -3398,8 +3021,7 @@
     "wPrice": 800,
     "priceType": "PP",
     "rPrice": 960,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 379,
@@ -3407,8 +3029,7 @@
     "wPrice": 1010,
     "priceType": "PP",
     "rPrice": 1160,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 380,
@@ -3416,8 +3037,7 @@
     "wPrice": 1220,
     "priceType": "PP",
     "rPrice": 1400,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 381,
@@ -3425,8 +3045,7 @@
     "wPrice": 1430,
     "priceType": "PP",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 382,
@@ -3434,8 +3053,7 @@
     "wPrice": 1700,
     "priceType": "PP",
     "rPrice": 2000,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 383,
@@ -3443,8 +3061,7 @@
     "wPrice": 1910,
     "priceType": "PP",
     "rPrice": 2500,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 384,
@@ -3452,8 +3069,7 @@
     "wPrice": 3070,
     "priceType": "PP",
     "rPrice": 3600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 385,
@@ -3461,8 +3077,7 @@
     "wPrice": 530,
     "priceType": "PP",
     "rPrice": 640,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 386,
@@ -3470,8 +3085,7 @@
     "wPrice": 640,
     "priceType": "PP",
     "rPrice": 750,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 387,
@@ -3479,8 +3093,7 @@
     "wPrice": 400,
     "priceType": "PP",
     "rPrice": 470,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 388,
@@ -3488,8 +3101,7 @@
     "wPrice": 450,
     "priceType": "PP",
     "rPrice": 540,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 389,
@@ -3497,8 +3109,7 @@
     "wPrice": 530,
     "priceType": "PP",
     "rPrice": 640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 390,
@@ -3506,8 +3117,7 @@
     "wPrice": 580,
     "priceType": "PP",
     "rPrice": 740,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 391,
@@ -3515,8 +3125,7 @@
     "wPrice": 690,
     "priceType": "PP",
     "rPrice": 850,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 392,
@@ -3524,8 +3133,7 @@
     "wPrice": 950,
     "priceType": "PP",
     "rPrice": 1160,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 393,
@@ -3533,8 +3141,7 @@
     "wPrice": 1330,
     "priceType": "KG",
     "rPrice": 1520,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 394,
@@ -3542,8 +3149,7 @@
     "wPrice": 1630,
     "priceType": "KG",
     "rPrice": 1840,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 395,
@@ -3551,8 +3157,7 @@
     "wPrice": 950,
     "priceType": "PP",
     "rPrice": 1200,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 396,
@@ -3560,8 +3165,7 @@
     "wPrice": 850,
     "priceType": "PP",
     "rPrice": 1000,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 397,
@@ -3569,8 +3173,7 @@
     "wPrice": 60,
     "priceType": "PP",
     "rPrice": 70,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 398,
@@ -3578,8 +3181,7 @@
     "wPrice": 70,
     "priceType": "PP",
     "rPrice": 80,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 399,
@@ -3587,8 +3189,7 @@
     "wPrice": 80,
     "priceType": "PP",
     "rPrice": 90,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 400,
@@ -3596,8 +3197,7 @@
     "wPrice": 90,
     "priceType": "PP",
     "rPrice": 100,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 401,
@@ -3605,8 +3205,7 @@
     "wPrice": 210,
     "priceType": "PP",
     "rPrice": 320,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 402,
@@ -3614,8 +3213,7 @@
     "wPrice": 480,
     "priceType": "PP",
     "rPrice": 640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 403,
@@ -3623,8 +3221,7 @@
     "wPrice": 420,
     "priceType": "PP",
     "rPrice": 530,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 404,
@@ -3632,8 +3229,7 @@
     "wPrice": 530,
     "priceType": "PP",
     "rPrice": 640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 405,
@@ -3641,8 +3237,7 @@
     "wPrice": 1800,
     "priceType": "PP",
     "rPrice": 380,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 406,
@@ -3650,8 +3245,7 @@
     "wPrice": 1800,
     "priceType": "PP",
     "rPrice": 430,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 407,
@@ -3659,8 +3253,7 @@
     "wPrice": 1800,
     "priceType": "PP",
     "rPrice": 480,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 408,
@@ -3668,8 +3261,7 @@
     "wPrice": 370,
     "priceType": "PP",
     "rPrice": 420,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 409,
@@ -3677,8 +3269,7 @@
     "wPrice": 420,
     "priceType": "PP",
     "rPrice": 470,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 410,
@@ -3686,8 +3277,7 @@
     "wPrice": 480,
     "priceType": "PP",
     "rPrice": 590,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 411,
@@ -3695,8 +3285,7 @@
     "wPrice": 60,
     "priceType": "PP",
     "rPrice": 70,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 412,
@@ -3704,8 +3293,7 @@
     "wPrice": 80,
     "priceType": "PP",
     "rPrice": 100,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 413,
@@ -3713,8 +3301,7 @@
     "wPrice": 100,
     "priceType": "PP",
     "rPrice": 130,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 414,
@@ -3722,8 +3309,7 @@
     "wPrice": 110,
     "priceType": "PP",
     "rPrice": 150,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 415,
@@ -3731,8 +3317,7 @@
     "wPrice": 4770,
     "priceType": "PP",
     "rPrice": 5300,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 416,
@@ -3740,8 +3325,7 @@
     "wPrice": 170,
     "priceType": "PP",
     "rPrice": 190,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 417,
@@ -3749,8 +3333,7 @@
     "wPrice": 190,
     "priceType": "PP",
     "rPrice": 210,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 418,
@@ -3758,8 +3341,7 @@
     "wPrice": 210,
     "priceType": "PP",
     "rPrice": 230,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 419,
@@ -3767,8 +3349,7 @@
     "wPrice": 230,
     "priceType": "PP",
     "rPrice": 260,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 420,
@@ -3776,8 +3357,7 @@
     "wPrice": 270,
     "priceType": "PP",
     "rPrice": 320,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 421,
@@ -3785,8 +3365,7 @@
     "wPrice": 420,
     "priceType": "PP",
     "rPrice": 530,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 422,
@@ -3794,8 +3373,7 @@
     "wPrice": 170,
     "priceType": "PP",
     "rPrice": 190,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 423,
@@ -3803,8 +3381,7 @@
     "wPrice": 180,
     "priceType": "PP",
     "rPrice": 210,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 424,
@@ -3812,8 +3389,7 @@
     "wPrice": 190,
     "priceType": "PP",
     "rPrice": 230,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 425,
@@ -3821,8 +3397,7 @@
     "wPrice": 270,
     "priceType": "PP",
     "rPrice": 320,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 426,
@@ -3830,8 +3405,7 @@
     "wPrice": 1910,
     "priceType": "PP",
     "rPrice": 2340,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 427,
@@ -3839,8 +3413,7 @@
     "wPrice": 1910,
     "priceType": "PP",
     "rPrice": 2340,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 428,
@@ -3848,8 +3421,7 @@
     "wPrice": 1910,
     "priceType": "PP",
     "rPrice": 2340,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 429,
@@ -3857,8 +3429,7 @@
     "wPrice": 2120,
     "priceType": "PP",
     "rPrice": 2500,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 430,
@@ -3866,8 +3437,7 @@
     "wPrice": 2330,
     "priceType": "PP",
     "rPrice": 2800,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 431,
@@ -3875,8 +3445,7 @@
     "wPrice": 2540,
     "priceType": "PP",
     "rPrice": 3200,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 432,
@@ -3884,8 +3453,7 @@
     "wPrice": 1530,
     "priceType": "KG",
     "rPrice": 1700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 433,
@@ -3893,8 +3461,7 @@
     "wPrice": 1350,
     "priceType": "KG",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 434,
@@ -3902,8 +3469,7 @@
     "wPrice": 1730,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 435,
@@ -3911,8 +3477,7 @@
     "wPrice": 280,
     "priceType": "PP",
     "rPrice": 320,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 436,
@@ -3920,8 +3485,7 @@
     "wPrice": 320,
     "priceType": "PP",
     "rPrice": 370,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 437,
@@ -3929,8 +3493,7 @@
     "wPrice": 370,
     "priceType": "PP",
     "rPrice": 420,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 438,
@@ -3938,8 +3501,7 @@
     "wPrice": 420,
     "priceType": "PP",
     "rPrice": 530,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 439,
@@ -3947,8 +3509,7 @@
     "wPrice": 530,
     "priceType": "PP",
     "rPrice": 640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 440,
@@ -3956,8 +3517,7 @@
     "wPrice": 640,
     "priceType": "PP",
     "rPrice": 750,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 441,
@@ -3965,8 +3525,7 @@
     "wPrice": 740,
     "priceType": "PP",
     "rPrice": 900,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 442,
@@ -3974,8 +3533,7 @@
     "wPrice": 2100,
     "priceType": "KG",
     "rPrice": 2340,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 443,
@@ -3983,8 +3541,7 @@
     "wPrice": 1630,
     "priceType": "KG",
     "rPrice": 1900,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 444,
@@ -3992,8 +3549,7 @@
     "wPrice": 530,
     "priceType": "PP",
     "rPrice": 640,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 445,
@@ -4001,8 +3557,7 @@
     "wPrice": 690,
     "priceType": "PP",
     "rPrice": 790,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 446,
@@ -4010,8 +3565,7 @@
     "wPrice": 2970,
     "priceType": "PP",
     "rPrice": 3400,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 447,
@@ -4019,8 +3573,7 @@
     "wPrice": 1900,
     "priceType": "PP",
     "rPrice": 2200,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 448,
@@ -4028,8 +3581,7 @@
     "wPrice": 1730,
     "priceType": "KG",
     "rPrice": 2040,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 449,
@@ -4037,8 +3589,7 @@
     "wPrice": 2300,
     "priceType": "PP",
     "rPrice": 2700,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 450,
@@ -4046,8 +3597,7 @@
     "wPrice": 1590,
     "priceType": "PP",
     "rPrice": 1900,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 451,
@@ -4055,8 +3605,7 @@
     "wPrice": null,
     "priceType": "PP",
     "rPrice": null,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 452,
@@ -4064,8 +3613,7 @@
     "wPrice": 9500,
     "priceType": "PP",
     "rPrice": 9500,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 453,
@@ -4073,8 +3621,7 @@
     "wPrice": 2100,
     "priceType": "PP",
     "rPrice": 2400,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 454,
@@ -4082,8 +3629,7 @@
     "wPrice": 1330,
     "priceType": "PP",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 455,
@@ -4091,8 +3637,7 @@
     "wPrice": 480,
     "priceType": "PP",
     "rPrice": 690,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 456,
@@ -4100,8 +3645,7 @@
     "wPrice": 580,
     "priceType": "PP",
     "rPrice": 790,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 457,
@@ -4109,8 +3653,7 @@
     "wPrice": 690,
     "priceType": "PP",
     "rPrice": 900,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 458,
@@ -4118,8 +3661,7 @@
     "wPrice": 1380,
     "priceType": "KG",
     "rPrice": 1600,
-    "material": "Brass",
-    "": null
+    "material": "Brass"
   },
   {
     "sr": 459,
@@ -4127,8 +3669,7 @@
     "wPrice": 740,
     "priceType": "PP",
     "rPrice": 840,
-    "material": "Copper",
-    "": null
+    "material": "Copper"
   },
   {
     "sr": 460,
@@ -4136,8 +3677,7 @@
     "wPrice": 2500,
     "priceType": "PP",
     "rPrice": 2900,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 461,
@@ -4145,8 +3685,7 @@
     "wPrice": 3500,
     "priceType": "PP",
     "rPrice": 4000,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 462,
@@ -4154,8 +3693,7 @@
     "wPrice": 7400,
     "priceType": "PP",
     "rPrice": 8500,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 463,
@@ -4163,8 +3701,7 @@
     "wPrice": 8000,
     "priceType": "PP",
     "rPrice": 9200,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 464,
@@ -4172,8 +3709,7 @@
     "wPrice": 10400,
     "priceType": "PP",
     "rPrice": 12000,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 465,
@@ -4181,8 +3717,7 @@
     "wPrice": 4200,
     "priceType": "KG",
     "rPrice": 4800,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   },
   {
     "sr": 466,
@@ -4190,7 +3725,6 @@
     "wPrice": 4000,
     "priceType": "KG",
     "rPrice": 4600,
-    "material": "Kansa",
-    "": null
+    "material": "Kansa"
   }
 ]
