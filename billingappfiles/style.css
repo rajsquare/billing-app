@@ -810,10 +810,10 @@ input {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 48px;
+  font-size: 70px;
   font-weight: 200;
   color: #000;
-  opacity: 0.5;
+  opacity: 0.7;
   font-family: Arial, sans-serif;
   letter-spacing: 0.1em;
   white-space: nowrap;
