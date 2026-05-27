@@ -3039,7 +3039,7 @@ function getModeKeys(
 }
 
 const MAX_ITEMS_PER_DL_PAGE =
-  25;
+  22;
 
 function chunkItems(
   items,
