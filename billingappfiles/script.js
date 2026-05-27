@@ -3079,20 +3079,24 @@ function buildSingleCopyPage(
 ) {
   let rows = "";
 
-  itemsChunk.forEach(
-    (item, idx) => {
-      rows += `
-        <tr>
-          <td>${idx + 1}</td>
-          <td>${escapeAttr(item.productName)}${item.note ? `<br><span class="print-item-note">${escapeAttr(item.note)}</span>` : ""}</td>
-          <td>${shortMaterialName(item.material)}</td>
-          <td>${roundQty(item.qty)}</td>
-          <td>${formatIndianMoney(item.price)}</td>
-          <td>${formatIndianMoney(item.total)}</td>
-        </tr>
-      `;
-    }
-  );
+ const serialStart =
+  (pageNum - 1) *
+  MAX_ITEMS_PER_DL_PAGE;
+
+itemsChunk.forEach(
+  (item, idx) => {
+    rows += `
+      <tr>
+        <td>${serialStart + idx + 1}</td>
+        <td>${escapeAttr(item.productName)}${item.note ? `<br><span class="print-item-note">${escapeAttr(item.note)}</span>` : ""}</td>
+        <td>${shortMaterialName(item.material)}</td>
+        <td>${roundQty(item.qty)}</td>
+        <td>${formatIndianMoney(item.price)}</td>
+        <td>${formatIndianMoney(item.total)}</td>
+      </tr>
+    `;
+  }
+);
 
   const isCustomerCopy =
     label === "CUSTOMER COPY";
@@ -3234,14 +3238,14 @@ function previewReceipt(
       index
     ) => {
       html +=
-        buildSingleCopyPage(
-          billData,
-          "VIEW",
-          chunk,
-          index ===
-            chunks.length -
-              1
-        );
+       buildSingleCopyPage(
+  billData,
+  "VIEW",
+  chunk,
+  index === chunks.length - 1,
+  index + 1,
+  chunks.length
+);
     }
   );
 
@@ -3897,30 +3901,39 @@ window.printReceivedBill =
                 ? serialData[keys.lastIssuedKey]
                 : (serialData[bill.mode] || 0);
 
-            const serial =
-              nextSerial(lastIssuedSerial);
+           const isTestBill =
+  (bill.customerName || "")
+    .trim()
+    .toLowerCase() === "test";
 
-            const todayDate =
-              getIndiaTodayDate();
+const serial = isTestBill
+  ? "TEST"
+  : nextSerial(lastIssuedSerial);
 
-            const isFirstOfDay =
-              serialData[keys.firstOfDayKey] !==
-              todayDate;
+const todayDate =
+  getIndiaTodayDate();
 
-            const updates = {
-              [keys.lastIssuedKey]:
-                serial
-            };
+const isFirstOfDay =
+  !isTestBill &&
+  serialData[keys.firstOfDayKey] !==
+    todayDate;
 
-            if (isFirstOfDay) {
-              updates[keys.firstOfDayKey] =
-                todayDate;
-            }
+if (!isTestBill) {
+  const updates = {
+    [keys.lastIssuedKey]:
+      serial
+  };
 
-            transaction.update(
-              serialDocRef,
-              updates
-            );
+  if (isFirstOfDay) {
+    updates[keys.firstOfDayKey] =
+      todayDate;
+  }
+
+  transaction.update(
+    serialDocRef,
+    updates
+  );
+}
 
             const billUpdate = {
               status:
