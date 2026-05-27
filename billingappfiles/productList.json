@@ -660,13 +660,13 @@
     "productName": "Masala Box Rectangular",
     "wPrice": 3500,
     "priceType": "PP",
-    "rPrice": 3920,
+    "rPrice": 3900,
     "material": "Brass"
   },
   {
     "sr": 84,
     "productName": "Dry Fruit Box Rectangular",
-    "wPrice": 2970,
+    "wPrice": 3000,
     "priceType": "PP",
     "rPrice": 3400,
     "material": "Brass"
@@ -1026,7 +1026,7 @@
   {
     "sr": 129,
     "productName": "Lucknowee Sipri 1-4",
-    "wPrice": 1330,
+    "wPrice": 1350,
     "priceType": "KG",
     "rPrice": 1500,
     "material": "Brass"
@@ -1034,7 +1034,7 @@
   {
     "sr": 130,
     "productName": "Lucknowee Sipri 5-6",
-    "wPrice": 1350,
+    "wPrice": 1370,
     "priceType": "KG",
     "rPrice": 1520,
     "material": "Brass"
@@ -1042,7 +1042,7 @@
   {
     "sr": 131,
     "productName": "Lucknowee Sipri 1-4",
-    "wPrice": 1750,
+    "wPrice": 1780,
     "priceType": "KG",
     "rPrice": 2100,
     "material": "Copper"
@@ -1050,7 +1050,7 @@
   {
     "sr": 132,
     "productName": "Lucknowee Sipri 5-6",
-    "wPrice": 1770,
+    "wPrice": 1800,
     "priceType": "KG",
     "rPrice": 2040,
     "material": "Copper"
@@ -1698,7 +1698,7 @@
   {
     "sr": 213,
     "productName": "Top 10-28",
-    "wPrice": 1150,
+    "wPrice": 1160,
     "priceType": "KG",
     "rPrice": 1220,
     "material": "Brass"
@@ -1706,7 +1706,7 @@
   {
     "sr": 214,
     "productName": "Top 29-36",
-    "wPrice": 1170,
+    "wPrice": 1180,
     "priceType": "KG",
     "rPrice": 1300,
     "material": "Brass"
@@ -1714,7 +1714,7 @@
   {
     "sr": 215,
     "productName": "Top 38-42",
-    "wPrice": 1320,
+    "wPrice": 1330,
     "priceType": "KG",
     "rPrice": 1400,
     "material": "Brass"
@@ -1722,7 +1722,7 @@
   {
     "sr": 216,
     "productName": "Top 44-48",
-    "wPrice": 1340,
+    "wPrice": 1350,
     "priceType": "KG",
     "rPrice": 1400,
     "material": "Brass"
@@ -1730,7 +1730,7 @@
   {
     "sr": 217,
     "productName": "Top 50-52",
-    "wPrice": 1360,
+    "wPrice": 1370,
     "priceType": "KG",
     "rPrice": 1450,
     "material": "Brass"
@@ -1874,7 +1874,7 @@
   {
     "sr": 235,
     "productName": "Patiya Regular",
-    "wPrice": 1750,
+    "wPrice": 1800,
     "priceType": "KG",
     "rPrice": 1860,
     "material": "Copper"
@@ -2002,9 +2002,9 @@
   {
     "sr": 251,
     "productName": "Parat Etching",
-    "wPrice": 2000,
+    "wPrice": 2100,
     "priceType": "KG",
-    "rPrice": 2240,
+    "rPrice": 2400,
     "material": "Copper"
   },
   {
@@ -2940,7 +2940,7 @@
     "productName": "Lotus Bowl",
     "wPrice": 1600,
     "priceType": "KG",
-    "rPrice": 1850,
+    "rPrice": 1900,
     "material": "Brass"
   },
   {
@@ -2962,7 +2962,7 @@
   {
     "sr": 371,
     "productName": "Hammered Lota 0",
-    "wPrice": 1430,
+    "wPrice": 1450,
     "priceType": "KG",
     "rPrice": 1600,
     "material": "Brass"
@@ -2970,7 +2970,7 @@
   {
     "sr": 372,
     "productName": "Hammered Lota 1-3",
-    "wPrice": 1380,
+    "wPrice": 1400,
     "priceType": "KG",
     "rPrice": 1640,
     "material": "Brass"
@@ -2978,7 +2978,7 @@
   {
     "sr": 373,
     "productName": "Nakshi Lota 0",
-    "wPrice": 1380,
+    "wPrice": 1400,
     "priceType": "KG",
     "rPrice": 1640,
     "material": "Brass"
@@ -2986,7 +2986,7 @@
   {
     "sr": 374,
     "productName": "Nakshi Lota 1-4",
-    "wPrice": 1330,
+    "wPrice": 1350,
     "priceType": "KG",
     "rPrice": 1640,
     "material": "Brass"
@@ -3074,7 +3074,7 @@
   {
     "sr": 385,
     "productName": "Hammered Lota 8",
-    "wPrice": 530,
+    "wPrice": 540,
     "priceType": "PP",
     "rPrice": 640,
     "material": "Copper"
@@ -3084,7 +3084,7 @@
     "productName": "Hammered Lota 9",
     "wPrice": 640,
     "priceType": "PP",
-    "rPrice": 750,
+    "rPrice": 740,
     "material": "Copper"
   },
   {
@@ -3562,7 +3562,7 @@
   {
     "sr": 446,
     "productName": "Triangle Masala Box",
-    "wPrice": 2970,
+    "wPrice": 3000,
     "priceType": "PP",
     "rPrice": 3400,
     "material": "Brass"
@@ -3626,7 +3626,7 @@
   {
     "sr": 454,
     "productName": "Oil Dispenser Jar",
-    "wPrice": 1330,
+    "wPrice": 1300,
     "priceType": "PP",
     "rPrice": 1600,
     "material": "Brass"
