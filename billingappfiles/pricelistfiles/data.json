@@ -90,17 +90,17 @@
   {
     "sr": 12,
     "productName": "Chirag Pawali 1-6",
-    "wPrice": 1650,
+    "wPrice": 1700,
     "priceType": "KG",
-    "rPrice": 1960,
+    "rPrice": 1900,
     "material": "Copper"
   },
   {
     "sr": 13,
     "productName": "Chirag Pawali 7-8",
-    "wPrice": 1670,
+    "wPrice": 1700,
     "priceType": "KG",
-    "rPrice": 1950,
+    "rPrice": 1900,
     "material": "Copper"
   },
   {
@@ -932,7 +932,7 @@
     "productName": "Joint Degchi / Nirmal Degchi",
     "wPrice": 1680,
     "priceType": "KG",
-    "rPrice": 1880,
+    "rPrice": 1900,
     "material": "Brass"
   },
   {
@@ -940,23 +940,23 @@
     "productName": "Degchi with Lid Set of 4",
     "wPrice": 1730,
     "priceType": "KG",
-    "rPrice": 1940,
+    "rPrice": 2000,
     "material": "Brass"
   },
   {
     "sr": 119,
     "productName": "Sheet Degchi ",
-    "wPrice": 1630,
+    "wPrice": 1730,
     "priceType": "KG",
-    "rPrice": 1940,
+    "rPrice": 2000,
     "material": "Brass"
   },
   {
     "sr": 120,
     "productName": "Sheet Degchi ",
-    "wPrice": 1950,
+    "wPrice": 2000,
     "priceType": "KG",
-    "rPrice": 2240,
+    "rPrice": 2300,
     "material": "Copper"
   },
   {
@@ -1218,17 +1218,17 @@
   {
     "sr": 153,
     "productName": "Urli Standard",
-    "wPrice": 1410,
+    "wPrice": 1450,
     "priceType": "KG",
-    "rPrice": 1640,
+    "rPrice": 1700,
     "material": "Brass"
   },
   {
     "sr": 154,
     "productName": "Urli 18-20",
-    "wPrice": 1460,
+    "wPrice": 1500,
     "priceType": "KG",
-    "rPrice": 1640,
+    "rPrice": 1700,
     "material": "Brass"
   },
   {
@@ -1676,15 +1676,15 @@
     "productName": "Pawali / Bucket Nakshi",
     "wPrice": 2030,
     "priceType": "KG",
-    "rPrice": 2340,
+    "rPrice": 2300,
     "material": "Brass"
   },
   {
     "sr": 211,
     "productName": "Pawali ",
-    "wPrice": 1270,
+    "wPrice": 1300,
     "priceType": "KG",
-    "rPrice": 1360,
+    "rPrice": 1400,
     "material": "Brass"
   },
   {
@@ -1692,7 +1692,7 @@
     "productName": "Pawali ",
     "wPrice": 1750,
     "priceType": "KG",
-    "rPrice": 1860,
+    "rPrice": 1900,
     "material": "Copper"
   },
   {
@@ -1700,7 +1700,7 @@
     "productName": "Top 10-28",
     "wPrice": 1160,
     "priceType": "KG",
-    "rPrice": 1220,
+    "rPrice": 1300,
     "material": "Brass"
   },
   {
@@ -1754,9 +1754,9 @@
   {
     "sr": 220,
     "productName": "Chai Tea Top",
-    "wPrice": 1120,
+    "wPrice": 1160,
     "priceType": "KG",
-    "rPrice": 1220,
+    "rPrice": 1300,
     "material": "Brass"
   },
   {
@@ -1826,7 +1826,7 @@
   {
     "sr": 229,
     "productName": "Top Joint Bottom",
-    "wPrice": 1170,
+    "wPrice": 1180,
     "priceType": "KG",
     "rPrice": 1230,
     "material": "Brass"
@@ -1834,17 +1834,17 @@
   {
     "sr": 230,
     "productName": "Langdi Joint Bottom",
-    "wPrice": 1180,
+    "wPrice": 1200,
     "priceType": "KG",
-    "rPrice": 1240,
+    "rPrice": 1230,
     "material": "Brass"
   },
   {
     "sr": 231,
     "productName": "Langdi Joint Bottom",
-    "wPrice": 1700,
+    "wPrice": 1800,
     "priceType": "KG",
-    "rPrice": 1800,
+    "rPrice": 1900,
     "material": "Copper"
   },
   {
@@ -1876,15 +1876,15 @@
     "productName": "Patiya Regular",
     "wPrice": 1800,
     "priceType": "KG",
-    "rPrice": 1860,
+    "rPrice": 2000,
     "material": "Copper"
   },
   {
     "sr": 236,
     "productName": "Patiya K+P Regular",
-    "wPrice": 1850,
+    "wPrice": 1900,
     "priceType": "KG",
-    "rPrice": 2040,
+    "rPrice": 2200,
     "material": "Copper"
   },
   {
@@ -1892,15 +1892,15 @@
     "productName": "Patiya Heavy K+P",
     "wPrice": 1850,
     "priceType": "KG",
-    "rPrice": 2040,
+    "rPrice": 2000,
     "material": "Copper"
   },
   {
     "sr": 238,
     "productName": "Parat Bidding",
-    "wPrice": 1355,
+    "wPrice": 1380,
     "priceType": "KG",
-    "rPrice": 1560,
+    "rPrice": 1600,
     "material": "Brass"
   },
   {
@@ -1916,7 +1916,7 @@
     "productName": "Parat 11-13",
     "wPrice": 1180,
     "priceType": "KG",
-    "rPrice": 1320,
+    "rPrice": 1400,
     "material": "Brass"
   },
   {
@@ -1924,7 +1924,7 @@
     "productName": "Parat 14",
     "wPrice": 1180,
     "priceType": "KG",
-    "rPrice": 1320,
+    "rPrice": 1400,
     "material": "Brass"
   },
   {
@@ -1932,7 +1932,7 @@
     "productName": "Parat 15",
     "wPrice": 1100,
     "priceType": "KG",
-    "rPrice": 1220,
+    "rPrice": 1300,
     "material": "Brass"
   },
   {
@@ -1940,23 +1940,23 @@
     "productName": "Parat 16-24",
     "wPrice": 1080,
     "priceType": "KG",
-    "rPrice": 1220,
+    "rPrice": 1300,
     "material": "Brass"
   },
   {
     "sr": 244,
     "productName": "Parat 25-30",
-    "wPrice": 1130,
+    "wPrice": 1180,
     "priceType": "KG",
-    "rPrice": 1220,
+    "rPrice": 1300,
     "material": "Brass"
   },
   {
     "sr": 245,
     "productName": "Parat 32-36",
-    "wPrice": 1180,
+    "wPrice": 1300,
     "priceType": "KG",
-    "rPrice": 1220,
+    "rPrice": 1400,
     "material": "Brass"
   },
   {
@@ -1994,9 +1994,9 @@
   {
     "sr": 250,
     "productName": "Parsi Patiya K+P",
-    "wPrice": 1750,
+    "wPrice": 1850,
     "priceType": "KG",
-    "rPrice": 2100,
+    "rPrice": 2200,
     "material": "Copper"
   },
   {
@@ -2082,9 +2082,9 @@
   {
     "sr": 261,
     "productName": "Top Joint Bottom",
-    "wPrice": 1700,
+    "wPrice": 1800,
     "priceType": "KG",
-    "rPrice": 1800,
+    "rPrice": 1900,
     "material": "Copper"
   },
   {
@@ -2106,33 +2106,33 @@
   {
     "sr": 264,
     "productName": "Lucknowee 10",
-    "wPrice": 1780,
+    "wPrice": 1800,
     "priceType": "KG",
-    "rPrice": 1860,
+    "rPrice": 2000,
     "material": "Copper"
   },
   {
     "sr": 265,
     "productName": "Lucknowee 12-24",
-    "wPrice": 1725,
+    "wPrice": 1750,
     "priceType": "KG",
-    "rPrice": 1885,
+    "rPrice": 1900,
     "material": "Copper"
   },
   {
     "sr": 266,
-    "productName": "Lucknowee 26-30",
+    "productName": "Lucknowee 26",
     "wPrice": 1800,
     "priceType": "KG",
-    "rPrice": 1960,
+    "rPrice": 2000,
     "material": "Copper"
   },
   {
     "sr": 267,
-    "productName": "Lucknowee 32-40",
-    "wPrice": 1800,
+    "productName": "Lucknowee 30-40",
+    "wPrice": 1850,
     "priceType": "KG",
-    "rPrice": 1960,
+    "rPrice": 2000,
     "material": "Copper"
   },
   {
@@ -2722,7 +2722,7 @@
   {
     "sr": 341,
     "productName": "Dana Plate",
-    "wPrice": 1650,
+    "wPrice": 1900,
     "priceType": "KG",
     "rPrice": 1860,
     "material": "Copper"
@@ -2738,9 +2738,9 @@
   {
     "sr": 343,
     "productName": "Designer Plate",
-    "wPrice": 1930,
+    "wPrice": 2000,
     "priceType": "KG",
-    "rPrice": 2240,
+    "rPrice": 2300,
     "material": "Brass"
   },
   {
@@ -2770,9 +2770,9 @@
   {
     "sr": 347,
     "productName": "Bhojan Patra",
-    "wPrice": 1530,
+    "wPrice": 1600,
     "priceType": "KG",
-    "rPrice": 1700,
+    "rPrice": 1900,
     "material": "Brass"
   },
   {
@@ -3162,9 +3162,9 @@
   {
     "sr": 396,
     "productName": "Bell",
-    "wPrice": 850,
+    "wPrice": 900,
     "priceType": "PP",
-    "rPrice": 1000,
+    "rPrice": 1100,
     "material": "Kansa"
   },
   {
