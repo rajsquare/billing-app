@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+  <title>Billing App</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    /* Last-app memory: auto-route to pricelist if that was the user's last app */
+    (function() {
+      var prev = localStorage.getItem("lastApp");
+      localStorage.setItem("lastApp", "billing");
+      if (
+        prev === "pricelist" &&
+        !sessionStorage.getItem("didAutoRedirect") &&
+        sessionStorage.getItem("intentionalAppSwitch") !== "true"
+      ) {
+        sessionStorage.setItem("didAutoRedirect", "true");
+        window.location.replace("https://rajsquare.github.io/pricelist/");
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- APP TABS -->
+  <div class="app-tabs">
+    <button
+      id="billingTab"
+      class="tab-btn active"
+    >
+      Billing
+    </button>
+
+    <button
+      id="receiverTab"
+      class="tab-btn"
+    >
+      Receiver
+    </button>
+
+    <button
+      id="daybookTab"
+      class="tab-btn daybook-mini"
+    >
+      Daybook
+    </button>
+  </div>
+
+  <!-- BILLING VIEW -->
+  <div id="billingView">
+
+    <div id="revisionBanner" class="revision-banner" style="display:none;"></div>
+
+    <div class="search-container">
+
+      <div class="header-row">
+        <h1>Billing App</h1>
+
+        <div class="header-controls">
+          <button id="pricelistSwitchBtn" class="app-switch-btn">PRICELIST</button>
+          <button id="liveBtn">LIVE (0)</button>
+          <button id="modeToggle">W</button>
+        </div>
+      </div>
+
+      <div class="search-wrapper">
+        <input
+          type="text"
+          id="searchBox"
+          placeholder="Search product..."
+          autocomplete="off"
+        >
+
+        <div id="clearSearch">
+          <span class="clear-x">✕</span>
+        </div>
+      </div>
+
+      <div id="materialFilter" class="filter-row">
+        <button class="filter-chip active" data-material="">All</button>
+        <button class="filter-chip material-brass" data-material="Brass">Brass</button>
+        <button class="filter-chip material-copper" data-material="Copper">Copper</button>
+        <button class="filter-chip material-kansa" data-material="Kansa">Kansa</button>
+      </div>
+
+      <div id="suggestions"></div>
+    </div>
+
+    <div id="billItems"></div>
+
+    <div class="total-card">
+      <div class="total-row">
+        <div class="total-row-left">
+          <span class="total-label">Total</span>
+          <span id="billItemCount" class="bill-item-count"></span>
+        </div>
+        <span id="grandTotal">₹0</span>
+      </div>
+
+      <div class="action-buttons">
+        <button id="sendBtn">Send</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RECEIVER VIEW -->
+  <div id="receiverView" style="display:none;">
+    <div class="receiver-card">
+      <div class="receiver-title">
+        Receiver Mode
+      </div>
+
+      <div class="receiver-subtitle">
+        Waiting for incoming bills...
+      </div>
+
+      <div id="incomingBills"></div>
+    </div>
+  </div>
+
+  <!-- DAYBOOK VIEW -->
+  <div id="daybookView" style="display:none;">
+    <div class="receiver-card">
+      <div class="receiver-title">
+        Daybook
+      </div>
+
+      <div id="daybookSummary">Total: ₹0</div>
+
+      <div id="daybookActions"></div>
+
+      <div id="daybookEntries"></div>
+    </div>
+  </div>
+
+  <!-- SEND MODAL -->
+  <div
+    id="printModal"
+    class="modal-overlay"
+    style="display:none;"
+  >
+    <div class="modal-card">
+
+      <div class="modal-title">
+        Send Details
+      </div>
+
+      <div id="modalBillSummary" class="modal-bill-summary"></div>
+
+      <div
+        class="modal-group"
+        id="customerGroup"
+      >
+        <label for="customerName">Customer Name</label>
+
+        <input
+          type="text"
+          id="customerName"
+          placeholder="Enter customer name"
+        >
+      </div>
+
+      <div class="modal-actions">
+        <button
+          id="cancelPrint"
+          class="secondary-btn"
+        >
+          Cancel
+        </button>
+
+        <button
+          id="confirmSend"
+          class="send-btn"
+        >
+          Send
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PREVIEW MODAL -->
+  <div
+    id="previewModal"
+    class="modal-overlay"
+    style="display:none;"
+  >
+    <div class="preview-card">
+
+      <div class="modal-title">
+        Bill Preview
+      </div>
+
+      <div
+        id="revisionViewTabs"
+        class="revision-view-tabs"
+        style="display:none;"
+      >
+        <button
+          id="revisionViewOriginalBtn"
+          class="revision-view-tab"
+          onclick="switchRevisionView('original')"
+        >
+          View Original
+        </button>
+        <button
+          id="revisionViewRevisedBtn"
+          class="revision-view-tab"
+          onclick="switchRevisionView('revised')"
+        >
+          View Revised
+        </button>
+      </div>
+
+      <div
+        id="previewContent"
+        class="preview-content"
+      ></div>
+
+      <div class="modal-actions">
+        <button
+          id="closePreview"
+          class="secondary-btn"
+        >
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LIVE DRAFT MONITOR MODAL -->
+  <div
+    id="liveDraftModal"
+    class="modal-overlay"
+    style="display:none;"
+  >
+    <div class="live-modal-card">
+      <div class="live-modal-header">
+        <div class="modal-title">Live Drafts</div>
+        <button id="closeLiveDraftModal" class="live-close-btn">✕</button>
+      </div>
+
+      <div id="liveDraftListView">
+        <div id="liveDraftCards" class="live-draft-list"></div>
+      </div>
+
+      <div id="liveDraftDetailView" style="display:none;">
+        <button id="liveDraftBackBtn" class="live-back-btn">← Back</button>
+        <div id="liveDraftDetailContent" class="live-detail-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRINT AREA -->
+  <div id="printInvoice"></div>
+
+  <script type="module" src="script.js"></script>
+
+</body>
+</html>
