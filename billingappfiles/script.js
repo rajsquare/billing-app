@@ -3979,7 +3979,8 @@ window.deleteDaybookNow =
 /* ================================
    APP SWITCHER
 ================================ */
-document.getElementById("pricelistSwitchBtn").addEventListener("click", () => {
+document.getElementById("appTitleLink").addEventListener("click", (e) => {
+  e.preventDefault();
   saveDraftNow();
   sessionStorage.setItem("intentionalAppSwitch", "true");
   localStorage.setItem("lastApp", "pricelist");
