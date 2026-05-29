@@ -1423,20 +1423,21 @@ function buildRevisionAuditPreviewHTML(
       diff
     );
 
-  const chunks =
-    chunkItems(
+  const pages =
+    paginateByHeight(
       mergedItems,
-      MAX_ITEMS_PER_DL_PAGE
+      revisedBill,
+      "OFFICE COPY"
     );
 
-  const totalPages = chunks.length;
+  const totalPages = pages.length;
   let html = "";
 
-  chunks.forEach((chunk, index) => {
+  pages.forEach((page, index) => {
     html += buildRevisionOfficeSinglePage(
       revisedBill,
       originalBill,
-      chunk,
+      page.chunk,
       diff,
       index === totalPages - 1,
       index + 1,
@@ -1460,10 +1461,11 @@ function buildRevisionReceiptPrintHTML(
   const customerItems =
     [...revisedBill.items].reverse();
 
-  const customerChunks =
-    chunkItems(
+  const customerPages =
+    paginateByHeight(
       customerItems,
-      MAX_ITEMS_PER_DL_PAGE
+      revisedBill,
+      "CUSTOMER COPY"
     );
 
   const mergedItems =
@@ -1473,34 +1475,36 @@ function buildRevisionReceiptPrintHTML(
       diff
     );
 
-  const officeChunks =
-    chunkItems(
+  const officePages =
+    paginateByHeight(
       mergedItems,
-      MAX_ITEMS_PER_DL_PAGE
+      revisedBill,
+      "OFFICE COPY"
     );
 
   let html = "";
 
-  customerChunks.forEach((chunk, index) => {
+  customerPages.forEach((page, index) => {
     html += buildSingleCopyPage(
       revisedBill,
       "CUSTOMER COPY",
-      chunk,
-      index === customerChunks.length - 1,
+      page.chunk,
+      index === customerPages.length - 1,
       index + 1,
-      customerChunks.length
+      customerPages.length,
+      page.serialOffset
     );
   });
 
-  officeChunks.forEach((chunk, index) => {
+  officePages.forEach((page, index) => {
     html += buildRevisionOfficeSinglePage(
       revisedBill,
       originalBill,
-      chunk,
+      page.chunk,
       diff,
-      index === officeChunks.length - 1,
+      index === officePages.length - 1,
       index + 1,
-      officeChunks.length
+      officePages.length
     );
   });
 
@@ -1565,58 +1569,64 @@ function openRevisionPreview(
 
   if (mode === "original") {
     if (!originalBill) {
-      const chunks =
-        chunkItems(
+      const pages =
+        paginateByHeight(
           [...bill.items].reverse(),
-          MAX_ITEMS_PER_DL_PAGE
+          bill,
+          "VIEW"
         );
       let html = "";
-      chunks.forEach((chunk, index) => {
+      pages.forEach((page, index) => {
         html += buildSingleCopyPage(
           bill,
           "VIEW",
-          chunk,
-          index === chunks.length - 1,
+          page.chunk,
+          index === pages.length - 1,
           index + 1,
-          chunks.length
+          pages.length,
+          page.serialOffset
         );
       });
       previewContent.innerHTML = html;
     } else {
-      const chunks =
-        chunkItems(
+      const pages =
+        paginateByHeight(
           [...originalBill.items].reverse(),
-          MAX_ITEMS_PER_DL_PAGE
+          originalBill,
+          "VIEW"
         );
       let html = "";
-      chunks.forEach((chunk, index) => {
+      pages.forEach((page, index) => {
         html += buildSingleCopyPage(
           originalBill,
           "VIEW",
-          chunk,
-          index === chunks.length - 1,
+          page.chunk,
+          index === pages.length - 1,
           index + 1,
-          chunks.length
+          pages.length,
+          page.serialOffset
         );
       });
       previewContent.innerHTML = html;
     }
   } else {
     if (!originalBill) {
-      const chunks =
-        chunkItems(
+      const pages =
+        paginateByHeight(
           [...bill.items].reverse(),
-          MAX_ITEMS_PER_DL_PAGE
+          bill,
+          "VIEW"
         );
       let html = "";
-      chunks.forEach((chunk, index) => {
+      pages.forEach((page, index) => {
         html += buildSingleCopyPage(
           bill,
           "VIEW",
-          chunk,
-          index === chunks.length - 1,
+          page.chunk,
+          index === pages.length - 1,
           index + 1,
-          chunks.length
+          pages.length,
+          page.serialOffset
         );
       });
       previewContent.innerHTML = html;
@@ -3079,29 +3089,247 @@ function getModeKeys(
   };
 }
 
-const MAX_ITEMS_PER_DL_PAGE =
-  22;
+/* ================================
+   HEIGHT-BASED PAGINATION
+   Replaces fixed MAX_ITEMS_PER_DL_PAGE.
 
-function chunkItems(
-  items,
-  size
-) {
-  const chunks = [];
+   Strategy:
+   - Render each row into a hidden off-screen
+     table at the exact same width as the real
+     print table (body max-width 520px, padding
+     2mm each side ≈ 6px each = 508px, then
+     table-layout:fixed at 100% of that).
+   - Measure actual offsetHeight of each <tr>
+     (captures multi-line product names).
+   - Accumulate rows until adding the next would
+     exceed availableRowPx; start a new page.
 
-  for (
-    let i = 0;
-    i < items.length;
-    i += size
-  ) {
-    chunks.push(
-      items.slice(
-        i,
-        i + size
-      )
-    );
+   Page height budget (screen pixels):
+   - @page height 220mm, margins 15mm+12mm
+     → printable 193mm of layout space.
+   - Each .receipt-copy has min-height 184mm
+     and scale(0.88); browser paginates on the
+     un-transformed 184mm layout value.
+   - At 96dpi: 184mm × (96/25.4) ≈ 695px layout.
+   - Fixed overhead (copy-label, header-row,
+     thead, print-total, bottom extras) is
+     measured live from the scaffold.
+   - Safety buffer: 24px (~6.35mm) to absorb
+     border, rounding, and minor browser variance.
+================================ */
+
+const PRINT_PAGE_HEIGHT_MM = 184;
+const MM_TO_PX = 96 / 25.4;
+const PRINT_PAGE_HEIGHT_PX =
+  Math.floor(PRINT_PAGE_HEIGHT_MM * MM_TO_PX);
+
+/* Width of the hidden measurement scaffold.
+   Matches body max-width (520px) minus
+   .print-wrapper horizontal padding (2mm x 2 = ~12px). */
+const SCAFFOLD_WIDTH_PX = 508;
+
+/* Safety buffer so the last row never hugs the
+   border. Absorbs border thickness + rounding. */
+const HEIGHT_SAFETY_PX = 24;
+
+function measureRowHeights(items) {
+  /* Build a minimal off-screen table that
+     matches print-table column widths exactly. */
+  const scaffold = document.createElement("div");
+  scaffold.style.cssText = [
+    "position:fixed",
+    "top:-9999px",
+    "left:-9999px",
+    "width:" + SCAFFOLD_WIDTH_PX + "px",
+    "visibility:hidden",
+    "pointer-events:none",
+    "z-index:-1",
+    "font-family:Arial,sans-serif",
+    "font-size:10px",
+    "line-height:1.15"
+  ].join(";");
+
+  const table = document.createElement("table");
+  table.style.cssText = [
+    "width:100%",
+    "border-collapse:collapse",
+    "table-layout:fixed",
+    "font-size:10px",
+    "line-height:1.15"
+  ].join(";");
+
+  const colgroup = document.createElement("colgroup");
+  [5, 44, 8, 9, 14, 20].forEach(function(pct) {
+    const col = document.createElement("col");
+    col.style.width = pct + "%";
+    colgroup.appendChild(col);
+  });
+  table.appendChild(colgroup);
+
+  const tbody = document.createElement("tbody");
+  const rowEls = [];
+
+  items.forEach(function(item) {
+    const tr = document.createElement("tr");
+    const nameCell = document.createElement("td");
+    nameCell.style.cssText = [
+      "width:44%",
+      "word-break:break-word",
+      "padding:4px 3px",
+      "vertical-align:middle",
+      "border:1px solid #000"
+    ].join(";");
+    nameCell.textContent = item.productName;
+    if (item.note) {
+      const noteSpan = document.createElement("span");
+      noteSpan.style.cssText = "display:block;font-size:8px;font-style:italic";
+      noteSpan.textContent = item.note;
+      nameCell.appendChild(noteSpan);
+    }
+    tr.appendChild(nameCell);
+    for (let c = 0; c < 5; c++) {
+      const td = document.createElement("td");
+      td.style.cssText = "padding:4px 3px;border:1px solid #000;white-space:nowrap;";
+      td.textContent = "-";
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+    rowEls.push(tr);
+  });
+
+  table.appendChild(tbody);
+  scaffold.appendChild(table);
+  document.body.appendChild(scaffold);
+
+  const heights = rowEls.map(function(tr) { return tr.offsetHeight; });
+  document.body.removeChild(scaffold);
+  return heights;
+}
+
+function measureFixedOverheadPx(billData, label, isLastPage) {
+  const isCustomerCopy = label === "CUSTOMER COPY";
+
+  const scaffold = document.createElement("div");
+  scaffold.style.cssText = [
+    "position:fixed",
+    "top:-9999px",
+    "left:-9999px",
+    "width:" + SCAFFOLD_WIDTH_PX + "px",
+    "visibility:hidden",
+    "pointer-events:none",
+    "z-index:-1",
+    "font-family:Arial,sans-serif",
+    "font-size:10px",
+    "line-height:1.15",
+    "padding:2px"
+  ].join(";");
+
+  const copyLabel = document.createElement("div");
+  copyLabel.style.cssText = "text-align:center;font-size:10px;font-weight:700;margin-bottom:4px;";
+  copyLabel.textContent = label;
+  scaffold.appendChild(copyLabel);
+
+  const headerRow = document.createElement("div");
+  headerRow.style.cssText = "display:flex;flex-direction:column;gap:6px;margin-bottom:12px;";
+  if (billData.customerName && billData.customerName !== "Retail Bill") {
+    const cust = document.createElement("div");
+    cust.style.cssText = "font-size:21px;font-weight:700;line-height:1.15;word-break:break-word;";
+    cust.textContent = billData.customerName;
+    headerRow.appendChild(cust);
+  }
+  const dateRow = document.createElement("div");
+  dateRow.style.cssText = "display:flex;justify-content:space-between;font-size:14px;font-weight:700;";
+  dateRow.textContent = billData.date || "";
+  headerRow.appendChild(dateRow);
+  scaffold.appendChild(headerRow);
+
+  const table = document.createElement("table");
+  table.style.cssText = "width:100%;border-collapse:collapse;table-layout:fixed;font-size:10px;line-height:1.15;";
+  const thead = document.createElement("thead");
+  const htr = document.createElement("tr");
+  ["S","Product","Mat","Qty","Rate","Amt"].forEach(function(h) {
+    const th = document.createElement("th");
+    th.style.cssText = "border:1px solid #000;padding:4px 3px;font-weight:800;";
+    th.textContent = h;
+    htr.appendChild(th);
+  });
+  thead.appendChild(htr);
+  table.appendChild(thead);
+  scaffold.appendChild(table);
+
+  const total = document.createElement("div");
+  total.style.cssText = "margin-top:10px;padding:6px 8px;border:1px solid #000;font-size:18px;font-weight:800;line-height:1.1;";
+  total.textContent = "Grand Total: 0";
+  scaffold.appendChild(total);
+
+  if (isLastPage && billData.mode === "W") {
+    if (isCustomerCopy) {
+      const bal = document.createElement("div");
+      bal.style.cssText = "padding-top:10px;font-size:35px;font-weight:800;line-height:1.1;";
+      bal.textContent = "Balance HV";
+      scaffold.appendChild(bal);
+    } else {
+      const div = document.createElement("div");
+      div.style.cssText = "padding-top:8px;font-size:14px;font-weight:700;";
+      div.textContent = "Receiver's Name:";
+      scaffold.appendChild(div);
+    }
   }
 
-  return chunks;
+  document.body.appendChild(scaffold);
+  const h = scaffold.offsetHeight;
+  document.body.removeChild(scaffold);
+  return h;
+}
+
+/*
+ * paginateByHeight(items, billData, label)
+ *
+ * Returns an array of pages, each being:
+ *   { chunk: Item[], serialOffset: number }
+ *
+ * serialOffset = count of items on previous pages,
+ * used so row serial numbers are correct (1-based
+ * within the whole bill, not just the page).
+ */
+function paginateByHeight(items, billData, label) {
+  if (!items.length) return [{ chunk: [], serialOffset: 0 }];
+
+  const rowHeights = measureRowHeights(items);
+
+  /* Use last-page overhead (larger value) as the
+     budget for all pages — conservative, safe. */
+  const overheadPx = measureFixedOverheadPx(billData, label, true);
+  const availableRowPx =
+    PRINT_PAGE_HEIGHT_PX - overheadPx - HEIGHT_SAFETY_PX;
+
+  /* Fallback if measurement environment is broken */
+  const rowBudget = Math.max(availableRowPx, 80);
+
+  const pages = [];
+  let currentChunk = [];
+  let currentHeight = 0;
+  let serialOffset = 0;
+
+  items.forEach(function(item, idx) {
+    const rh = rowHeights[idx] || 18;
+
+    if (currentChunk.length > 0 && currentHeight + rh > rowBudget) {
+      pages.push({ chunk: currentChunk, serialOffset: serialOffset });
+      serialOffset += currentChunk.length;
+      currentChunk = [];
+      currentHeight = 0;
+    }
+
+    currentChunk.push(item);
+    currentHeight += rh;
+  });
+
+  if (currentChunk.length > 0) {
+    pages.push({ chunk: currentChunk, serialOffset: serialOffset });
+  }
+
+  return pages;
 }
 
 function nextSerial(
@@ -3116,13 +3344,12 @@ function buildSingleCopyPage(
   itemsChunk,
   isLastPage,
   pageNum,
-  totalPages
+  totalPages,
+  serialOffset
 ) {
   let rows = "";
 
- const serialStart =
-  (pageNum - 1) *
-  MAX_ITEMS_PER_DL_PAGE;
+ const serialStart = serialOffset || 0;
 
 itemsChunk.forEach(
   (item, idx) => {
@@ -3214,47 +3441,56 @@ itemsChunk.forEach(
 function buildReceiptPrintHTML(
   billData
 ) {
-  const chunks =
-    chunkItems(
-      [...billData.items].reverse(),
-      MAX_ITEMS_PER_DL_PAGE
+  const items = [...billData.items].reverse();
+
+  const customerPages =
+    paginateByHeight(
+      items,
+      billData,
+      "CUSTOMER COPY"
     );
 
-  const totalPages =
-    chunks.length;
+  const officePages =
+    paginateByHeight(
+      items,
+      billData,
+      "OFFICE COPY"
+    );
 
   let html = "";
 
-  chunks.forEach(
+  customerPages.forEach(
     (
-      chunk,
+      page,
       index
     ) => {
       html +=
         buildSingleCopyPage(
           billData,
           "CUSTOMER COPY",
-          chunk,
-          index === totalPages - 1,
+          page.chunk,
+          index === customerPages.length - 1,
           index + 1,
-          totalPages
+          customerPages.length,
+          page.serialOffset
         );
     }
   );
 
-  chunks.forEach(
+  officePages.forEach(
     (
-      chunk,
+      page,
       index
     ) => {
       html +=
         buildSingleCopyPage(
           billData,
           "OFFICE COPY",
-          chunk,
-          index === totalPages - 1,
+          page.chunk,
+          index === officePages.length - 1,
           index + 1,
-          totalPages
+          officePages.length,
+          page.serialOffset
         );
     }
   );
@@ -3265,27 +3501,29 @@ function buildReceiptPrintHTML(
 function previewReceipt(
   billData
 ) {
-  const chunks =
-    chunkItems(
+  const pages =
+    paginateByHeight(
       [...billData.items].reverse(),
-      MAX_ITEMS_PER_DL_PAGE
+      billData,
+      "VIEW"
     );
 
   let html = "";
 
-  chunks.forEach(
+  pages.forEach(
     (
-      chunk,
+      page,
       index
     ) => {
       html +=
        buildSingleCopyPage(
   billData,
   "VIEW",
-  chunk,
-  index === chunks.length - 1,
+  page.chunk,
+  index === pages.length - 1,
   index + 1,
-  chunks.length
+  pages.length,
+  page.serialOffset
 );
     }
   );
@@ -3741,8 +3979,7 @@ window.deleteDaybookNow =
 /* ================================
    APP SWITCHER
 ================================ */
-document.getElementById("appTitleLink").addEventListener("click", (e) => {
-  e.preventDefault();
+document.getElementById("pricelistSwitchBtn").addEventListener("click", () => {
   saveDraftNow();
   sessionStorage.setItem("intentionalAppSwitch", "true");
   localStorage.setItem("lastApp", "pricelist");
