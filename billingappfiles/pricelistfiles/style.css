@@ -1,42 +1,38 @@
 /* ================================
-   DESIGN TOKENS
+   WARM COMMERCE - PRICELIST
 ================================ */
 :root {
-  /* Primary palette */
-  --color-primary:        #2f3f64;
-  --color-primary-dark:   #243152;
-  --color-primary-light:  #3d5280;
-  --color-primary-tint:   #eef1f7;
-  --color-retail:         #c94040;
-  --color-success:        #0f7b3b;
-  --color-success-dark:   #0a6330;
-  --color-success-tint:   #ecfdf5;
-  --color-danger-text:    #b91c1c;
-  --color-danger-surface: #fef2f2;
-  --color-revision:       #7c3aed;
-  --color-suite:          #0369a1;
-  --color-suite-dark:     #025d8a;
-
-  /* Neutrals - refined warm-cool scale */
-  --color-bg:             #f8f9fb;
-  --color-surface:        #ffffff;
-  --color-surface-raised: #ffffff;
-  --color-border:         #e8eaed;
-  --color-border-strong:  #d4d7dc;
-  --color-border-subtle:  #f0f1f3;
+  /* Page & surface */
+  --color-bg: #FAF9F7;
+  --color-surface: #FFFFFF;
 
   /* Text hierarchy */
-  --color-text-primary:   #1a1f2e;
-  --color-text-secondary: #5c6370;
-  --color-text-muted:     #9199a5;
-  --color-text-faint:     #b4bac4;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #78716C;
+  --color-text-muted: #A8A29E;
 
-  /* Shadows - 3-tier system */
-  --shadow-sm:   0 1px 2px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.02);
-  --shadow-md:   0 2px 8px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
-  --shadow-lg:   0 8px 24px rgba(0,0,0,0.08), 0 16px 48px rgba(0,0,0,0.06);
+  /* Brand accent */
+  --color-accent: #B45309;
 
-  /* Spacing scale (4px base) */
+  /* Material indicators */
+  --color-brass: #CA8A04;
+  --color-copper: #C2410C;
+  --color-kansa: #78716C;
+
+  /* Semantic */
+  --color-success: #15803D;
+  --color-danger: #DC2626;
+
+  /* Neutrals */
+  --color-border: #E7E5E4;
+  --color-border-subtle: #F5F4F2;
+  --color-search-bg: #F5F4F2;
+
+  /* Typography */
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Spacing */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -46,22 +42,11 @@
   --space-8: 32px;
   --space-10: 40px;
 
-  /* Radius scale */
+  /* Radius */
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
-  --radius-xl: 16px;
   --radius-pill: 999px;
-
-  /* Typography */
-  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "SF Mono", "Cascadia Code", "Fira Code", monospace;
-  --leading-tight: 1.2;
-  --leading-normal: 1.5;
-  --leading-relaxed: 1.6;
-  --tracking-tight: -0.02em;
-  --tracking-normal: 0;
-  --tracking-wide: 0.04em;
 
   /* Transitions */
   --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
@@ -69,6 +54,11 @@
   --duration-fast: 150ms;
   --duration-normal: 200ms;
   --duration-slow: 250ms;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
 }
 
 /* ================================
@@ -80,7 +70,7 @@
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   margin: 0 auto;
   background: var(--color-bg);
   color: var(--color-text-primary);
@@ -88,12 +78,11 @@ body {
   padding: var(--space-4);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: var(--leading-normal);
+  line-height: 1.5;
   font-size: 15px;
 }
 
-button,
-input {
+button, input {
   font-family: inherit;
 }
 
@@ -103,8 +92,7 @@ button {
   transition: background var(--duration-fast) var(--ease-default),
               color var(--duration-fast) var(--ease-default),
               box-shadow var(--duration-normal) var(--ease-default),
-              transform var(--duration-fast) var(--ease-default),
-              border-color var(--duration-fast) var(--ease-default);
+              transform var(--duration-fast) var(--ease-default);
 }
 
 input {
@@ -118,7 +106,7 @@ input {
 .search-container {
   position: sticky;
   top: 0;
-  background: rgba(248, 249, 251, 0.88);
+  background: rgba(250, 249, 247, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   padding-bottom: var(--space-2);
@@ -140,11 +128,11 @@ input {
 ================================ */
 h1 {
   margin: 0;
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: var(--tracking-tight);
-  color: var(--color-text-secondary);
-  line-height: var(--leading-tight);
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--color-text-primary);
+  line-height: 1.2;
 }
 
 /* ================================
@@ -153,18 +141,15 @@ h1 {
 #modeToggle {
   padding: 6px 10px;
   border-radius: var(--radius-md);
-  color: white;
-  font-weight: 600;
+  background: var(--color-border-subtle);
+  color: var(--color-text-secondary);
   font-size: 11px;
-  background: var(--color-primary);
-  min-width: 42px;
+  font-weight: 600;
   letter-spacing: 0.02em;
-  box-shadow: 0 1px 3px rgba(47, 63, 100, 0.15);
 }
 
 #modeToggle:hover {
-  background: var(--color-primary-dark);
-  box-shadow: 0 2px 8px rgba(47, 63, 100, 0.25);
+  background: var(--color-border);
 }
 
 #modeToggle:active {
@@ -180,26 +165,26 @@ h1 {
 
 #searchInput {
   width: 100%;
-  padding: 11px 44px 11px 14px;
-  border-radius: var(--radius-lg);
-  border: 1px solid transparent;
+  padding: 12px 44px 12px 16px;
+  border-radius: 12px;
+  border: none;
   font-size: 15px;
-  background: var(--color-bg);
+  background: var(--color-search-bg);
   color: var(--color-text-primary);
   outline: none;
   font-family: inherit;
   box-shadow: none;
+  height: 48px;
 }
 
 #searchInput:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(47, 63, 100, 0.08), var(--shadow-sm);
+  box-shadow: 0 0 0 2px rgba(180, 83, 9, 0.15);
   background: var(--color-surface);
 }
 
 #searchInput::placeholder {
-  font-size: 13px;
-  color: var(--color-text-faint);
+  font-size: 14px;
+  color: var(--color-text-muted);
 }
 
 /* ================================
@@ -216,13 +201,13 @@ h1 {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background: var(--color-border-subtle);
+  background: var(--color-border);
   border-radius: 50%;
   transition: background var(--duration-fast) var(--ease-default);
 }
 
 #clearSearch:hover {
-  background: var(--color-border);
+  background: #D6D3D1;
 }
 
 .clear-x {
@@ -230,10 +215,6 @@ h1 {
   color: var(--color-text-secondary);
   font-weight: 700;
   line-height: 1;
-}
-
-#clearSearch:active .clear-x {
-  color: var(--color-text-primary);
 }
 
 /* ================================
@@ -245,10 +226,10 @@ h1 {
 }
 
 .filter-label {
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   color: var(--color-text-muted);
   margin-bottom: var(--space-2);
   padding-left: 2px;
@@ -264,14 +245,15 @@ h1 {
    FILTER BUTTON
 ================================ */
 .filter-btn {
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
-  padding: 3px 8px;
+  background: transparent;
+  color: var(--color-text-muted);
+  padding: 4px 10px;
   border-radius: var(--radius-pill);
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 500;
   border: 1px solid var(--color-border);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   transition: background var(--duration-fast) var(--ease-default),
               border-color var(--duration-fast) var(--ease-default),
               color var(--duration-fast) var(--ease-default),
@@ -280,8 +262,7 @@ h1 {
 
 .filter-btn:hover {
   background: var(--color-border-subtle);
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
 }
 
 .filter-btn:active {
@@ -292,56 +273,63 @@ h1 {
    FILTER ACTIVE STATES
 ================================ */
 .filter-btn.active-brass {
-  background: #fdf3d4;
-  border-color: #c69510;
-  color: #5c4400;
+  background: #FDF3D4;
+  border-color: var(--color-brass);
+  color: #5C4400;
 }
 
 .filter-btn.active-copper {
-  background: #fce6d4;
-  border-color: #b85a34;
-  color: #6b2810;
+  background: #FCE6D4;
+  border-color: var(--color-copper);
+  color: #6B2810;
 }
 
 .filter-btn.active-kansa {
-  background: #ede6ce;
-  border-color: #8a6a20;
-  color: #3d2e0a;
+  background: #EDE6CE;
+  border-color: var(--color-kansa);
+  color: #3D2E0A;
 }
 
 /* ================================
-   PRODUCT CARD
+   PRODUCT CARD - ROW STYLE
 ================================ */
 .product-card {
   background: var(--color-surface);
-  padding: var(--space-3);
-  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  border-radius: 0;
   margin-bottom: 0;
   border: none;
-  border-bottom: 1px solid var(--color-border-subtle);
+  border-bottom: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-border);
   box-shadow: none;
-  contain: layout style;
   transition: background var(--duration-fast) var(--ease-default);
 }
 
 .product-card:hover {
   background: var(--color-border-subtle);
-  transform: none;
-  box-shadow: none;
 }
 
-.product-card:active {
-  transform: none;
-  box-shadow: none;
+.product-card.material-brass,
+.product-card[data-material="Brass"] {
+  border-left-color: var(--color-brass);
+}
+
+.product-card.material-copper,
+.product-card[data-material="Copper"] {
+  border-left-color: var(--color-copper);
+}
+
+.product-card.material-kansa,
+.product-card[data-material="Kansa"] {
+  border-left-color: var(--color-kansa);
 }
 
 .product-title {
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 500;
+  font-size: 15px;
   color: var(--color-text-primary);
   margin-bottom: var(--space-2);
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tight);
+  line-height: 1.2;
 }
 
 /* ================================
@@ -357,34 +345,28 @@ h1 {
 .price-w-full {
   display: inline-block;
   width: auto;
-  padding: 4px 12px;
+  padding: 3px 10px;
   text-align: center;
   border-radius: var(--radius-pill);
   color: white;
-  font-weight: 800;
-  font-family: var(--font-mono), var(--font-sans);
-  background: var(--color-primary-dark);
-  font-size: 14px;
-  letter-spacing: var(--tracking-tight);
+  font-weight: 700;
+  background: var(--color-accent);
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
-  box-shadow: none;
   margin-right: var(--space-2);
 }
 
 .price-r-full {
   display: inline-block;
   width: auto;
-  padding: 4px 12px;
+  padding: 3px 10px;
   text-align: center;
   border-radius: var(--radius-pill);
   color: white;
-  font-weight: 800;
-  font-family: var(--font-mono), var(--font-sans);
-  background: var(--color-retail);
-  font-size: 14px;
-  letter-spacing: var(--tracking-tight);
+  font-weight: 700;
+  background: var(--color-danger);
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
-  box-shadow: none;
   margin-right: var(--space-2);
 }
 
@@ -400,40 +382,41 @@ h1 {
 
 .unit {
   background: var(--color-border-subtle);
-  padding: 4px 10px;
+  padding: 2px 8px;
   border-radius: var(--radius-pill);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
   color: var(--color-text-secondary);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .unit-pp {
-  background: var(--color-primary-tint);
-  color: var(--color-primary);
+  background: rgba(180, 83, 9, 0.06);
+  color: var(--color-accent);
 }
 
 /* ================================
    MATERIAL BADGES
 ================================ */
 .material-badge {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .material-brass {
-  background: #fdf5e0;
-  color: #6b5112;
+  background: #FDF5E0;
+  color: #6B5112;
 }
 
 .material-copper {
-  background: #fceee4;
-  color: #7a3d1e;
+  background: #FCEEE4;
+  color: #7A3D1E;
 }
 
 .material-kansa {
-  background: #f2eddf;
-  color: #5c4a22;
+  background: #F2EDDF;
+  color: #5C4A22;
 }
 
 /* ================================
@@ -448,24 +431,19 @@ h1 {
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
-  box-shadow: var(--shadow-sm);
   transition: background var(--duration-fast) var(--ease-default),
               color var(--duration-fast) var(--ease-default),
               border-color var(--duration-fast) var(--ease-default),
-              box-shadow var(--duration-normal) var(--ease-default),
               transform var(--duration-fast) var(--ease-default);
 }
 
 .restock-btn:hover {
   background: var(--color-border-subtle);
-  border-color: var(--color-border-strong);
   color: var(--color-text-primary);
-  box-shadow: var(--shadow-md);
 }
 
 .restock-btn:active {
   transform: scale(0.97);
-  box-shadow: var(--shadow-sm);
 }
 
 /* ================================
@@ -489,8 +467,8 @@ h1 {
 }
 
 .restock-note input:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(47, 63, 100, 0.08);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.08);
 }
 
 .restock-note input::placeholder {
@@ -505,12 +483,10 @@ h1 {
   cursor: pointer;
   font-weight: 600;
   font-size: 13px;
-  box-shadow: 0 1px 3px rgba(15, 123, 59, 0.15);
 }
 
 .restock-note button:hover {
-  background: var(--color-success-dark);
-  box-shadow: 0 2px 8px rgba(15, 123, 59, 0.22);
+  background: #116B33;
 }
 
 .restock-note button:active {
@@ -532,27 +508,26 @@ h1 {
 .app-switch-btn {
   padding: 5px 10px;
   border-radius: var(--radius-md);
-  background: var(--color-suite);
+  background: var(--color-accent);
   color: white;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.05em;
   cursor: pointer;
   white-space: nowrap;
-  box-shadow: 0 1px 3px rgba(3, 105, 161, 0.2);
+  box-shadow: 0 1px 3px rgba(180, 83, 9, 0.2);
   transition: background var(--duration-fast) var(--ease-default),
               box-shadow var(--duration-normal) var(--ease-default),
               transform var(--duration-fast) var(--ease-default);
 }
 
 .app-switch-btn:hover {
-  background: var(--color-suite-dark);
-  box-shadow: 0 2px 8px rgba(3, 105, 161, 0.3);
+  background: #9A4408;
+  box-shadow: 0 2px 8px rgba(180, 83, 9, 0.3);
 }
 
 .app-switch-btn:active {
   transform: scale(0.97);
-  box-shadow: 0 1px 3px rgba(3, 105, 161, 0.2);
 }
 
 /* ================================
@@ -571,7 +546,6 @@ h1 {
   font-size: 14px;
   z-index: 999;
   box-shadow: var(--shadow-lg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* ================================
@@ -581,7 +555,7 @@ h1 {
   text-align: center;
   padding: var(--space-10) var(--space-6);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--color-text-muted);
-  line-height: var(--leading-relaxed);
+  line-height: 1.6;
 }
