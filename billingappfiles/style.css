@@ -199,9 +199,9 @@ input {
 
 .header-row h1 {
   margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--color-text-primary);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
   letter-spacing: var(--tracking-tight);
   line-height: var(--leading-tight);
 }
@@ -224,11 +224,11 @@ input {
 }
 
 #modeToggle {
-  padding: 8px 14px;
+  padding: 6px 10px;
   border-radius: var(--radius-md);
   background: var(--color-primary);
   color: white;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.02em;
   box-shadow: 0 1px 3px rgba(47, 63, 100, 0.15);
@@ -249,23 +249,25 @@ input {
 
 #searchBox {
   width: 100%;
-  padding: 14px 50px 14px 16px;
+  padding: 11px 44px 11px 14px;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  font-size: 16px;
-  background: var(--color-surface);
+  border: 1px solid transparent;
+  font-size: 15px;
+  background: var(--color-bg);
   color: var(--color-text-primary);
   outline: none;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
 }
 
 #searchBox:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(47, 63, 100, 0.08), var(--shadow-sm);
+  box-shadow: 0 0 0 3px rgba(47, 63, 100, 0.08), var(--shadow-md);
+  background: var(--color-surface);
 }
 
 #searchBox::placeholder {
-  color: var(--color-text-muted);
+  font-size: 13px;
+  color: var(--color-text-faint);
 }
 
 #clearSearch {
@@ -296,6 +298,17 @@ input {
 
 #suggestions {
   margin-top: var(--space-3);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+#suggestions:empty {
+  border: none;
+  background: none;
 }
 
 /* ================================
@@ -310,13 +323,14 @@ input {
 }
 
 .filter-chip {
-  padding: 5px 12px;
+  padding: 3px 8px;
   border-radius: var(--radius-pill);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
+  min-height: 28px;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border-subtle);
   letter-spacing: 0.01em;
   transition: background var(--duration-fast) var(--ease-default),
               border-color var(--duration-fast) var(--ease-default),
@@ -326,8 +340,8 @@ input {
 
 .filter-chip:hover {
   background: var(--color-border-subtle);
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
 }
 
 .filter-chip:active {
@@ -341,35 +355,35 @@ input {
 }
 
 .filter-chip.material-brass {
-  background: #fdf8ed;
-  color: #6b5112;
-  border-color: #f0e4c4;
+  background: transparent;
+  color: #8a6a20;
+  border-color: #e8dfc4;
 }
 
 .filter-chip.material-brass:hover {
-  background: #faf0d6;
+  background: #fdf8ed;
   border-color: #e6d4a0;
 }
 
 .filter-chip.material-copper {
-  background: #fdf4ee;
-  color: #7a3d1e;
+  background: transparent;
+  color: #8a4d2e;
   border-color: #f0ddd0;
 }
 
 .filter-chip.material-copper:hover {
-  background: #fbe8db;
+  background: #fdf4ee;
   border-color: #e6c8b4;
 }
 
 .filter-chip.material-kansa {
-  background: #f7f4ed;
-  color: #5c4a22;
+  background: transparent;
+  color: #6b5a32;
   border-color: #e8e0cc;
 }
 
 .filter-chip.material-kansa:hover {
-  background: #f0eadb;
+  background: #f7f4ed;
   border-color: #ddd4b8;
 }
 
@@ -412,17 +426,29 @@ input {
 
 .suggestion-card {
   cursor: pointer;
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  margin-bottom: 0;
+  padding: 10px var(--space-3);
+  border-bottom: 1px solid var(--color-border-subtle);
+  box-shadow: none;
 }
 
 .suggestion-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-border-strong);
+  background: var(--color-border-subtle);
+  transform: none;
+  box-shadow: none;
+  border-color: var(--color-border-subtle);
 }
 
 .suggestion-card:active {
-  transform: translateY(0);
-  box-shadow: var(--shadow-sm);
+  transform: none;
+  box-shadow: none;
+}
+
+.suggestion-card:last-child {
+  border-bottom: none;
 }
 
 .suggestion-top {
@@ -433,14 +459,15 @@ input {
 
 .suggestion-name,
 .bill-title {
-  font-weight: 600;
-  font-size: 15px;
+  font-weight: 500;
+  font-size: 14px;
   color: var(--color-text-primary);
   line-height: var(--leading-tight);
 }
 
 .suggestion-price {
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 14px;
   font-variant-numeric: tabular-nums;
   font-family: var(--font-mono), var(--font-sans);
   color: var(--color-text-primary);
@@ -472,12 +499,13 @@ input {
 }
 
 .unit {
-  padding: 2px 6px;
+  padding: 1px 5px;
   border-radius: var(--radius-pill);
-  background: var(--color-border-subtle);
-  font-size: 10px;
+  background: transparent;
+  font-size: 9px;
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: var(--color-text-faint);
+  border: none;
   letter-spacing: 0.02em;
 }
 
@@ -1432,14 +1460,14 @@ input {
    LIVE BUTTON
 ================================ */
 #liveBtn {
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: var(--radius-md);
-  background: #374151;
+  background: var(--color-border-subtle);
   color: var(--color-text-muted);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
   white-space: nowrap;
   transition: background var(--duration-fast) var(--ease-default),
               color var(--duration-fast) var(--ease-default),
@@ -2094,29 +2122,29 @@ input {
 }
 
 .suggestion-price {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
   font-family: var(--font-mono), var(--font-sans);
-  color: var(--color-primary);
+  color: var(--color-text-primary);
 }
 
 .suggestion-add-btn {
-  width: 28px;
-  height: 28px;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 8px;
-  margin: -8px;
-  box-sizing: content-box;
-  background: var(--color-primary);
-  color: white;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  min-height: 22px;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  background: var(--color-border-subtle);
+  color: var(--color-text-muted);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 300;
   line-height: 1;
   flex-shrink: 0;
@@ -2125,8 +2153,9 @@ input {
 }
 
 .suggestion-card:hover .suggestion-add-btn {
-  background: var(--color-primary-dark);
-  transform: scale(1.06);
+  background: var(--color-border-strong);
+  color: var(--color-text-secondary);
+  transform: none;
 }
 
 /* -- Receiver card: name + amount side by side -- */
@@ -2276,17 +2305,6 @@ input {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
-.suggestion-card {
-  animation: cardFadeUp 0.2s var(--ease-out) both;
-  will-change: opacity, transform;
-}
-
-.suggestion-card:nth-child(1) { animation-delay: 0ms; }
-.suggestion-card:nth-child(2) { animation-delay: 30ms; }
-.suggestion-card:nth-child(3) { animation-delay: 55ms; }
-.suggestion-card:nth-child(4) { animation-delay: 75ms; }
-.suggestion-card:nth-child(5) { animation-delay: 90ms; }
 
 /* ================================
    LIVE PULSE ANIMATION
