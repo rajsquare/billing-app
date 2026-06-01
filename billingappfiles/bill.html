@@ -7,6 +7,9 @@
     content="width=device-width, initial-scale=1.0"
   >
   <title>Billing App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script>
     /* Last-app memory: auto-route to pricelist if that was the user's last app */
@@ -58,16 +61,14 @@
     <div class="search-container">
 
       <div class="header-row">
-        <h1>
-          <button
-            id="appTitleLink"
-            class="app-title-switch"
-            type="button"
-            aria-label="Switch to Pricelist App"
-          >
-            Billing
-          </button>
-        </h1>
+        <button
+          id="appTitleLink"
+          class="app-title-switch"
+          type="button"
+          aria-label="Switch to Pricelist App"
+        >
+          Billing
+        </button>
 
         <div class="header-controls">
           <button id="liveBtn">LIVE (0)</button>
@@ -79,7 +80,7 @@
         <input
           type="text"
           id="searchBox"
-          placeholder="Search product..."
+          placeholder="+ Add product..."
           autocomplete="off"
         >
 
@@ -100,11 +101,8 @@
 
     <div class="hero-total">
       <div class="total-row">
-        <div class="total-row-left">
-          <span class="total-label">Total</span>
-          <span id="billItemCount" class="bill-item-count"></span>
-        </div>
-        <span id="grandTotal">₹0</span>
+        <span id="grandTotal">&#8377;0</span>
+        <span id="billItemCount" class="bill-item-count"></span>
       </div>
     </div>
 
@@ -126,7 +124,7 @@
       </div>
 
       <div class="receiver-subtitle">
-        No bills received today
+        No bills received
       </div>
 
       <div class="receiver-hint">
