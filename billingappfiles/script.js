@@ -10,6 +10,8 @@ import {
   serverTimestamp,
   query,
   orderBy,
+  where,
+  Timestamp,
   runTransaction,
   getDocs,
   getDoc,
@@ -54,13 +56,60 @@ const billsCollection = collection(db, "bills");
 const daybookCollection = collection(db, "daybook");
 const liveDraftBillsCollection = collection(db, "liveDraftBills");
 
+/* ─────────────────────────────────────────────────────────────
+   PHASE 2 — BILLS LISTENER OPTIMISATION
+   Query: effectiveVersion != false
+   Rationale (from validation report):
+     • All active bills written by this codebase have effectiveVersion === true.
+     • Legacy bills created before the field existed have it missing/undefined.
+     • Firestore "!= false" includes both true AND missing-field documents,
+       matching the existing UI filter (effectiveVersion !== false) exactly.
+     • "== true" would silently drop legacy documents — rejected.
+   Composite index required: effectiveVersion ASC, createdAt ASC
+   (Firestore requires orderBy(effectiveVersion) when using != on that field.)
+───────────────────────────────────────────────────────────── */
 const billsQuery = query(
   billsCollection,
+  where("effectiveVersion", "!=", false),
+  orderBy("effectiveVersion", "asc"),
   orderBy("createdAt", "asc")
 );
 
+/* ─────────────────────────────────────────────────────────────
+   PHASE 3 — DAYBOOK LISTENER OPTIMISATION
+   Scope the listener to today's entries only, using a
+   createdAt Timestamp range computed once at startup in IST.
+   India does not observe DST so the +5:30 offset is fixed.
+   Historical entries are never needed at runtime; they exist
+   only for audit and are deleted wholesale by deleteDaybookNow()
+   which uses getDocs(daybookCollection) — unaffected by this query.
+   Index required: createdAt ASC (single-field; likely already exists).
+───────────────────────────────────────────────────────────── */
+const _DAYBOOK_RANGE = (function () {
+  const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000; // +5 h 30 m, fixed
+  const nowUTC = new Date();
+  const nowIST = new Date(nowUTC.getTime() + IST_OFFSET_MS);
+  // Midnight IST today expressed as a UTC Date
+  const startUTC = new Date(
+    Date.UTC(
+      nowIST.getUTCFullYear(),
+      nowIST.getUTCMonth(),
+      nowIST.getUTCDate(),
+      0, 0, 0, 0
+    ) - IST_OFFSET_MS
+  );
+  // Midnight IST tomorrow = start + 24 h
+  const endUTC = new Date(startUTC.getTime() + 24 * 60 * 60 * 1000);
+  return {
+    start: Timestamp.fromDate(startUTC),
+    end:   Timestamp.fromDate(endUTC)
+  };
+}());
+
 const daybookQuery = query(
   daybookCollection,
+  where("createdAt", ">=", _DAYBOOK_RANGE.start),
+  where("createdAt", "<",  _DAYBOOK_RANGE.end),
   orderBy("createdAt", "asc")
 );
 
@@ -78,6 +127,17 @@ const BILL_DRAFT_KEY = "billingAppDraftV4";
 const DAYBOOK_PRINTED_KEY = "daybookPrintedOnce";
 const DRAFT_MAX_AGE_MS =
   24 * 60 * 60 * 1000;
+
+/* ─────────────────────────────────────────────────────────────
+   PHASE 1 — CATALOG CACHE CONSTANTS
+   localStorage key is versioned (V1) so a future schema change
+   can be isolated by bumping the version suffix.
+   TTL: 30 minutes — long enough to avoid reads across a normal
+   session; short enough that a price update takes effect within
+   half an hour without any manual intervention.
+───────────────────────────────────────────────────────────── */
+const CATALOG_CACHE_KEY    = "billingAppCatalogCacheV1";
+const CATALOG_CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
 const DISCOUNT_PRODUCTS = new Set([
   "Discount (Less)"
@@ -1032,6 +1092,42 @@ function renderRevisionBanner() {
   `;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   PHASE 2 — ON-DEMAND PARENT BILL FETCH HELPER
+   With the bills listener scoped to effectiveVersion != false,
+   locked historical originals (effectiveVersion: false) are not
+   loaded at startup. The three safeguards below call this helper
+   whenever a downstream workflow needs a parent bill that is
+   absent from incomingBillCache.
+   Behaviour:
+     • If the bill is already cached, returns it immediately (no read).
+     • If absent, fetches the Firestore document and populates the cache.
+     • Returns the bill data on success, null on missing doc or error.
+     • Never throws — all failures return null so callers can fall back.
+───────────────────────────────────────────────────────────── */
+async function _fetchBillIntoCache(billId) {
+  if (!billId) return null;
+
+  // Already in cache — return immediately, no Firestore read.
+  if (incomingBillCache[billId]) {
+    return incomingBillCache[billId];
+  }
+
+  try {
+    const snap = await getDoc(doc(db, "bills", billId));
+
+    if (snap.exists()) {
+      incomingBillCache[billId] = snap.data();
+      return incomingBillCache[billId];
+    }
+
+    return null; // Document does not exist.
+  } catch (err) {
+    console.error("[PARENT FETCH] getDoc failed for", billId, err);
+    return null;
+  }
+}
+
 function getBillChainIds(docId) {
   const bill = incomingBillCache[docId];
 
@@ -1666,7 +1762,18 @@ function printRevisionReceipt(
   window.print();
 }
 
-function openRevisionPreview(
+/* ─────────────────────────────────────────────────────────────
+   SAFEGUARD B — REVISION PREVIEW  (DEP-6)
+   Original: read originalBill from cache; silently show wrong
+             data (the revision itself) when parent was missing.
+   Fixed:    attempt on-demand Firestore fetch if parent absent;
+             only fall back to the silent substitution if the
+             fetch also fails (e.g. document was already deleted).
+   Made async to await _fetchBillIntoCache.
+   switchRevisionView calls this function — async is compatible
+   because it is invoked via onclick and the return value is unused.
+───────────────────────────────────────────────────────────── */
+async function openRevisionPreview(
   docId,
   mode
 ) {
@@ -1706,8 +1813,20 @@ function openRevisionPreview(
     }
   }
 
-  const originalBill =
+  // ── Safeguard B: fetch parent if absent from cache ──────────
+  let originalBill =
     incomingBillCache[bill.parentBillId];
+
+  if (!originalBill && bill.parentBillId) {
+    console.log(
+      "[PARENT FETCH] revision preview — fetching parentBillId:",
+      bill.parentBillId,
+      "for revision docId:", docId
+    );
+    originalBill =
+      await _fetchBillIntoCache(bill.parentBillId);
+  }
+  // ────────────────────────────────────────────────────────────
 
   if (mode === "original") {
     if (!originalBill) {
@@ -1806,47 +1925,141 @@ window.switchRevisionView =
 /* ================================
    PRODUCTS
 ================================ */
+
+/* ─────────────────────────────────────────────────────────────
+   PHASE 1 — CATALOG CACHE HELPERS
+
+   _readCatalogCache()
+     Reads the localStorage entry. Returns the raw products array
+     if the cache is present, valid JSON, passes schema validation,
+     and is within TTL. Returns null for every failure mode:
+       • key missing
+       • JSON parse error
+       • schema mismatch (products not an array / timestamp not a number)
+       • TTL exceeded
+     Never throws. All errors produce null → caller falls back to Firestore.
+
+   _writeCatalogCache(rawProducts)
+     Persists { products, timestamp } to localStorage.
+     Failures (quota exceeded, etc.) are silently swallowed — a failed
+     write simply means the next load will re-fetch from Firestore.
+
+   _applyRawProducts(rawProducts)
+     Converts the raw server/cache array into the augmented in-memory
+     format (adds searchableText + searchableTokens). Identical to the
+     original inline mapping in loadProducts so the output is unchanged.
+───────────────────────────────────────────────────────────── */
+function _readCatalogCache() {
+  try {
+    const raw = localStorage.getItem(CATALOG_CACHE_KEY);
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+
+    // Schema guard: must have a products array and a numeric timestamp.
+    if (
+      !parsed ||
+      !Array.isArray(parsed.products) ||
+      typeof parsed.timestamp !== "number"
+    ) {
+      return null;
+    }
+
+    // TTL check.
+    if (Date.now() - parsed.timestamp > CATALOG_CACHE_TTL_MS) {
+      return null; // Expired — caller will re-fetch from Firestore.
+    }
+
+    return parsed.products; // Valid, fresh cache hit.
+  } catch (_) {
+    // JSON.parse failure or any other unexpected error.
+    return null; // Fall through to Firestore.
+  }
+}
+
+function _writeCatalogCache(rawProducts) {
+  try {
+    localStorage.setItem(
+      CATALOG_CACHE_KEY,
+      JSON.stringify({
+        products:  rawProducts,
+        timestamp: Date.now()
+      })
+    );
+  } catch (_) {
+    // localStorage quota exceeded or access denied — non-fatal.
+    // Next load will re-fetch from Firestore and attempt to write again.
+  }
+}
+
+function _applyRawProducts(rawProducts) {
+  products = rawProducts.map(
+    product => {
+      const searchableText =
+        normalize(
+          `${product.productName} ${product.material || ""}`
+        );
+
+      return {
+        ...product,
+        searchableText,
+        searchableTokens:
+          tokenize(searchableText)
+      };
+    }
+  );
+
+  productsBySr.clear();
+
+  products.forEach(
+    p => productsBySr.set(p.sr, p)
+  );
+}
+
 async function loadProducts() {
   try {
-const catalogRef = doc(
-  pricelistDb,
-  "catalog",
-  "current"
-);
+    // ── Try localStorage cache first ──────────────────────────
+    const cachedRaw = _readCatalogCache();
+
+    if (cachedRaw !== null) {
+      // Cache hit: hydrate memory, skip Firestore entirely.
+      _applyRawProducts(cachedRaw);
+      restoreDraft();
+      console.log(
+        `[CATALOG CACHE] Hit — loaded ${products.length} products from localStorage (no Firestore read)`
+      );
+      return;
+    }
+
+    // ── Cache miss or expired: fetch from Firestore ───────────
+    console.log(
+      "[CATALOG CACHE] Miss — fetching from Firestore"
+    );
+
+    const catalogRef = doc(
+      pricelistDb,
+      "catalog",
+      "current"
+    );
+
     const catalogSnap = await getDoc(catalogRef);
 
     if (!catalogSnap.exists()) {
       throw new Error("Catalog snapshot not found");
     }
 
-    const catalogData = catalogSnap.data();
+    const rawProducts =
+      catalogSnap.data().products || [];
 
-    products = (catalogData.products || []).map(
-      product => {
-        const searchableText =
-          normalize(
-            `${product.productName} ${product.material || ""}`
-          );
+    // Persist raw server data to cache before augmenting.
+    _writeCatalogCache(rawProducts);
 
-        return {
-          ...product,
-          searchableText,
-          searchableTokens:
-            tokenize(searchableText)
-        };
-      }
-    );
-
-    productsBySr.clear();
-
-    products.forEach(
-      p => productsBySr.set(p.sr, p)
-    );
+    _applyRawProducts(rawProducts);
 
     restoreDraft();
 
     console.log(
-      `Loaded ${products.length} products from Firestore catalog`
+      `[CATALOG CACHE] Fetched ${products.length} products from Firestore — cache written`
     );
 
   } catch (err) {
@@ -4177,8 +4390,16 @@ window.viewReceivedBill =
     previewReceipt(bill);
   };
 
+/* ─────────────────────────────────────────────────────────────
+   SAFEGUARD C — REPRINT  (DEP-6)
+   Original: read originalBill from cache; fall back to
+             printReceipt(bill) silently when parent absent.
+   Fixed:    attempt on-demand fetch first; retain printReceipt
+             fallback only if the fetch also fails.
+   Made async to await _fetchBillIntoCache.
+───────────────────────────────────────────────────────────── */
 window.reprintReceivedBill =
-  function(docId) {
+  async function(docId) {
     const bill =
       incomingBillCache[docId];
 
@@ -4188,10 +4409,19 @@ window.reprintReceivedBill =
       bill.isOriginal === false &&
       bill.parentBillId
     ) {
-      const originalBill =
-        incomingBillCache[
-          bill.parentBillId
-        ];
+      // Try cache first, then on-demand fetch.
+      let originalBill =
+        incomingBillCache[bill.parentBillId];
+
+      if (!originalBill) {
+        console.log(
+          "[PARENT FETCH] reprint — fetching parentBillId:",
+          bill.parentBillId,
+          "for revision docId:", docId
+        );
+        originalBill =
+          await _fetchBillIntoCache(bill.parentBillId);
+      }
 
       if (originalBill) {
         printRevisionReceipt(
@@ -4200,6 +4430,7 @@ window.reprintReceivedBill =
         );
         return;
       }
+      // originalBill still null after fetch — fall through to printReceipt.
     }
 
     printReceipt(bill);
@@ -4340,14 +4571,23 @@ if (!isTestBill) {
           }
         );
 
+      // ── Safeguard C: fetch parent if absent from cache ───────
       if (
         finalBill.isOriginal === false &&
         finalBill.parentBillId
       ) {
-        const originalBill =
-          incomingBillCache[
-            finalBill.parentBillId
-          ];
+        let originalBill =
+          incomingBillCache[finalBill.parentBillId];
+
+        if (!originalBill) {
+          console.log(
+            "[PARENT FETCH] print (post-transaction) — fetching parentBillId:",
+            finalBill.parentBillId,
+            "for revision docId:", docId
+          );
+          originalBill =
+            await _fetchBillIntoCache(finalBill.parentBillId);
+        }
 
         if (originalBill) {
           printRevisionReceipt(
@@ -4360,6 +4600,7 @@ if (!isTestBill) {
       } else {
         printReceipt(finalBill);
       }
+      // ─────────────────────────────────────────────────────────
     } catch (err) {
       console.error(err);
 
@@ -4393,6 +4634,24 @@ window.doneReceivedBill =
         "bills",
         docId
       );
+
+    // ── Safeguard A: ensure parent is in cache before chain resolution ──
+    // getBillChainIds() walks incomingBillCache to find all chain members.
+    // With the active-only listener, the locked historical original
+    // (effectiveVersion: false) is not loaded at startup. Fetch it now
+    // so the chain walk finds it and the lock transaction is complete.
+    const _billForChain = incomingBillCache[docId];
+    if (_billForChain && _billForChain.parentBillId) {
+      if (!incomingBillCache[_billForChain.parentBillId]) {
+        console.log(
+          "[PARENT FETCH] done workflow — fetching parentBillId:",
+          _billForChain.parentBillId,
+          "for active docId:", docId
+        );
+        await _fetchBillIntoCache(_billForChain.parentBillId);
+      }
+    }
+    // ────────────────────────────────────────────────────────────────────
 
     // Resolve chain members from cache before entering the transaction.
     // Ancestor bills (effectiveVersion:false) are immutable — safe to read from cache.
