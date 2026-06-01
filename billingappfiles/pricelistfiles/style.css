@@ -121,7 +121,7 @@ input {
   background: rgba(248, 249, 251, 0.88);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  padding-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
   margin-bottom: var(--space-4);
   z-index: 100;
   border-bottom: 1px solid var(--color-border);
@@ -140,10 +140,10 @@ input {
 ================================ */
 h1 {
   margin: 0;
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 600;
   letter-spacing: var(--tracking-tight);
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
   line-height: var(--leading-tight);
 }
 
@@ -151,11 +151,11 @@ h1 {
    TOGGLE BUTTON
 ================================ */
 #modeToggle {
-  padding: 8px 14px;
+  padding: 6px 10px;
   border-radius: var(--radius-md);
   color: white;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 11px;
   background: var(--color-primary);
   min-width: 42px;
   letter-spacing: 0.02em;
@@ -180,24 +180,26 @@ h1 {
 
 #searchInput {
   width: 100%;
-  padding: 14px 44px 14px 16px;
+  padding: 11px 44px 11px 14px;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  font-size: 16px;
-  background: var(--color-surface);
+  border: 1px solid transparent;
+  font-size: 15px;
+  background: var(--color-bg);
   color: var(--color-text-primary);
   outline: none;
   font-family: inherit;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
 }
 
 #searchInput:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(47, 63, 100, 0.08), var(--shadow-sm);
+  background: var(--color-surface);
 }
 
 #searchInput::placeholder {
-  color: var(--color-text-muted);
+  font-size: 13px;
+  color: var(--color-text-faint);
 }
 
 /* ================================
@@ -243,7 +245,7 @@ h1 {
 }
 
 .filter-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -264,9 +266,9 @@ h1 {
 .filter-btn {
   background: var(--color-surface);
   color: var(--color-text-secondary);
-  padding: 7px 14px;
+  padding: 3px 8px;
   border-radius: var(--radius-pill);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
   border: 1px solid var(--color-border);
   letter-spacing: 0.01em;
@@ -312,33 +314,32 @@ h1 {
 ================================ */
 .product-card {
   background: var(--color-surface);
-  padding: var(--space-4);
-  border-radius: var(--radius-lg);
-  margin-bottom: var(--space-3);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  margin-bottom: 0;
+  border: none;
+  border-bottom: 1px solid var(--color-border-subtle);
+  box-shadow: none;
   contain: layout style;
-  transition: box-shadow var(--duration-normal) var(--ease-default),
-              border-color var(--duration-normal) var(--ease-default),
-              transform var(--duration-fast) var(--ease-default);
+  transition: background var(--duration-fast) var(--ease-default);
 }
 
 .product-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-border-strong);
+  background: var(--color-border-subtle);
+  transform: none;
+  box-shadow: none;
 }
 
 .product-card:active {
-  transform: translateY(0);
-  box-shadow: var(--shadow-sm);
+  transform: none;
+  box-shadow: none;
 }
 
 .product-title {
-  font-weight: 700;
-  font-size: 15px;
+  font-weight: 600;
+  font-size: 14px;
   color: var(--color-text-primary);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-2);
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tight);
 }
@@ -347,37 +348,44 @@ h1 {
    PRICE DISPLAYS
 ================================ */
 .price-row {
-  margin-bottom: var(--space-3);
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin-bottom: var(--space-2);
 }
 
 .price-w-full {
-  width: 100%;
-  padding: 14px 0;
+  display: inline-block;
+  width: auto;
+  padding: 4px 12px;
   text-align: center;
-  border-radius: 10px;
+  border-radius: var(--radius-pill);
   color: white;
   font-weight: 800;
   font-family: var(--font-mono), var(--font-sans);
   background: var(--color-primary-dark);
-  font-size: 22px;
+  font-size: 14px;
   letter-spacing: var(--tracking-tight);
   font-variant-numeric: tabular-nums;
-  box-shadow: 0 2px 6px rgba(36, 49, 82, 0.15);
+  box-shadow: none;
+  margin-right: var(--space-2);
 }
 
 .price-r-full {
-  width: 100%;
-  padding: 14px 0;
+  display: inline-block;
+  width: auto;
+  padding: 4px 12px;
   text-align: center;
-  border-radius: 10px;
+  border-radius: var(--radius-pill);
   color: white;
   font-weight: 800;
   font-family: var(--font-mono), var(--font-sans);
   background: var(--color-retail);
-  font-size: 22px;
+  font-size: 14px;
   letter-spacing: var(--tracking-tight);
   font-variant-numeric: tabular-nums;
-  box-shadow: 0 2px 6px rgba(201, 64, 64, 0.15);
+  box-shadow: none;
+  margin-right: var(--space-2);
 }
 
 /* ================================
@@ -522,11 +530,11 @@ h1 {
    APP SWITCHER BUTTON
 ================================ */
 .app-switch-btn {
-  padding: 8px 14px;
+  padding: 5px 10px;
   border-radius: var(--radius-md);
   background: var(--color-suite);
   color: white;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.05em;
   cursor: pointer;
@@ -577,27 +585,3 @@ h1 {
   color: var(--color-text-muted);
   line-height: var(--leading-relaxed);
 }
-
-/* ================================
-   CARD ANIMATION
-================================ */
-@keyframes cardFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.product-card {
-  animation: cardFadeUp var(--duration-slow) var(--ease-out) both;
-}
-
-.product-card:nth-child(1) { animation-delay: 0ms; }
-.product-card:nth-child(2) { animation-delay: 30ms; }
-.product-card:nth-child(3) { animation-delay: 55ms; }
-.product-card:nth-child(4) { animation-delay: 75ms; }
-.product-card:nth-child(5) { animation-delay: 90ms; }

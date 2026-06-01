@@ -186,7 +186,7 @@ input {
    SEARCH
 ================================ */
 .search-container {
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-6);
 }
 
 .header-row {
@@ -309,6 +309,8 @@ input {
 #suggestions:empty {
   border: none;
   background: none;
+  padding: 0;
+  margin: 0;
 }
 
 /* ================================
@@ -635,12 +637,15 @@ input {
    HERO TOTAL
 ================================ */
 .hero-total {
-  padding: 28px 20px;
+  padding: 16px 20px;
   text-align: center;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   margin-bottom: var(--space-6);
   border-radius: var(--radius-lg);
+  position: sticky;
+  top: 38px;
+  z-index: 40;
 }
 
 .hero-total .total-row {
@@ -679,13 +684,13 @@ input {
 }
 
 .bill-item-count {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--color-text-muted);
 }
 
 #grandTotal {
-  font-size: 42px;
+  font-size: 36px;
   font-weight: 800;
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
@@ -872,7 +877,7 @@ input {
   background: var(--color-surface);
   width: min(95vw, 420px);
   border-radius: var(--radius-xl);
-  padding: var(--space-5);
+  padding: var(--space-6);
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--color-border);
 }
@@ -922,6 +927,7 @@ input {
 
 .preview-card {
   max-height: 90vh;
+  max-width: min(95vw, 400px);
   display: flex;
   flex-direction: column;
 }
@@ -929,7 +935,12 @@ input {
 .preview-content {
   overflow-y: auto;
   max-height: 70vh;
-  margin-top: var(--space-3);
+  padding: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.preview-card .modal-actions {
+  margin-top: var(--space-6);
 }
 
 .preview-content .print-wrapper {
@@ -948,7 +959,7 @@ input {
    DAYBOOK UI
 ================================ */
 .daybook-date {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--color-text-muted);
   font-weight: 600;
   text-transform: uppercase;
@@ -1389,6 +1400,12 @@ input {
   .receiver-card {
     padding: var(--space-5);
   }
+
+  .modal-card,
+  .preview-card,
+  .live-modal-card {
+    padding: var(--space-6);
+  }
 }
 
 /* ================================
@@ -1569,25 +1586,27 @@ input {
 .live-draft-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 0;
 }
 
 .live-draft-card {
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
+  padding: var(--space-3);
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid var(--color-border-subtle);
   background: var(--color-surface);
   cursor: pointer;
-  transition: border-color var(--duration-fast) var(--ease-default),
-              background var(--duration-fast) var(--ease-default),
-              box-shadow var(--duration-normal) var(--ease-default);
+  transition: background var(--duration-fast) var(--ease-default);
   contain: layout style;
 }
 
+.live-draft-card:last-child {
+  border-bottom: none;
+}
+
 .live-draft-card:hover {
-  border-color: var(--color-primary);
-  background: var(--color-primary-tint);
-  box-shadow: var(--shadow-sm);
+  background: var(--color-border-subtle);
+  box-shadow: none;
 }
 
 .live-draft-card:active {
@@ -1595,8 +1614,8 @@ input {
 }
 
 .live-draft-name {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--color-text-primary);
   letter-spacing: var(--tracking-tight);
 }
@@ -1605,7 +1624,7 @@ input {
   display: flex;
   gap: var(--space-3);
   margin-top: var(--space-1);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -1614,7 +1633,7 @@ input {
 
 .live-draft-subtotal {
   margin-top: var(--space-2);
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   font-family: var(--font-mono), var(--font-sans);
@@ -1995,13 +2014,13 @@ input {
 /* Empty bill state */
 .empty-bill-state {
   text-align: center;
-  padding: 48px 24px 56px;
+  padding: 56px 24px;
 }
 
 .empty-bill-hint {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
-  color: var(--color-text-muted);
+  color: var(--color-text-faint);
   line-height: var(--leading-relaxed);
 }
 
@@ -2274,7 +2293,7 @@ input {
 
 .live-draft-header .live-draft-subtotal {
   margin-top: 0;
-  font-size: 16px;
+  font-size: 14px;
   flex-shrink: 0;
 }
 
@@ -2360,7 +2379,7 @@ input {
    LIVE REVISION ACCENT
 ================================ */
 .live-draft-card:has(.live-revision-tag) {
-  box-shadow: inset 3px 0 0 var(--color-revision);
+  border-left: 2px solid var(--color-revision);
 }
 
 /* ================================
@@ -2392,6 +2411,10 @@ input {
 }
 
 /* Daybook actions muted */
+#daybookActions {
+  margin-bottom: var(--space-4);
+}
+
 #daybookActions button {
   font-size: 12px;
   padding: 8px 14px;
