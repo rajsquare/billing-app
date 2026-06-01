@@ -115,10 +115,8 @@ input {
 .app-tabs {
   display: flex;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  padding: 4px var(--space-4);
+  background: var(--color-surface);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -131,19 +129,19 @@ input {
 .tab-btn {
   flex: 1;
   padding: 8px var(--space-3);
-  border-radius: var(--radius-md);
+  border-radius: 0;
   background: transparent;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--color-text-muted);
   letter-spacing: 0.01em;
-  transition: background var(--duration-fast) var(--ease-default),
-              color var(--duration-fast) var(--ease-default),
-              box-shadow var(--duration-normal) var(--ease-default);
+  border-bottom: 2px solid transparent;
+  transition: color var(--duration-fast) var(--ease-default),
+              border-color var(--duration-fast) var(--ease-default);
 }
 
 .tab-btn:hover {
-  background: var(--color-border-subtle);
+  background: transparent;
   color: var(--color-text-primary);
 }
 
@@ -152,13 +150,15 @@ input {
 }
 
 .tab-btn.active {
-  background: var(--color-primary);
-  color: white;
-  box-shadow: 0 1px 4px rgba(47, 63, 100, 0.15);
+  background: transparent;
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-primary);
+  box-shadow: none;
+  font-weight: 700;
 }
 
 .tab-btn.active:hover {
-  background: var(--color-primary-dark);
+  background: transparent;
 }
 
 .daybook-mini {
@@ -486,6 +486,25 @@ input {
   color: var(--color-text-secondary);
   font-size: 13px;
   line-height: var(--leading-normal);
+}
+
+.receiver-hint {
+  font-size: 12px;
+  color: var(--color-text-faint);
+  margin-top: var(--space-1);
+  line-height: var(--leading-normal);
+}
+
+/* Receiver empty state centered */
+.receiver-card {
+  text-align: center;
+  padding: 48px 24px;
+}
+
+/* Receiver action buttons compact */
+#receiverView .action-buttons button {
+  padding: 8px 12px;
+  font-size: 12px;
 }
 
 /* ================================
@@ -968,15 +987,15 @@ input {
 .daybook-subtotal {
   margin-top: var(--space-1);
   margin-bottom: var(--space-2);
-  padding: 10px 14px;
-  background: var(--color-border-subtle);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: 15px;
+  padding: var(--space-2) 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  font-size: 13px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   font-family: var(--font-mono), var(--font-sans);
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
   text-align: right;
 }
 /* ================================
@@ -1911,7 +1930,7 @@ input {
 /* Receiver card amount (replaces inline style) */
 .receiver-amount {
   margin-top: var(--space-3);
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   font-family: var(--font-mono), var(--font-sans);
@@ -2209,8 +2228,27 @@ input {
   margin-bottom: var(--space-1);
 }
 
+/* Daybook hero section */
+.daybook-hero {
+  padding: 24px 20px;
+  text-align: center;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.daybook-hero-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-1);
+}
+
 .daybook-total-amount {
-  font-size: 26px;
+  font-size: 32px;
   font-weight: 800;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
@@ -2336,9 +2374,31 @@ input {
    DAYBOOK MODE ACCENTS
 ================================ */
 .daybook-entry--w {
-  box-shadow: inset 3px 0 0 var(--color-primary);
+  border-left: 2px solid var(--color-primary);
 }
 
 .daybook-entry--r {
-  box-shadow: inset 3px 0 0 var(--color-retail);
+  border-left: 2px solid var(--color-retail);
+}
+
+/* Daybook entries as minimal rows */
+.daybook-entry {
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid var(--color-border-subtle);
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: var(--space-3);
+}
+
+/* Daybook actions muted */
+#daybookActions button {
+  font-size: 12px;
+  padding: 8px 14px;
+}
+
+#daybookActions .delete-btn {
+  opacity: 0.4;
+  font-size: 11px;
+  padding: 6px 10px;
 }
