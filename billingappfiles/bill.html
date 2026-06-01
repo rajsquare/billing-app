@@ -98,9 +98,7 @@
       <div id="suggestions"></div>
     </div>
 
-    <div id="billItems"></div>
-
-    <div class="total-card">
+    <div class="hero-total">
       <div class="total-row">
         <div class="total-row-left">
           <span class="total-label">Total</span>
@@ -108,7 +106,11 @@
         </div>
         <span id="grandTotal">₹0</span>
       </div>
+    </div>
 
+    <div id="billItems"></div>
+
+    <div class="fixed-cta">
       <div class="action-buttons">
         <button id="sendBtn">Send</button>
       </div>
@@ -120,11 +122,15 @@
   <div id="receiverView" style="display:none;">
     <div class="receiver-card">
       <div class="receiver-title">
-        Receiver Mode
+        Received
       </div>
 
       <div class="receiver-subtitle">
-        Waiting for incoming bills...
+        No bills received today
+      </div>
+
+      <div class="receiver-hint">
+        Bills appear here when sent from billing
       </div>
 
       <div id="incomingBills"></div>
@@ -133,17 +139,12 @@
 
   <!-- DAYBOOK VIEW -->
   <div id="daybookView" style="display:none;">
-    <div class="receiver-card">
-      <div class="receiver-title">
-        Daybook
-      </div>
-
+    <div class="daybook-hero">
+      <div class="daybook-hero-label">Today</div>
       <div id="daybookSummary">Total: ₹0</div>
-
-      <div id="daybookActions"></div>
-
-      <div id="daybookEntries"></div>
     </div>
+    <div id="daybookActions"></div>
+    <div id="daybookEntries"></div>
   </div>
 
   <!-- SEND MODAL -->
