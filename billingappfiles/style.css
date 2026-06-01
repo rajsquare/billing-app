@@ -179,7 +179,7 @@ input {
 }
 
 #billingView {
-  padding-bottom: 90px;
+  padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
 }
 
 /* ================================
@@ -610,19 +610,6 @@ input {
   gap: 2px;
 }
 
-.total-card {
-  background: var(--color-surface);
-  border-radius: var(--radius-xl);
-  padding: var(--space-4) var(--space-4) var(--space-5);
-  margin-top: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-top: 3px solid var(--color-primary);
-  box-shadow: var(--shadow-md);
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
-}
-
 .total-row {
   display: flex;
   justify-content: space-between;
@@ -738,6 +725,14 @@ input {
 
 .delete-btn:hover,
 .bill-card:focus-within .delete-btn {
+  opacity: 1;
+  background: var(--color-danger-surface);
+  border-color: #fecaca;
+  color: var(--color-danger-text);
+}
+
+.delete-btn:focus,
+.delete-btn:focus-visible {
   opacity: 1;
   background: var(--color-danger-surface);
   border-color: #fecaca;
