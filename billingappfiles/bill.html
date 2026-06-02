@@ -7,6 +7,9 @@
     content="width=device-width, initial-scale=1.0"
   >
   <title>Billing App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script>
     /* Last-app memory: auto-route to pricelist if that was the user's last app */
@@ -26,28 +29,36 @@
 </head>
 <body>
 
-  <!-- APP TABS -->
+  <!-- APP TABS — Segmented control toggle -->
   <div class="app-tabs">
-    <button
-      id="billingTab"
-      class="tab-btn active"
-    >
-      Billing
-    </button>
+    <div class="app-tabs-inner">
+      <button
+        id="billingTab"
+        class="tab-btn active"
+        aria-pressed="true"
+        role="tab"
+      >
+        Billing
+      </button>
 
-    <button
-      id="receiverTab"
-      class="tab-btn"
-    >
-      Receiver
-    </button>
+      <button
+        id="receiverTab"
+        class="tab-btn"
+        aria-pressed="false"
+        role="tab"
+      >
+        Receiver
+      </button>
 
-    <button
-      id="daybookTab"
-      class="tab-btn daybook-mini"
-    >
-      Daybook
-    </button>
+      <button
+        id="daybookTab"
+        class="tab-btn daybook-mini"
+        aria-pressed="false"
+        role="tab"
+      >
+        Daybook
+      </button>
+    </div>
   </div>
 
   <!-- BILLING VIEW -->
