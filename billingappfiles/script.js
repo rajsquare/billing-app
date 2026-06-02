@@ -4597,12 +4597,11 @@ window.doneReceivedBill =
             billRef
           );
 
-          // Lock ancestor revision chain atomically.
-          // If locking fails, the entire transaction rolls back — no partial success.
+          // Delete entire revision chain atomically.
+          // The daybook entry preserves the final summary — old versions are no longer needed.
           chainToLock.forEach(id => {
-            transaction.update(
-              doc(db, "bills", id),
-              { isLocked: true }
+            transaction.delete(
+              doc(db, "bills", id)
             );
           });
         }
