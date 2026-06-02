@@ -10,6 +10,9 @@ import {
   serverTimestamp,
   query,
   orderBy,
+  where,
+  limit,
+  Timestamp,
   runTransaction,
   getDocs,
   getDoc,
@@ -56,11 +59,14 @@ const liveDraftBillsCollection = collection(db, "liveDraftBills");
 
 const billsQuery = query(
   billsCollection,
-  orderBy("createdAt", "asc")
+  where("createdAt", ">=", getStartOfTodayTimestamp()),
+  orderBy("createdAt", "asc"),
+  limit(200)
 );
 
 const daybookQuery = query(
   daybookCollection,
+  where("createdAt", ">=", getStartOfTodayTimestamp()),
   orderBy("createdAt", "asc")
 );
 
@@ -145,6 +151,9 @@ let revisionDiffCache = {};
 
 let _saveDraftTimer = null;
 let _searchTimer = null;
+let _syncDraftTimer = null;
+let _lastDraftHash = "";
+let _lastStaleCleanup = 0;
 let productsBySr = new Map();
 
 /* ================================
@@ -315,6 +324,27 @@ function getIndiaDateInfo() {
 
 function getIndiaTodayDate() {
   return _todayFmt.format(new Date());
+}
+
+function getStartOfTodayTimestamp() {
+  const now = new Date();
+
+  const istDateStr = _todayFmt.format(now);
+
+  const parts = istDateStr.split("-");
+  const year = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10) - 1;
+  const day = parseInt(parts[2], 10);
+
+  const midnightUTC = new Date(
+    Date.UTC(year, month, day, 0, 0, 0, 0)
+  );
+
+  midnightUTC.setUTCMinutes(
+    midnightUTC.getUTCMinutes() - 330
+  );
+
+  return Timestamp.fromDate(midnightUTC);
 }
 
 function getCurrentPrice(product) {
@@ -705,6 +735,51 @@ async function syncLiveDraft() {
   }
 }
 
+function simpleDraftHash(items, name) {
+  let str =
+    (name || "") + "|";
+
+  for (let i = 0; i < items.length; i++) {
+    str +=
+      items[i].product.productName +
+      ":" +
+      items[i].qty +
+      ",";
+  }
+
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash =
+      ((hash << 5) - hash) +
+      str.charCodeAt(i);
+    hash |= 0;
+  }
+
+  return String(hash);
+}
+
+function debouncedSyncLiveDraft() {
+  if (_syncDraftTimer) {
+    clearTimeout(_syncDraftTimer);
+  }
+
+  _syncDraftTimer = setTimeout(() => {
+    _syncDraftTimer = null;
+
+    const currentHash = simpleDraftHash(
+      billItems,
+      customerName.value
+    );
+
+    if (currentHash === _lastDraftHash) {
+      return;
+    }
+
+    _lastDraftHash = currentHash;
+    syncLiveDraft();
+  }, 1000);
+}
+
 async function deleteLiveDraft() {
   try {
     const draftRef =
@@ -961,6 +1036,24 @@ function subscribeToLiveDrafts() {
           }
         }
       );
+
+      const now = Date.now();
+      if (now - _lastStaleCleanup > 30000) {
+        _lastStaleCleanup = now;
+
+        Object.keys(liveDraftsCache).forEach(
+          id => {
+            if (
+              id !== sessionId &&
+              isDraftStale(liveDraftsCache[id])
+            ) {
+              deleteDoc(
+                doc(db, "liveDraftBills", id)
+              ).catch(() => {});
+            }
+          }
+        );
+      }
 
       renderLiveCount();
 
@@ -1808,18 +1901,53 @@ window.switchRevisionView =
 ================================ */
 async function loadProducts() {
   try {
-const catalogRef = doc(
-  pricelistDb,
-  "catalog",
-  "current"
-);
-    const catalogSnap = await getDoc(catalogRef);
+    const todayStr = getIndiaTodayDate();
+    const cacheRaw =
+      localStorage.getItem("catalogCache");
 
-    if (!catalogSnap.exists()) {
-      throw new Error("Catalog snapshot not found");
+    let catalogData = null;
+
+    if (cacheRaw) {
+      try {
+        const cached = JSON.parse(cacheRaw);
+
+        if (cached && cached.date === todayStr && cached.data) {
+          catalogData = cached.data;
+          console.log(
+            "Using cached catalog from localStorage"
+          );
+        }
+      } catch (e) {
+        localStorage.removeItem("catalogCache");
+      }
     }
 
-    const catalogData = catalogSnap.data();
+    if (!catalogData) {
+      const catalogRef = doc(
+        pricelistDb,
+        "catalog",
+        "current"
+      );
+      const catalogSnap = await getDoc(catalogRef);
+
+      if (!catalogSnap.exists()) {
+        throw new Error("Catalog snapshot not found");
+      }
+
+      catalogData = catalogSnap.data();
+
+      localStorage.setItem(
+        "catalogCache",
+        JSON.stringify({
+          date: todayStr,
+          data: catalogData
+        })
+      );
+
+      console.log(
+        "Fetched catalog from Firestore and cached"
+      );
+    }
 
     products = (catalogData.products || []).map(
       product => {
@@ -1846,7 +1974,7 @@ const catalogRef = doc(
     restoreDraft();
 
     console.log(
-      `Loaded ${products.length} products from Firestore catalog`
+      `Loaded ${products.length} products from catalog`
     );
 
   } catch (err) {
@@ -2155,10 +2283,12 @@ receiverTab.addEventListener(
 
 daybookTab.addEventListener(
   "click",
-  () =>
+  () => {
     activateView(
       "daybook"
-    )
+    );
+    renderDaybook();
+  }
 );
 /* ================================
    MODE + SEARCH UI
@@ -2366,7 +2496,7 @@ window.selectProduct =
     renderBill();
     updateGrandTotal();
     saveDraft();
-    syncLiveDraft();
+    debouncedSyncLiveDraft();
     qtyDirty = false;
 
     searchBox.value = "";
@@ -2565,7 +2695,7 @@ window.commitQty =
     }
 
     qtyDirty = false;
-    syncLiveDraft();
+    debouncedSyncLiveDraft();
     saveDraftNow();
   };
 
@@ -3190,7 +3320,7 @@ window.reviseBill =
     renderBill();
     updateGrandTotal();
     saveDraft();
-    syncLiveDraft();
+    debouncedSyncLiveDraft();
 
     renderRevisionBanner();
     activateView("billing");
@@ -3887,6 +4017,12 @@ function renderIncomingBills() {
 }
 
 function renderDaybook() {
+  if (
+    daybookView.style.display === "none"
+  ) {
+    return;
+  }
+
   const entries =
     Object.values(
       daybookCache
