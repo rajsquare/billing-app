@@ -3277,7 +3277,7 @@ function buildWholesaleBottomFooterHTML(billData, label) {
   const customerFooterText =
     billData.grandTotal < 0
       ? "Return HV"
-      : "Balance HV";
+      : "Balance";
 
   return `
     <div class="print-bottom-footer">

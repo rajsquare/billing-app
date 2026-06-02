@@ -3268,7 +3268,7 @@ function buildPrintFooterHTML(billData, label, isLastPage) {
   const customerFooterText =
     billData.grandTotal < 0
       ? "Return HV"
-      : "Balance HV";
+      : "Balance";
 
   const wholesaleExtras =
     billData.mode === "W" && isLastPage
