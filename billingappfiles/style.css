@@ -1,56 +1,55 @@
 /* ================================================================
-   BILLING APP — PREMIUM REDESIGN v3.0
-   Design DNA: Warm fintech • Forest green dominant • Lime accent
-   Inspired by: SnapInvoice clean cards, Steady Budget hierarchy,
-                Banking app bold numerals, Self-care pastel warmth
-   Typography: Plus Jakarta Sans (UI) + Instrument Serif (display)
+   BILLING APP — PREMIUM REDESIGN v4.0
+   Design DNA: Royal Blue • Finance-forward • Inter typography
+   Primary: #2563EB  |  Font: Inter
 ================================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 
 /* ================================
    DESIGN TOKENS
 ================================ */
 :root {
-  /* ── Brand Palette ── */
-  --forest:          #1B4332;
-  --forest-mid:      #2D6A4F;
-  --forest-light:    #40916C;
-  --forest-pale:     #D8F3DC;
-  --lime:            #B7E4C7;
-  --lime-vivid:      #52B788;
-  --lime-pop:        #C8F04A;
-  --lime-pop-dark:   #A4C53A;
+  /* ── Brand Palette (Royal Blue) ── */
+  --primary:          #2563EB;
+  --primary-hover:    #1D4ED8;
+  --primary-active:   #1E40AF;
+  --primary-light:    #DBEAFE;
+  --primary-mid:      #3B82F6;
 
   /* ── Surfaces ── */
-  --bg:              #F5F3EE;
-  --bg-warm:         #EEE9DF;
+  --bg:              #F5F7FA;
+  --bg-warm:         #EEF2F8;
   --surface:         #FFFFFF;
-  --surface-2:       #FAFAF8;
-  --surface-3:       #F2EFE8;
-  --surface-4:       #EAE5DB;
+  --surface-2:       #FAFBFD;
+  --surface-3:       #F1F5F9;
+  --surface-4:       #E8EDF5;
 
   /* ── Borders ── */
-  --border:          #E5DED2;
-  --border-strong:   #C9C0B4;
+  --border:          #E2E8F0;
+  --border-strong:   #CBD5E1;
 
   /* ── Text ── */
-  --text-1:          #1A1612;
-  --text-2:          #5C5347;
-  --text-3:          #9B9188;
+  --text-1:          #0F172A;
+  --text-2:          #475569;
+  --text-3:          #94A3B8;
   --text-inv:        #FFFFFF;
 
-  /* ── Semantic ── */
-  --retail:          #D05B3A;
-  --retail-soft:     #FDF0EB;
-  --success:         #1B6B3A;
-  --success-mid:     #2D8653;
-  --success-bg:      #EDF7F1;
+  /* ── Semantic / Status ── */
+  --retail:          #B91C1C;
+  --retail-soft:     #FEF2F2;
+  --success:         #15803D;
+  --success-mid:     #16A34A;
+  --success-bg:      #F0FDF4;
   --danger:          #B91C1C;
   --danger-soft:     #FEF2F2;
+  --warning:         #B45309;
+  --warning-soft:    #FFFBEB;
+  --info:            #2563EB;
+  --info-soft:       #DBEAFE;
   --revision:        #6B3FA0;
   --revision-soft:   #F3EEFF;
-  --amber:           #D97706;
+  --amber:           #B45309;
   --amber-soft:      #FFFBEB;
 
   /* ── Materials ── */
@@ -65,12 +64,12 @@
   --kansa-border:    #D9C88A;
 
   /* ── Shadows ── */
-  --shadow-xs:  0 1px 3px rgba(27,67,50,0.05);
-  --shadow-sm:  0 2px 8px rgba(27,67,50,0.07), 0 1px 2px rgba(27,67,50,0.04);
-  --shadow-md:  0 4px 20px rgba(27,67,50,0.09), 0 1px 4px rgba(27,67,50,0.05);
-  --shadow-lg:  0 12px 40px rgba(27,67,50,0.13), 0 3px 10px rgba(27,67,50,0.07);
-  --shadow-xl:  0 24px 60px rgba(27,67,50,0.18), 0 6px 20px rgba(27,67,50,0.10);
-  --shadow-card: 0 2px 12px rgba(27,67,50,0.06), 0 1px 3px rgba(27,67,50,0.04);
+  --shadow-xs:  0 1px 3px rgba(37,99,235,0.05);
+  --shadow-sm:  0 2px 8px rgba(37,99,235,0.07), 0 1px 2px rgba(37,99,235,0.04);
+  --shadow-md:  0 4px 20px rgba(37,99,235,0.09), 0 1px 4px rgba(37,99,235,0.05);
+  --shadow-lg:  0 12px 40px rgba(15,23,42,0.12), 0 3px 10px rgba(15,23,42,0.06);
+  --shadow-xl:  0 24px 60px rgba(15,23,42,0.16), 0 6px 20px rgba(15,23,42,0.09);
+  --shadow-card: 0 2px 12px rgba(15,23,42,0.06), 0 1px 3px rgba(15,23,42,0.04);
 
   /* ── Radius ── */
   --r-xs:    6px;
@@ -91,8 +90,8 @@
   --sp-8: 32px;
 
   /* ── Typography ── */
-  --font-ui:      'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-ui:      'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono:    'DM Mono', 'SF Mono', monospace;
 
   /* ── Transitions ── */
@@ -101,6 +100,7 @@
   --t-spring: 0.26s cubic-bezier(0.34, 1.56, 0.64, 1);
   --t-ease:   0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 
 /* ================================
    RESET + BASE
@@ -122,9 +122,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100dvh;
-  /* Warm paper texture via subtle noise */
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(27,67,50,0.04) 0%, transparent 70%);
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(37,99,235,0.04) 0%, transparent 70%);
 }
 
 button, input, textarea {
@@ -147,14 +146,16 @@ input {
   transition: border-color var(--t-normal), box-shadow var(--t-normal);
 }
 
+
 /* ================================
-   APP TABS — Top navigation bar
+   APP TABS — Segmented control navigation
+   Clearly interactive: active highlight, hover states, pointer cursor
 ================================ */
 .app-tabs {
   display: flex;
-  gap: 6px;
+  gap: 0;
   padding: 10px 16px;
-  background: rgba(245,243,238,0.95);
+  background: rgba(245,247,250,0.97);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   position: sticky;
@@ -166,10 +167,21 @@ input {
   margin: 0 auto;
 }
 
+/* Segmented toggle container */
+.app-tabs-inner {
+  display: flex;
+  gap: 0;
+  background: var(--surface-3);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  padding: 3px;
+  flex: 1;
+}
+
 .tab-btn {
   flex: 1;
-  padding: 10px 14px;
-  border-radius: var(--r-md);
+  padding: 9px 14px;
+  border-radius: 8px;
   background: transparent;
   font-weight: 600;
   font-size: 13.5px;
@@ -177,10 +189,16 @@ input {
   letter-spacing: 0.01em;
   position: relative;
   border: 1.5px solid transparent;
+  cursor: pointer;
+  transition:
+    background var(--t-normal),
+    color var(--t-normal),
+    box-shadow var(--t-ease),
+    border-color var(--t-normal);
 }
 
 .tab-btn:hover {
-  background: var(--surface-3);
+  background: var(--surface-4);
   color: var(--text-2);
 }
 
@@ -189,15 +207,15 @@ input {
 }
 
 .tab-btn.active {
-  background: var(--forest);
+  background: var(--primary);
   color: var(--text-inv);
-  border-color: transparent;
-  box-shadow: 0 2px 10px rgba(27,67,50,0.30);
+  border-color: var(--primary-hover);
+  box-shadow: 0 2px 8px rgba(37,99,235,0.30);
   font-weight: 700;
 }
 
 .tab-btn.active:hover {
-  background: var(--forest-mid);
+  background: var(--primary-hover);
 }
 
 .daybook-mini {
@@ -222,6 +240,7 @@ input {
   margin-left: 5px;
   vertical-align: middle;
 }
+
 
 /* ================================
    MAIN VIEWS
@@ -279,7 +298,7 @@ input {
   left: 0;
   right: 0;
   height: 2.5px;
-  background: var(--lime-vivid);
+  background: var(--primary-mid);
   border-radius: 2px;
   transform: scaleX(0);
   transition: transform var(--t-normal);
@@ -291,7 +310,7 @@ input {
 }
 
 .app-title-switch:focus-visible {
-  outline: 2px solid var(--forest-light);
+  outline: 2px solid var(--primary);
   outline-offset: 4px;
   border-radius: 4px;
 }
@@ -307,27 +326,28 @@ input {
 #modeToggle {
   padding: 9px 16px;
   border-radius: var(--r-sm);
-  background: var(--forest);
+  background: var(--primary);
   color: var(--text-inv);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  box-shadow: 0 2px 8px rgba(27,67,50,0.25);
+  box-shadow: 0 2px 8px rgba(37,99,235,0.28);
   min-width: 46px;
 }
 
 #modeToggle:hover {
-  background: var(--forest-mid);
-  box-shadow: 0 3px 12px rgba(27,67,50,0.35);
+  background: var(--primary-hover);
+  box-shadow: 0 3px 12px rgba(37,99,235,0.38);
 }
 
 #modeToggle:active {
   transform: scale(0.95);
+  background: var(--primary-active);
 }
 
 #modeToggle.mode-retail {
   background: var(--retail);
-  box-shadow: 0 2px 8px rgba(208,91,58,0.30);
+  box-shadow: 0 2px 8px rgba(185,28,28,0.30);
 }
 
 /* ── Live Button ── */
@@ -358,13 +378,14 @@ input {
   background: var(--success);
   color: #bbf7d0;
   border-color: transparent;
-  box-shadow: 0 2px 10px rgba(27,107,58,0.32);
+  box-shadow: 0 2px 10px rgba(21,128,61,0.32);
 }
 
 #liveBtn.live-btn-active:hover {
   background: var(--success-mid);
   color: #dcfce7;
 }
+
 
 /* ── Search wrapper ── */
 .search-wrapper {
@@ -379,7 +400,7 @@ input {
   transform: translateY(-50%);
   width: 17px;
   height: 17px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239B9188' stroke-width='2.2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394A3B8' stroke-width='2.2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
   background-size: contain;
   background-repeat: no-repeat;
   pointer-events: none;
@@ -397,11 +418,12 @@ input {
   outline: none;
   box-shadow: var(--shadow-xs);
   font-weight: 500;
+  font-family: var(--font-ui);
 }
 
 #searchBox:focus {
-  border-color: var(--forest-light);
-  box-shadow: 0 0 0 3px rgba(64,145,108,0.12), var(--shadow-xs);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.12), var(--shadow-xs);
 }
 
 #searchBox::placeholder {
@@ -466,6 +488,7 @@ input {
   border: 1.5px solid var(--border);
   letter-spacing: 0.02em;
   min-height: 36px;
+  cursor: pointer;
 }
 
 .filter-chip:hover {
@@ -479,10 +502,10 @@ input {
 }
 
 .filter-chip.active {
-  background: var(--forest);
+  background: var(--primary);
   color: var(--text-inv);
-  border-color: var(--forest);
-  box-shadow: 0 2px 6px rgba(27,67,50,0.20);
+  border-color: var(--primary);
+  box-shadow: 0 2px 6px rgba(37,99,235,0.22);
 }
 
 .filter-chip.material-brass {
@@ -509,6 +532,7 @@ input {
 .filter-chip.material-brass.active  { background: #fde68a; border-color: #b45309; color: #78350f; }
 .filter-chip.material-copper.active { background: #fed7aa; border-color: #c2410c; color: #7c2d12; }
 .filter-chip.material-kansa.active  { background: #e5d9b4; border-color: #78570f; color: #3d2c00; }
+
 
 /* ================================
    CARDS — Core surface component
@@ -590,13 +614,13 @@ input {
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
   font-family: var(--font-mono);
-  color: var(--forest);
+  color: var(--primary);
 }
 
 .suggestion-add-btn {
   width: 30px;
   height: 30px;
-  background: var(--forest);
+  background: var(--primary);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -606,14 +630,14 @@ input {
   font-weight: 300;
   line-height: 1;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(27,67,50,0.25);
+  box-shadow: 0 2px 8px rgba(37,99,235,0.28);
   transition: background var(--t-fast), transform var(--t-spring), box-shadow var(--t-fast);
 }
 
 .suggestion-card:hover .suggestion-add-btn {
-  background: var(--forest-mid);
+  background: var(--primary-hover);
   transform: scale(1.12);
-  box-shadow: 0 4px 12px rgba(27,67,50,0.35);
+  box-shadow: 0 4px 12px rgba(37,99,235,0.38);
 }
 
 /* ── Section headings inside views ── */
@@ -631,6 +655,7 @@ input {
   font-weight: 500;
   padding: 20px 0 8px;
 }
+
 
 /* ================================
    BADGES + UNIT PILLS
@@ -698,9 +723,9 @@ input {
 }
 
 .bill-input:focus {
-  border-color: var(--forest-light);
+  border-color: var(--primary);
   background: var(--surface);
-  box-shadow: 0 0 0 3px rgba(64,145,108,0.11);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.11);
 }
 
 .bill-input::placeholder {
@@ -732,7 +757,7 @@ input {
 }
 
 .bill-name-input:focus {
-  border-bottom-color: var(--forest-light);
+  border-bottom-color: var(--primary);
 }
 
 /* ── Bill card layout ── */
@@ -820,6 +845,7 @@ input {
   align-items: center;
 }
 
+
 /* ================================
    TOTAL BAR — sticky footer card
 ================================ */
@@ -864,13 +890,12 @@ input {
 
 #grandTotal {
   font-size: 36px;
-  font-weight: 400;
+  font-weight: 800;
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   color: var(--text-1);
   line-height: 1;
-  font-style: italic;
 }
 
 .action-buttons,
@@ -891,12 +916,12 @@ input {
   width: 100%;
   padding: 16px;
   border-radius: var(--r-lg);
-  background: var(--forest);
+  background: var(--primary);
   color: var(--text-inv);
   font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.01em;
-  box-shadow: 0 4px 14px rgba(27,67,50,0.30);
+  box-shadow: 0 4px 14px rgba(37,99,235,0.32);
   position: relative;
   overflow: hidden;
 }
@@ -910,13 +935,14 @@ input {
 }
 
 #sendBtn:hover {
-  background: var(--forest-mid);
-  box-shadow: 0 6px 20px rgba(27,67,50,0.40);
+  background: var(--primary-hover);
+  box-shadow: 0 6px 20px rgba(37,99,235,0.42);
 }
 
 #sendBtn:active {
   transform: scale(0.985);
-  box-shadow: 0 2px 8px rgba(27,67,50,0.22);
+  background: var(--primary-active);
+  box-shadow: 0 2px 8px rgba(37,99,235,0.22);
 }
 
 /* Delete / danger button */
@@ -952,18 +978,19 @@ input {
 }
 
 .primary-btn {
-  background: var(--forest);
+  background: var(--primary);
   color: var(--text-inv);
-  box-shadow: 0 2px 8px rgba(27,67,50,0.22);
+  box-shadow: 0 2px 8px rgba(37,99,235,0.24);
 }
 
 .primary-btn:hover {
-  background: var(--forest-mid);
-  box-shadow: 0 4px 14px rgba(27,67,50,0.30);
+  background: var(--primary-hover);
+  box-shadow: 0 4px 14px rgba(37,99,235,0.32);
 }
 
 .primary-btn:active {
   transform: scale(0.97);
+  background: var(--primary-active);
 }
 
 /* Confirm/Send modal button — success */
@@ -976,12 +1003,12 @@ input {
   border-radius: var(--r-sm);
   font-size: 14.5px;
   font-weight: 700;
-  box-shadow: 0 2px 8px rgba(27,107,58,0.22);
+  box-shadow: 0 2px 8px rgba(21,128,61,0.22);
 }
 
 .send-btn:hover {
   background: var(--success-mid);
-  box-shadow: 0 4px 14px rgba(27,107,58,0.32);
+  box-shadow: 0 4px 14px rgba(21,128,61,0.32);
 }
 
 .send-btn:active {
@@ -1027,13 +1054,14 @@ input {
   transform: scale(0.97);
 }
 
+
 /* ================================
    MODALS + OVERLAYS
 ================================ */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10,16,12,0.45);
+  background: rgba(10,16,30,0.48);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   display: none;
@@ -1104,9 +1132,9 @@ input {
 }
 
 .modal-group input:focus {
-  border-color: var(--forest-light);
+  border-color: var(--primary);
   background: var(--surface);
-  box-shadow: 0 0 0 3px rgba(64,145,108,0.12);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
 }
 
 .modal-group input::placeholder {
@@ -1180,12 +1208,11 @@ input {
 .receiver-amount {
   margin-top: 11px;
   font-size: 22px;
-  font-weight: 400;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   letter-spacing: -0.02em;
   color: var(--text-1);
-  font-style: italic;
 }
 
 /* Left accent bar for mode identity */
@@ -1193,6 +1220,7 @@ input {
   border-left: 3px solid transparent;
   transition: border-color var(--t-normal);
 }
+
 
 /* ================================
    DAYBOOK UI
@@ -1215,12 +1243,11 @@ input {
 .daybook-amount {
   margin-top: 6px;
   font-size: 18px;
-  font-weight: 400;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   letter-spacing: -0.02em;
   color: var(--text-1);
-  font-style: italic;
 }
 
 .daybook-group-label {
@@ -1254,13 +1281,12 @@ input {
 
 .daybook-total-amount {
   font-size: 32px;
-  font-weight: 400;
+  font-weight: 800;
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   color: var(--text-1);
   line-height: 1.1;
-  font-style: italic;
 }
 
 .daybook-total-breakdown {
@@ -1297,7 +1323,7 @@ input {
 
 /* Mode accent bars */
 .daybook-entry--w {
-  border-left: 3px solid var(--forest);
+  border-left: 3px solid var(--primary);
 }
 
 .daybook-entry--r {
@@ -1386,6 +1412,7 @@ input {
   margin-top: 4px;
 }
 
+
 /* ================================
    LIVE DRAFT MODAL
 ================================ */
@@ -1454,8 +1481,8 @@ input {
 }
 
 .live-draft-card:hover {
-  border-color: var(--forest-mid);
-  background: rgba(27,67,50,0.03);
+  border-color: var(--primary);
+  background: rgba(37,99,235,0.03);
   box-shadow: var(--shadow-sm);
 }
 
@@ -1484,12 +1511,11 @@ input {
 .live-draft-subtotal {
   margin-top: 7px;
   font-size: 20px;
-  font-weight: 400;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   letter-spacing: -0.02em;
   color: var(--text-1);
-  font-style: italic;
 }
 
 /* Live draft card layout */
@@ -1610,7 +1636,7 @@ input {
   margin-top: 12px;
   padding: 11px 15px;
   background: var(--success-bg);
-  border: 1.5px solid #a7f3d0;
+  border: 1.5px solid #bbf7d0;
   border-radius: var(--r-sm);
   font-size: 15px;
   font-weight: 800;
@@ -1619,6 +1645,7 @@ input {
   color: var(--success);
   text-align: right;
 }
+
 
 /* ================================
    TOAST NOTIFICATION SYSTEM
@@ -1639,6 +1666,7 @@ input {
   white-space: nowrap;
   pointer-events: none;
   will-change: opacity, transform;
+  font-family: var(--font-ui);
 }
 
 .toast--visible {
@@ -1647,8 +1675,8 @@ input {
 }
 
 .toast--success { background: var(--success);  color: white; }
-.toast--error   { background: #dc2626;          color: white; }
-.toast--info    { background: var(--forest);    color: white; }
+.toast--error   { background: var(--danger);   color: white; }
+.toast--info    { background: var(--primary);  color: white; }
 
 /* ================================
    LIVE PULSE ANIMATION
@@ -1717,9 +1745,9 @@ input {
    FOCUS CHOREOGRAPHY
 ================================ */
 .bill-card:focus-within {
-  border-color: rgba(64,145,108,0.30);
+  border-color: rgba(37,99,235,0.30);
   box-shadow:
-    0 0 0 2px rgba(64,145,108,0.08),
+    0 0 0 2px rgba(37,99,235,0.08),
     var(--shadow-card);
 }
 
@@ -1754,6 +1782,7 @@ input {
   #modeToggle { padding: 8px 10px; font-size: 11px; }
   #liveBtn    { padding: 8px 10px; font-size: 11px; }
 }
+
 
 /* ================================
    PRINT FOUNDATION — UNCHANGED
@@ -1961,7 +1990,7 @@ input {
   page-break-inside: avoid;
 }
 
-/* DAYBOOK PRINT — UNCHANGED */
+/* DAYBOOK PRINT */
 .daybook-print-title {
   text-align: center;
   font-size: 18px;
@@ -2017,7 +2046,8 @@ input {
   padding: 4px 6px;
 }
 
-/* PRINT AUDIT STYLES — UNCHANGED */
+
+/* PRINT AUDIT STYLES */
 .print-revised-wm-overlay {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
