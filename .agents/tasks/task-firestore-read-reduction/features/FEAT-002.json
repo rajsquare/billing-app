@@ -1,0 +1,21 @@
+{
+  "id": "FEAT-002",
+  "type": "fix",
+  "description": "Fix critical TDZ crash and catalog cache QuotaExceededError issues found in code review",
+  "status": "completed",
+  "steps": [
+    "STEP 1 - Fix TDZ crash: Move INTL FORMATTERS section (containing _todayFmt and other Intl.DateTimeFormat declarations) above the billsQuery and daybookQuery definitions that call getStartOfTodayTimestamp(), which references _todayFmt.",
+    "STEP 2 - Fix catalog cache QuotaExceededError: Wrap localStorage.setItem('catalogCache', ...) in its own try/catch so a QuotaExceededError does not propagate to the outer catch block that would leave products empty."
+  ],
+  "acceptance_criteria": [
+    "_todayFmt is declared before getStartOfTodayTimestamp() is called at module top-level",
+    "localStorage.setItem for catalogCache is wrapped in its own try/catch",
+    "No syntax errors in the modified script.js"
+  ],
+  "verification": [
+    "Run npx acorn --ecma2022 --module billingappfiles/script.js to confirm no syntax errors",
+    "Confirm INTL FORMATTERS section appears before the query definitions in the file"
+  ],
+  "blocked_reason": null,
+  "findings": "Both fixes applied and validated with acorn parser (exit code 0). The INTL FORMATTERS section now appears between the collection definitions and the query definitions, ensuring _todayFmt is initialized before getStartOfTodayTimestamp() is called."
+}
