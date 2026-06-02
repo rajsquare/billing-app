@@ -57,6 +57,33 @@ const billsCollection = collection(db, "bills");
 const daybookCollection = collection(db, "daybook");
 const liveDraftBillsCollection = collection(db, "liveDraftBills");
 
+/* ================================
+   INTL FORMATTERS (module-level, reused across all renders)
+================================ */
+const _moneyFmt = new Intl.NumberFormat("en-IN", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+});
+const _moneyWholeFmt = new Intl.NumberFormat("en-IN");
+const _dateFmt = new Intl.DateTimeFormat("en-IN", {
+  timeZone: "Asia/Kolkata",
+  day: "2-digit",
+  month: "short",
+  year: "numeric"
+});
+const _timeFmt = new Intl.DateTimeFormat("en-IN", {
+  timeZone: "Asia/Kolkata",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: true
+});
+const _todayFmt = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Kolkata",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit"
+});
+
 const billsQuery = query(
   billsCollection,
   where("createdAt", ">=", getStartOfTodayTimestamp()),
@@ -92,33 +119,6 @@ const DISCOUNT_PRODUCTS = new Set([
 const EDITABLE_NAME_PRODUCTS = new Set([
   "Utensils"
 ]);
-
-/* ================================
-   INTL FORMATTERS (module-level, reused across all renders)
-================================ */
-const _moneyFmt = new Intl.NumberFormat("en-IN", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2
-});
-const _moneyWholeFmt = new Intl.NumberFormat("en-IN");
-const _dateFmt = new Intl.DateTimeFormat("en-IN", {
-  timeZone: "Asia/Kolkata",
-  day: "2-digit",
-  month: "short",
-  year: "numeric"
-});
-const _timeFmt = new Intl.DateTimeFormat("en-IN", {
-  timeZone: "Asia/Kolkata",
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: true
-});
-const _todayFmt = new Intl.DateTimeFormat("en-CA", {
-  timeZone: "Asia/Kolkata",
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit"
-});
 
 /* ================================
    STATE
@@ -1936,13 +1936,17 @@ async function loadProducts() {
 
       catalogData = catalogSnap.data();
 
-      localStorage.setItem(
-        "catalogCache",
-        JSON.stringify({
-          date: todayStr,
-          data: catalogData
-        })
-      );
+      try {
+        localStorage.setItem(
+          "catalogCache",
+          JSON.stringify({
+            date: todayStr,
+            data: catalogData
+          })
+        );
+      } catch (e) {
+        console.warn("Could not cache catalog to localStorage:", e);
+      }
 
       console.log(
         "Fetched catalog from Firestore and cached"

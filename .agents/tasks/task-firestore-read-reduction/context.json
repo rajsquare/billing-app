@@ -1,0 +1,18 @@
+{
+  "project_type": "Client-side billing app using Firebase Firestore via CDN ES modules, deployed to GitHub Pages",
+  "language": "JavaScript (ES modules via CDN, no build step)",
+  "build_system": "None - static files served directly. No npm/node build pipeline. Firebase SDK loaded from gstatic.com CDN.",
+  "test_framework": "None - no test infrastructure exists",
+  "build_command": "N/A - static files, no build step",
+  "test_command": "N/A - no tests exist. Validate by AST parsing (node --check) for syntax errors.",
+  "verification_instructions": "1. Run `node --check billingappfiles/script.js` - will fail because of CDN imports (ESM from URLs). Instead, use a basic JS parser to confirm no syntax errors. 2. Manually verify the logic by reading the code.",
+  "snapshot_or_generated_files": null,
+  "setup_instructions": "No setup needed - this is a static client-side app. Files are in billingappfiles/",
+  "environment_constraints": "OPEN_INTERNET network mode. No build step. No test framework. The script.js uses ES module imports from CDN URLs which won't work in Node.js directly. Validation must be AST-based or manual.",
+  "contribution_requirements": "No CONTRIBUTING.md exists. Follow existing code style (verbose formatting, explicit variable names).",
+  "key_patterns": "- Firebase SDK v10.12.2 loaded via CDN ESM imports from gstatic.com\n- All state is in module-level variables (incomingBillCache, daybookCache, liveDraftsCache)\n- onSnapshot listeners use docChanges() for incremental cache updates\n- renderIncomingBills() already has a visibility guard (skips DOM rebuild when receiver hidden)\n- renderDaybook() has NO visibility guard\n- debouncedSaveDraft uses 300ms setTimeout\n- syncLiveDraft is called directly (no separate debounce timer) alongside saveDraft\n- India timezone (Asia/Kolkata) used for date formatting\n- The app uses serverTimestamp() for createdAt on bills and daybook entries\n- Product catalog loaded once from pricelist-a9d70 project's catalog/current doc",
+  "relevant_files": [
+    "billingappfiles/script.js"
+  ],
+  "directory_structure": "billingappfiles/ - main app directory\n  script.js - 4479 lines, all app logic\n  bill.html - HTML structure\n  style.css - styles\n  pricelistfiles/ - separate pricelist management app\n  productList.json - local product data (possibly unused, catalog comes from Firestore)"
+}
