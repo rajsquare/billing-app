@@ -1702,19 +1702,15 @@ function buildRevisionReceiptPrintHTML(
       "CUSTOMER COPY"
     );
 
-  const mergedItems =
-    buildMergedOfficeItems(
-      originalBill,
-      revisedBill,
-      diff
-    );
-
+  // Office Copy renders identically to the Customer Copy (same items,
+  // same clean renderer) — no strike-throughs, highlights, removed rows,
+  // or changed-cell shading. Office metadata (label, time, serial ①,
+  // receiver name box) is preserved via buildSingleCopyPage("OFFICE COPY").
   const officePages =
-    paginateRevisionOfficeByHeight(
-      mergedItems,
+    paginateByHeight(
+      customerItems,
       revisedBill,
-      originalBill,
-      diff
+      "OFFICE COPY"
     );
 
   let html = "";
@@ -1732,18 +1728,75 @@ function buildRevisionReceiptPrintHTML(
   });
 
   officePages.forEach((page, index) => {
-    html += buildRevisionOfficeSinglePage(
+    html += buildSingleCopyPage(
       revisedBill,
-      originalBill,
+      "OFFICE COPY",
       page.chunk,
-      diff,
       index === officePages.length - 1,
       index + 1,
-      officePages.length
+      officePages.length,
+      page.serialOffset,
+      "REVISED BILL"
     );
   });
 
+  // Modification details shown ONLY here, as a dedicated section below
+  // the bill. Does not alter the bill body above it.
+  html += buildRevisionCommentSectionHTML(revisedBill, diff);
+
   return html;
+}
+
+function buildRevisionCommentSectionHTML(revisedBill, diff) {
+  const lines = [];
+
+  if (diff.customerNameChanged) {
+    lines.push(
+      `<li>Customer name: "${escapeAttr(diff.originalCustomerName || "—")}" → "${escapeAttr(diff.revisedCustomerName || "—")}"</li>`
+    );
+  }
+
+  diff.added.forEach(item => {
+    lines.push(
+      `<li>Added: ${escapeAttr(item.productName)} (${shortMaterialName(item.material)}) — Qty ${roundQty(item.qty)}, Rate ₹${formatIndianMoneyWhole(item.price)}, Amt ₹${formatIndianMoneyWhole(item.total)}</li>`
+    );
+  });
+
+  diff.removed.forEach(item => {
+    lines.push(
+      `<li>Removed: ${escapeAttr(item.productName)} (${shortMaterialName(item.material)}) — was Qty ${roundQty(item.qty)}, Rate ₹${formatIndianMoneyWhole(item.price)}, Amt ₹${formatIndianMoneyWhole(item.total)}</li>`
+    );
+  });
+
+  diff.changed.forEach(c => {
+    const parts = [];
+    if (c.qtyChanged) {
+      parts.push(`Qty ${roundQty(c.originalItem.qty)} → ${roundQty(c.revisedItem.qty)}`);
+    }
+    if (c.priceChanged) {
+      parts.push(`Rate ₹${formatIndianMoneyWhole(c.originalItem.price)} → ₹${formatIndianMoneyWhole(c.revisedItem.price)}`);
+    }
+    lines.push(
+      `<li>Changed: ${escapeAttr(c.revisedItem.productName)} (${shortMaterialName(c.revisedItem.material)}) — ${parts.join(", ")}</li>`
+    );
+  });
+
+  const detailList = lines.length
+    ? `<ul class="print-revision-comment-list">${lines.join("")}</ul>`
+    : `<div class="print-revision-comment-empty">No line-item changes.</div>`;
+
+  return `
+    <div class="invoice-box-unit">
+      <div class="print-revision-comment">
+        <div class="print-revision-comment-title">Revised Bill — Modification Details</div>
+        <div class="print-revision-comment-meta">
+          Revised by: ${escapeAttr(revisedBill.revisedBy || "—")}${revisedBill.time ? " | " + escapeAttr(revisedBill.time) : ""}${revisedBill.serialNumber ? " | #" + escapeAttr(revisedBill.serialNumber) : ""}
+        </div>
+        <div class="print-revision-comment-summary">${escapeAttr(buildDiffSummary(diff))}</div>
+        ${detailList}
+      </div>
+    </div>
+  `;
 }
 
 function printRevisionReceipt(
@@ -3450,13 +3503,23 @@ function buildStandardPrintPageHTML(
   rows,
   footerHTML,
   pageNum,
-  totalPages
+  totalPages,
+  watermarkText
 ) {
   return `
     <div class="invoice-box-unit">
       <div class="print-estimate-heading">Estimate</div>
       <div class="print-wrapper receipt-copy">
         <div class="copy-label">${label}</div>
+
+        ${watermarkText
+          ? `<div class="print-revised-wm-overlay">
+               <span>${escapeAttr(watermarkText)}</span>
+               <span>${escapeAttr(watermarkText)}</span>
+               <span>${escapeAttr(watermarkText)}</span>
+               <span>${escapeAttr(watermarkText)}</span>
+             </div>`
+          : ""}
 
         <div class="print-header-row">
           ${billData.customerName && billData.customerName !== "Retail Bill"
@@ -3641,7 +3704,8 @@ function buildSingleCopyPage(
   isLastPage,
   pageNum,
   totalPages,
-  serialOffset
+  serialOffset,
+  watermarkText
 ) {
  const serialStart = serialOffset || 0;
   const rows = itemsChunk.map(
@@ -3662,7 +3726,8 @@ function buildSingleCopyPage(
       isLastPage
     ),
     pageNum,
-    totalPages
+    totalPages,
+    watermarkText
   );
 }
 

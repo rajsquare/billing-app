@@ -1683,6 +1683,58 @@ input {
   padding: 1px 3px;
 }
 
+/* Clean revision comment/history block — printed below the Office Copy bill. */
+.print-revision-comment {
+  width: 100%;
+  margin-top: 6px;
+  padding: 6mm 4mm;
+  border: 1px solid #000;
+  background: #fff;
+  color: #000;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.print-revision-comment-title {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid #000;
+  padding-bottom: 3px;
+  margin-bottom: 5px;
+}
+
+.print-revision-comment-meta {
+  font-size: 10px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.print-revision-comment-summary {
+  font-size: 10px;
+  font-style: italic;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.print-revision-comment-list {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.print-revision-comment-list li {
+  margin-bottom: 2px;
+}
+
+.print-revision-comment-empty {
+  font-size: 11px;
+  color: #555;
+}
+
 /* ================================
    MODAL ANIMATIONS
 ================================ */
