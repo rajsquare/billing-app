@@ -1977,9 +1977,19 @@ async function loadProducts() {
 
     restoreDraft();
 
-    console.log(
-      `Loaded ${products.length} products from catalog`
-    );
+    // One-time migration: reset firstOfDay tracking to guarantee ① on next first print
+    const migrationKey = "firstOfDayMigrationV1";
+    if (!localStorage.getItem(migrationKey)) {
+      try {
+        await setDoc(serialDocRef, {
+          WFirstOfDayDate: "",
+          RFirstOfDayDate: ""
+        }, { merge: true });
+        localStorage.setItem(migrationKey, "done");
+      } catch (e) {
+        console.warn("[Migration] firstOfDay reset failed:", e);
+      }
+    }
 
   } catch (err) {
     console.error(err);
@@ -4431,10 +4441,15 @@ const serial = isTestBill
 const todayDate =
   getIndiaTodayDate();
 
+const storedFirstOfDayDate =
+  serialData[keys.firstOfDayKey];
+
 const isFirstOfDay =
   !isTestBill &&
-  serialData[keys.firstOfDayKey] !==
-    todayDate;
+  !(
+    typeof storedFirstOfDayDate === "string" &&
+    storedFirstOfDayDate === todayDate
+  );
 
 if (!isTestBill) {
   const updates = {
