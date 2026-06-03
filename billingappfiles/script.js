@@ -1977,20 +1977,6 @@ async function loadProducts() {
 
     restoreDraft();
 
-    // One-time migration: reset firstOfDay tracking to guarantee ① on next first print
-    const migrationKey = "firstOfDayMigrationV1";
-    if (!localStorage.getItem(migrationKey)) {
-      try {
-        await setDoc(serialDocRef, {
-          WFirstOfDayDate: "",
-          RFirstOfDayDate: ""
-        }, { merge: true });
-        localStorage.setItem(migrationKey, "done");
-      } catch (e) {
-        console.warn("[Migration] firstOfDay reset failed:", e);
-      }
-    }
-
   } catch (err) {
     console.error(err);
     showToast("Failed to load products", "error");
