@@ -1977,9 +1977,19 @@ async function loadProducts() {
 
     restoreDraft();
 
-    console.log(
-      `Loaded ${products.length} products from catalog`
-    );
+    // One-time migration: reset firstOfDay tracking to guarantee ① on next first print
+    const migrationKey = "firstOfDayMigrationV1";
+    if (!localStorage.getItem(migrationKey)) {
+      try {
+        await setDoc(serialDocRef, {
+          WFirstOfDayDate: "",
+          RFirstOfDayDate: ""
+        }, { merge: true });
+        localStorage.setItem(migrationKey, "done");
+      } catch (e) {
+        console.warn("[Migration] firstOfDay reset failed:", e);
+      }
+    }
 
   } catch (err) {
     console.error(err);
@@ -4438,16 +4448,8 @@ const isFirstOfDay =
   !isTestBill &&
   !(
     typeof storedFirstOfDayDate === "string" &&
-    /^\d{4}-\d{2}-\d{2}$/.test(storedFirstOfDayDate) &&
     storedFirstOfDayDate === todayDate
   );
-
-console.log("[FirstOfDay]", {
-  mode: bill.mode,
-  todayDate,
-  storedDate: storedFirstOfDayDate,
-  isFirstOfDay
-});
 
 if (!isTestBill) {
   const updates = {
