@@ -4431,23 +4431,10 @@ const serial = isTestBill
 const todayDate =
   getIndiaTodayDate();
 
-const storedFirstOfDayDate =
-  serialData[keys.firstOfDayKey];
-
 const isFirstOfDay =
   !isTestBill &&
-  !(
-    typeof storedFirstOfDayDate === "string" &&
-    /^\d{4}-\d{2}-\d{2}$/.test(storedFirstOfDayDate) &&
-    storedFirstOfDayDate === todayDate
-  );
-
-console.log("[FirstOfDay]", {
-  mode: bill.mode,
-  todayDate,
-  storedDate: storedFirstOfDayDate,
-  isFirstOfDay
-});
+  serialData[keys.firstOfDayKey] !==
+    todayDate;
 
 if (!isTestBill) {
   const updates = {
