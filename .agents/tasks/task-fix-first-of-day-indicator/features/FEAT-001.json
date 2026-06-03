@@ -2,7 +2,7 @@
   "id": "FEAT-001",
   "type": "fix",
   "description": "Fix the first-of-day circle indicator (①) to reliably appear on the OFFICE COPY of the first W and R bill printed each day. The issue stems from the date-bounded bills listener introduced in PR #9 which uses getStartOfTodayTimestamp(). When the page stays open overnight, the stale query timestamp can cause subtle inconsistencies. Additionally, the isFirstOfDay determination needs to be robust against edge cases in the Firestore serial counter data. The rendering condition (label !== 'CUSTOMER COPY' && billData.isFirstOfDay) in buildStandardPrintPageHTML is correct and must be preserved.",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "In billingappfiles/script.js around line 4434, improve the isFirstOfDay logic to handle edge cases more defensively. The current check is: serialData[keys.firstOfDayKey] !== todayDate. This is correct but can fail if: (a) the serial counter document has a stale/corrupted firstOfDayDate value in a different format, (b) the field value is null or an unexpected type. Add a type check to ensure the comparison is between two valid YYYY-MM-DD strings. If serialData[keys.firstOfDayKey] is not a string matching YYYY-MM-DD format, treat it as first-of-day.",
     "In billingappfiles/script.js around line 3472, KEEP the existing condition 'label !== CUSTOMER COPY && billData.isFirstOfDay' UNCHANGED. This is correct - the indicator should only show on OFFICE COPY.",
@@ -21,5 +21,5 @@
     "Grep for the new date validation logic"
   ],
   "blocked_reason": null,
-  "findings": ""
+  "findings": "node --check passes cleanly (no syntax errors). The rendering condition at line 3472 was verified unchanged. The fix ensures that when a new day starts, the first W bill and first R bill will show the ① on the OFFICE COPY because the stored date will either be yesterday's date (valid but non-matching) or an invalid value (also treated as first-of-day)."
 }
