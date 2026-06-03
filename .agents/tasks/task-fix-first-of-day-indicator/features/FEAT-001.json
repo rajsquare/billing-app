@@ -21,5 +21,5 @@
     "Grep for the new date validation logic"
   ],
   "blocked_reason": null,
-  "findings": "node --check passes cleanly (no syntax errors). The rendering condition at line 3472 was verified unchanged. The fix ensures that when a new day starts, the first W bill and first R bill will show the ① on the OFFICE COPY because the stored date will either be yesterday's date (valid but non-matching) or an invalid value (also treated as first-of-day)."
+  "findings": "node --check passes cleanly (no syntax errors). The rendering condition at line 3472 was verified unchanged. The fix ensures that when a new day starts, the first W bill and first R bill will show the ① on the OFFICE COPY because the stored date will either be yesterday's date (valid but non-matching) or an invalid value (also treated as first-of-day). Removed regex test per user request - simple typeof+equality is sufficient. Added one-time migration to reset WFirstOfDayDate and RFirstOfDayDate to empty strings. Removed console.log per user constraint."
 }
