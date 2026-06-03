@@ -1,0 +1,18 @@
+{
+  "project_type": "Firebase web billing application (vanilla JS, ES modules via CDN)",
+  "language": "JavaScript",
+  "build_system": "None - static files served directly, Firebase SDK loaded from CDN",
+  "test_framework": "None - no automated tests",
+  "build_command": null,
+  "test_command": null,
+  "verification_instructions": "Static analysis and code review. Verify JavaScript syntax is valid by checking for parse errors.",
+  "snapshot_or_generated_files": null,
+  "setup_instructions": "No setup needed - static HTML/JS/CSS files",
+  "environment_constraints": "No build system, no tests, no Docker. Verification is done through code review and syntax checking.",
+  "contribution_requirements": "None documented",
+  "key_patterns": "Single-file app (billingappfiles/script.js, ~4618 lines). Firestore real-time listeners via onSnapshot. Transactions for serial number assignment. Two-copy print system (CUSTOMER COPY + OFFICE COPY). The circle-1 indicator shows on OFFICE COPY only for the first W and R bill of each day.",
+  "relevant_files": [
+    "billingappfiles/script.js"
+  ],
+  "directory_structure": "billingappfiles/ contains bill.html (entry point), script.js (all logic), style.css (styles), and pricelistfiles/ subdirectory for pricelist sub-app."
+}
