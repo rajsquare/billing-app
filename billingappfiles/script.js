@@ -3469,7 +3469,7 @@ function buildStandardPrintPageHTML(
 
           <div class="print-date-serial-row">
             <span class="print-date">${escapeAttr(billData.date)}</span>
-            <span class="print-serial">${billData.serialNumber ? (label !== "CUSTOMER COPY" && billData.isFirstOfDay ? "① " : "") + "#" + escapeAttr(billData.serialNumber) : ""}</span>
+            <span class="print-serial">${billData.serialNumber ? (billData.isFirstOfDay ? "① " : "") + "#" + escapeAttr(billData.serialNumber) : ""}</span>
           </div>
 
           ${label !== "CUSTOMER COPY" && billData.time
