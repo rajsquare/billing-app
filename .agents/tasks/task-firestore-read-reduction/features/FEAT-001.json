@@ -1,0 +1,38 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Implement comprehensive Firestore read reduction optimizations in script.js. This includes: date-bounding the bills and daybook listeners, adding catalog caching with localStorage, increasing live draft sync debounce with content-hash change detection, adding conditional rendering guard to daybook, and auto-cleanup of stale drafts.",
+  "status": "completed",
+  "steps": [
+    "STEP 1 - Add missing imports: Add `where`, `limit`, `Timestamp` to the Firebase Firestore import statement at the top of billingappfiles/script.js (line 2-16). These are needed for the query constraints.",
+    "STEP 2 - Create startOfToday helper: Add a helper function `getStartOfTodayTimestamp()` that computes midnight of today in Asia/Kolkata timezone and returns a Firestore Timestamp. Use: create a Date in IST midnight, convert to Firestore Timestamp.fromDate(). Place this near the HELPERS section (around line 250).",
+    "STEP 3 - Date-bound the bills query: Replace the current `billsQuery` definition (line 56-59) which is `query(billsCollection, orderBy('createdAt', 'asc'))` with `query(billsCollection, where('createdAt', '>=', getStartOfTodayTimestamp()), orderBy('createdAt', 'asc'), limit(200))`. This ensures only today's bills are loaded on startup instead of the entire collection history.",
+    "STEP 4 - Date-bound the daybook query: Replace the current `daybookQuery` definition (line 61-64) which is `query(daybookCollection, orderBy('createdAt', 'asc'))` with `query(daybookCollection, where('createdAt', '>=', getStartOfTodayTimestamp()), orderBy('createdAt', 'asc'))`. Daybook is inherently daily, no limit needed.",
+    "STEP 5 - Catalog localStorage cache with version check: Modify the `loadProducts()` function (around line 1807). Before fetching the full catalog/current doc, check localStorage for a cached version. Strategy: (a) Always read catalog/current (which contains the products), but cache it in localStorage with a timestamp. (b) On load, check if cached version exists and is from today (same IST date). If yes, use cached data and skip the Firestore read entirely. If not, read from Firestore, update the cache. The cache key should be 'catalogCache' storing JSON with {date: 'YYYY-MM-DD', data: catalogData}.",
+    "STEP 6 - Increase syncLiveDraft debounce and add content-hash change detection: (a) Create a new variable `let _syncDraftTimer = null;` and `let _lastDraftHash = '';` near the state section. (b) Create a function `debouncedSyncLiveDraft()` that uses 1000ms debounce (instead of calling syncLiveDraft directly). (c) Add content hashing: before actually syncing, compute a simple hash of the current bill state (JSON.stringify of items + customer name, then a basic hash). If hash matches `_lastDraftHash`, skip the sync entirely. (d) Replace all direct calls to `syncLiveDraft()` (found at lines 2369, 2568, 3193) with `debouncedSyncLiveDraft()`. This reduces write frequency which reduces read fan-out to other listeners.",
+    "STEP 7 - Add visibility guard to renderDaybook: At the top of `renderDaybook()` function (line 3889), add the same pattern used in `renderIncomingBills()`: if `daybookView.style.display === 'none'` then return early. Also, in the `daybookTab` event listener (line 2156), add a call to `renderDaybook()` after `activateView('daybook')` so the UI refreshes when the tab becomes visible.",
+    "STEP 8 - Auto-delete stale live drafts on snapshot: In the `subscribeToLiveDrafts()` function's snapshot handler (line 945-992), after processing docChanges, add logic to auto-delete drafts older than 2 minutes that are NOT the current session. For each entry in liveDraftsCache, if `isDraftStale(draft)` and the id !== sessionId, call `deleteDoc(doc(db, 'liveDraftBills', id))` (fire-and-forget). This reduces the collection size and thus reads for all listeners. Add a guard so this cleanup runs at most once every 30 seconds to avoid excessive delete operations."
+  ],
+  "acceptance_criteria": [
+    "The Firebase import statement includes `where`, `limit`, and `Timestamp`",
+    "billsQuery uses where('createdAt', '>=', startOfToday) and limit(200)",
+    "daybookQuery uses where('createdAt', '>=', startOfToday)",
+    "loadProducts() checks localStorage cache before reading catalog/current from Firestore",
+    "syncLiveDraft calls are debounced at 1000ms with content-hash deduplication",
+    "renderDaybook() has visibility guard and daybook tab click triggers renderDaybook()",
+    "Stale live drafts from other sessions are auto-cleaned up",
+    "No syntax errors in the modified script.js",
+    "All existing functionality is preserved: real-time bill reception, live draft viewing, daybook tracking, revision workflows, serial number assignment"
+  ],
+  "verification": [
+    "Run a JavaScript syntax check using node with an ESM-compatible approach or use acorn/esprima to parse the file and confirm no syntax errors",
+    "Grep for the new imports (where, limit, Timestamp) to confirm they are present",
+    "Grep for getStartOfTodayTimestamp to confirm the helper exists",
+    "Grep for the modified billsQuery and daybookQuery to confirm they use where clauses",
+    "Grep for catalogCache in localStorage logic",
+    "Grep for debouncedSyncLiveDraft to confirm the new debounce function exists",
+    "Grep for daybookView.style.display inside renderDaybook to confirm the visibility guard"
+  ],
+  "blocked_reason": null,
+  "findings": "All 8 steps implemented successfully. Syntax validated with acorn --ecma2022 --module (exit code 0). The getStartOfTodayTimestamp helper uses _todayFmt (en-CA format gives YYYY-MM-DD) to get today's IST date, then constructs UTC midnight by subtracting IST offset (330 minutes). No test framework exists, so validation was purely syntax-based."
+}
