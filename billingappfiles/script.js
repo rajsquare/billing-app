@@ -1653,35 +1653,25 @@ function buildRevisionAuditPreviewHTML(
   originalBill,
   diff
 ) {
-  const mergedItems =
-    buildMergedOfficeItems(
-      originalBill,
-      revisedBill,
-      diff
-    );
-
   const pages =
-    paginateRevisionOfficeByHeight(
-      mergedItems,
+    paginateByHeight(
+      [...revisedBill.items].reverse(),
       revisedBill,
-      originalBill,
-      diff,
-      false
+      "OFFICE COPY"
     );
 
   const totalPages = pages.length;
   let html = "";
 
   pages.forEach((page, index) => {
-    html += buildRevisionOfficeSinglePage(
+    html += buildSingleCopyPage(
       revisedBill,
-      originalBill,
+      "OFFICE COPY",
       page.chunk,
-      diff,
       index === totalPages - 1,
       index + 1,
       totalPages,
-      false
+      page.serialOffset
     );
   });
 
@@ -1692,35 +1682,21 @@ function buildRevisionReceiptPrintHTML(
   revisedBill,
   originalBill
 ) {
-  const diff =
-    buildRevisionDiff(
-      originalBill,
-      revisedBill
-    );
-
-  const customerItems =
+  const items =
     [...revisedBill.items].reverse();
 
   const customerPages =
     paginateByHeight(
-      customerItems,
+      items,
       revisedBill,
       "CUSTOMER COPY"
     );
 
-  const mergedItems =
-    buildMergedOfficeItems(
-      originalBill,
-      revisedBill,
-      diff
-    );
-
   const officePages =
-    paginateRevisionOfficeByHeight(
-      mergedItems,
+    paginateByHeight(
+      items,
       revisedBill,
-      originalBill,
-      diff
+      "OFFICE COPY"
     );
 
   let html = "";
@@ -1738,14 +1714,14 @@ function buildRevisionReceiptPrintHTML(
   });
 
   officePages.forEach((page, index) => {
-    html += buildRevisionOfficeSinglePage(
+    html += buildSingleCopyPage(
       revisedBill,
-      originalBill,
+      "OFFICE COPY",
       page.chunk,
-      diff,
       index === officePages.length - 1,
       index + 1,
-      officePages.length
+      officePages.length,
+      page.serialOffset
     );
   });
 
