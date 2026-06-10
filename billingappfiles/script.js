@@ -3046,7 +3046,10 @@ function createBillData() {
             item.total,
 
           note:
-            item.note || ""
+            item.note || "",
+
+          priceType:
+            item.product.priceType || ""
         })
       )
   };
@@ -3543,6 +3546,32 @@ function buildWholesaleBottomFooterHTML(billData, label) {
   `;
 }
 
+function buildTotalQuantityHTML(billData) {
+  var totalKg = 0;
+  var totalPcs = 0;
+  (billData.items || []).forEach(function(item) {
+    var qty = parseFloat(item.qty) || 0;
+    if (item.priceType === "KG") {
+      totalKg += qty;
+    } else if (item.priceType === "PP") {
+      totalPcs += qty;
+    }
+  });
+  var parts = [];
+  if (totalKg > 0) {
+    parts.push(
+      (Number.isInteger(totalKg) ? totalKg : parseFloat(totalKg.toFixed(3))) + " kg"
+    );
+  }
+  if (totalPcs > 0) {
+    parts.push(
+      (Number.isInteger(totalPcs) ? totalPcs : parseFloat(totalPcs.toFixed(3))) + " pcs"
+    );
+  }
+  if (parts.length === 0) return "";
+  return \`<div class="print-qty-summary">Total Quantity: \${parts.join(", ")}</div>\`;
+}
+
 function buildPrintFooterHTML(billData, label, isLastPage) {
   const wholesaleFooter =
     billData.mode === "W" && isLastPage
@@ -3552,17 +3581,23 @@ function buildPrintFooterHTML(billData, label, isLastPage) {
       )
       : "";
 
-  return `
+  const totalQtyHTML =
+    label === "OFFICE COPY" && isLastPage
+      ? buildTotalQuantityHTML(billData)
+      : "";
+
+  return \`
     <div class="print-total-area">
       <div class="print-total">
-        Grand Total: ₹${formatIndianMoneyWhole(billData.grandTotal)}/-
+        Grand Total: ₹\${formatIndianMoneyWhole(billData.grandTotal)}/-
       </div>
       <div class="print-gst-notice">
         GST @ 5% applicable as per prevailing tax regulations.
       </div>
+      \${totalQtyHTML}
     </div>
-    ${wholesaleFooter}
-  `;
+    \${wholesaleFooter}
+  \`;
 }
 
 function buildStandardPrintPageHTML(
@@ -3577,7 +3612,7 @@ function buildStandardPrintPageHTML(
     <div class="invoice-box-unit">
       <div class="print-estimate-heading">Estimate</div>
       <div class="print-wrapper receipt-copy">
-        <div class="copy-label">${label}</div>
+        <div class="copy-label${label === 'OFFICE COPY' ? ' office-copy-label' : ''}">${label}</div>
 
         <div class="print-header-row">
           ${billData.customerName && billData.customerName !== "Retail Bill"
