@@ -3569,7 +3569,7 @@ function buildTotalQuantityHTML(billData) {
     );
   }
   if (parts.length === 0) return "";
-  return \`<div class="print-qty-summary">Total Quantity: \${parts.join(", ")}</div>\`;
+  return `<div class="print-qty-summary">Total Quantity: ${parts.join(", ")}</div>`;
 }
 
 function buildPrintFooterHTML(billData, label, isLastPage) {
@@ -3586,18 +3586,18 @@ function buildPrintFooterHTML(billData, label, isLastPage) {
       ? buildTotalQuantityHTML(billData)
       : "";
 
-  return \`
+  return `
     <div class="print-total-area">
       <div class="print-total">
-        Grand Total: ₹\${formatIndianMoneyWhole(billData.grandTotal)}/-
+        Grand Total: ₹${formatIndianMoneyWhole(billData.grandTotal)}/-
       </div>
       <div class="print-gst-notice">
         GST @ 5% applicable as per prevailing tax regulations.
       </div>
-      \${totalQtyHTML}
+      ${totalQtyHTML}
     </div>
-    \${wholesaleFooter}
-  \`;
+    ${wholesaleFooter}
+  `;
 }
 
 function buildStandardPrintPageHTML(
