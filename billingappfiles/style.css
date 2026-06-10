@@ -872,8 +872,11 @@ input {
 }
 
 .office-copy-label {
-  background-color: #000;
-  color: #fff;
+  background-color: #000 !important;
+  color: #fff !important;
+  display: inline-block;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .print-estimate-heading {
