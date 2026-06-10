@@ -1455,7 +1455,7 @@ function buildRevisionOfficeSinglePage(
     <div class="invoice-box-unit">
       <div class="print-estimate-heading">Estimate</div>
       <div class="print-wrapper receipt-copy" style="position:relative;">
-        <div class="copy-label">OFFICE COPY</div>
+        <div class="copy-label office-copy-label">OFFICE COPY</div>
 
         <div class="print-revised-wm-overlay">
           <span>REVISED BILL</span>
