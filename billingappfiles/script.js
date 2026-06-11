@@ -2001,6 +2001,12 @@ const synonyms = {
   ],
   bronze: [
     "kansa"
+  ],
+  "k+p": [
+    "kalai"
+  ],
+  kalai: [
+    "k+p"
   ]
 };
 
