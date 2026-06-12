@@ -865,8 +865,6 @@ input {
 }
 
 .copy-label {
-  display: flex;
-  justify-content: center;
   text-align: center;
   font-size: 10px;
   font-weight: 700;
@@ -877,6 +875,7 @@ input {
   background-color: #000000 !important;
   color: #ffffff !important;
   width: fit-content !important;
+  margin: 0 auto !important;
   padding: 1px 6px !important;
   box-sizing: border-box;
   -webkit-print-color-adjust: exact !important;
