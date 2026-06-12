@@ -872,8 +872,8 @@ input {
 }
 
 .office-copy-label {
-  background-color: #000 !important;
-  color: #fff !important;
+  background-color: #808080 !important;
+  color: #ffff00 !important;
   display: block;
   width: 100%;
   box-sizing: border-box;
