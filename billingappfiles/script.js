@@ -1455,7 +1455,7 @@ function buildRevisionOfficeSinglePage(
     <div class="invoice-box-unit">
       <div class="print-estimate-heading">Estimate</div>
       <div class="print-wrapper receipt-copy" style="position:relative;">
-        <div class="copy-label office-copy-label" style="background-color:#000000;color:#ffffff;padding:1px 6px;box-sizing:border-box;">OFFICE COPY</div>
+        <div class="copy-label office-copy-label" style="background-color:#000000;color:#ffffff;width:fit-content;margin:0 auto;padding:1px 6px;box-sizing:border-box;">OFFICE COPY</div>
 
         <div class="print-revised-wm-overlay">
           <span>REVISED BILL</span>
@@ -3618,7 +3618,7 @@ function buildStandardPrintPageHTML(
     <div class="invoice-box-unit">
       <div class="print-estimate-heading">Estimate</div>
       <div class="print-wrapper receipt-copy">
-        <div class="copy-label${label === 'OFFICE COPY' ? ' office-copy-label' : ''}" ${label === 'OFFICE COPY' ? 'style="background-color:#000000;color:#ffffff;padding:1px 6px;box-sizing:border-box;"' : ''}>${label}</div>
+        <div class="copy-label${label === 'OFFICE COPY' ? ' office-copy-label' : ''}" ${label === 'OFFICE COPY' ? 'style="background-color:#000000;color:#ffffff;width:fit-content;margin:0 auto;padding:1px 6px;box-sizing:border-box;"' : ''}>${label}</div>
 
         <div class="print-header-row">
           ${billData.customerName && billData.customerName !== "Retail Bill"
