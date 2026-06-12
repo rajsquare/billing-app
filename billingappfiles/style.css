@@ -865,6 +865,8 @@ input {
 }
 
 .copy-label {
+  display: flex;
+  justify-content: center;
   text-align: center;
   font-size: 10px;
   font-weight: 700;
@@ -874,8 +876,8 @@ input {
 .office-copy-label {
   background-color: #000000 !important;
   color: #ffffff !important;
-  display: inline-block !important;
-  width: auto !important;
+  width: fit-content !important;
+  padding: 1px 6px !important;
   box-sizing: border-box;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
