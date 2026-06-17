@@ -15,7 +15,8 @@ import {
   runTransaction,
   getDocs,
   getDoc,
-  writeBatch
+  writeBatch,
+  increment
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* ================================
@@ -55,6 +56,7 @@ const pricelistDb =
 const billsCollection = collection(db, "bills");
 const daybookCollection = collection(db, "daybook");
 const liveDraftBillsCollection = collection(db, "liveDraftBills");
+const productSalesCollection = collection(db, "productSales");
 
 /* ================================
    INTL FORMATTERS (module-level, reused across all renders)
@@ -164,6 +166,8 @@ const receiverTab =
   document.getElementById("receiverTab");
 const daybookTab =
   document.getElementById("daybookTab");
+const reportTab =
+  document.getElementById("reportTab");
 
 const billingView =
   document.getElementById("billingView");
@@ -171,6 +175,8 @@ const receiverView =
   document.getElementById("receiverView");
 const daybookView =
   document.getElementById("daybookView");
+const reportView =
+  document.getElementById("reportView");
 
 const searchBox =
   document.getElementById("searchBox");
@@ -2205,6 +2211,8 @@ function activateView(
     "none";
   daybookView.style.display =
     "none";
+  reportView.style.display =
+    "none";
 
   billingTab.classList.remove(
     "active"
@@ -2213,6 +2221,9 @@ function activateView(
     "active"
   );
   daybookTab.classList.remove(
+    "active"
+  );
+  reportTab.classList.remove(
     "active"
   );
 
@@ -2251,6 +2262,18 @@ function activateView(
       "active"
     );
   }
+
+  if (
+    view ===
+    "report"
+  ) {
+    reportView.style.display =
+      "block";
+
+    reportTab.classList.add(
+      "active"
+    );
+  }
 }
 
 billingTab.addEventListener(
@@ -2276,6 +2299,13 @@ daybookTab.addEventListener(
       "daybook"
     );
     renderDaybook();
+  }
+);
+
+reportTab.addEventListener(
+  "click",
+  () => {
+    openReportWithPassword();
   }
 );
 /* ================================
@@ -4373,6 +4403,238 @@ window.deleteDaybookNow =
   };
 
 /* ================================
+   REPORT — PASSWORD + RENDER + CLEAR + PRINT
+================================ */
+let reportUnlocked = false;
+
+async function hashPassword(plain) {
+  const enc = new TextEncoder();
+  const buf = await crypto.subtle.digest(
+    "SHA-256",
+    enc.encode(plain)
+  );
+  return Array.from(new Uint8Array(buf))
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+async function openReportWithPassword() {
+  // Always re-lock on each open so password is re-checked every time
+  reportUnlocked = false;
+
+  let storedHash = "";
+  try {
+    const secRef = doc(db, "appConfig", "security");
+    const secSnap = await getDoc(secRef);
+    if (secSnap.exists()) {
+      storedHash = secSnap.data().reportPasswordHash || "";
+    }
+  } catch (err) {
+    console.error("Could not read security config", err);
+    showToast("Could not load security config", "error");
+    return;
+  }
+
+  if (!storedHash) {
+    showToast("Report password not configured in Firestore", "error");
+    return;
+  }
+
+  const entered = prompt("Enter report password:");
+  if (entered === null) return;
+
+  const enteredHash = await hashPassword(entered);
+  if (enteredHash !== storedHash) {
+    showToast("Incorrect password", "error");
+    return;
+  }
+
+  reportUnlocked = true;
+  activateView("report");
+  renderReport();
+}
+
+async function renderReport() {
+  const reportContent = document.getElementById("reportContent");
+  if (!reportContent) return;
+
+  reportContent.innerHTML = `<div class="receiver-subtitle">Loading…</div>`;
+
+  try {
+    const snapshot = await getDocs(productSalesCollection);
+    const salesData = [];
+    snapshot.forEach(docSnap => {
+      salesData.push(docSnap.data());
+    });
+
+    // Build product price lookup from loaded catalog
+    const priceMap = new Map();
+    products.forEach(p => {
+      priceMap.set(p.productName, getCurrentPrice(p) || 0);
+    });
+
+    // Sort by quantity descending
+    salesData.sort((a, b) => (b.quantity || 0) - (a.quantity || 0));
+
+    if (!salesData.length) {
+      reportContent.innerHTML = `
+        <div class="receiver-subtitle">No sales data yet.</div>
+        <div class="report-actions">
+          <button class="primary-btn" onclick="printReport()">Print Report</button>
+          <button class="delete-btn" onclick="clearReport()">Clear Report</button>
+        </div>
+      `;
+      return;
+    }
+
+    const rows = salesData.map(item => {
+      const avgPrice = priceMap.get(item.productName) || 0;
+      return `
+        <tr>
+          <td class="report-name-cell">${escapeAttr(item.productName)}</td>
+          <td>${escapeAttr(item.material || "—")}</td>
+          <td>${avgPrice > 0 ? "₹" + formatIndianMoneyWhole(avgPrice) : "—"}</td>
+          <td class="report-qty-cell">${roundQty(item.quantity || 0)}</td>
+        </tr>
+      `;
+    }).join("");
+
+    reportContent.innerHTML = `
+      <div class="report-search-wrap">
+        <input
+          type="text"
+          id="reportSearchBox"
+          class="report-search-input"
+          placeholder="Search product…"
+          autocomplete="off"
+          oninput="filterReport(this.value)"
+        >
+      </div>
+      <div class="report-actions">
+        <button class="primary-btn" onclick="printReport()">Print Report</button>
+        <button class="delete-btn" onclick="clearReport()">Clear Report</button>
+      </div>
+      <div class="report-table-wrap">
+        <table class="report-table" id="reportTable">
+          <thead>
+            <tr>
+              <th>Product Name</th>
+              <th>Material</th>
+              <th>Avg Price</th>
+              <th class="report-qty-head">Qty</th>
+            </tr>
+          </thead>
+          <tbody id="reportTableBody">${rows}</tbody>
+        </table>
+      </div>
+    `;
+
+    // Store data for filtering
+    window._reportData = salesData;
+    window._reportPriceMap = priceMap;
+  } catch (err) {
+    console.error(err);
+    reportContent.innerHTML = `<div class="receiver-subtitle">Failed to load report.</div>`;
+  }
+}
+
+window.filterReport = function(query) {
+  const tbody = document.getElementById("reportTableBody");
+  if (!tbody || !window._reportData) return;
+
+  const q = query.trim().toLowerCase();
+  const rows = (window._reportData || [])
+    .filter(item => !q || item.productName.toLowerCase().includes(q))
+    .map(item => {
+      const avgPrice = (window._reportPriceMap || new Map()).get(item.productName) || 0;
+      return `
+        <tr>
+          <td class="report-name-cell">${escapeAttr(item.productName)}</td>
+          <td>${escapeAttr(item.material || "—")}</td>
+          <td>${avgPrice > 0 ? "₹" + formatIndianMoneyWhole(avgPrice) : "—"}</td>
+          <td class="report-qty-cell">${roundQty(item.quantity || 0)}</td>
+        </tr>
+      `;
+    }).join("");
+
+  tbody.innerHTML = rows || `<tr><td colspan="4" style="text-align:center;padding:16px;color:#94a3b8;">No results</td></tr>`;
+};
+
+window.clearReport = async function() {
+  const confirm1 = prompt('Type DELETE to confirm clearing all report data:');
+  if (confirm1 === null) return;
+  if (confirm1 !== "DELETE") {
+    showToast("Cancelled — you must type DELETE exactly", "error");
+    return;
+  }
+
+  try {
+    const snapshot = await getDocs(productSalesCollection);
+    if (snapshot.empty) {
+      showToast("Report is already empty", "info");
+      return;
+    }
+
+    const batch = writeBatch(db);
+    snapshot.forEach(docSnap => {
+      batch.delete(docSnap.ref);
+    });
+    await batch.commit();
+
+    window._reportData = [];
+    window._reportPriceMap = new Map();
+    showToast("Report cleared", "success");
+    renderReport();
+  } catch (err) {
+    console.error(err);
+    showToast("Failed to clear report", "error");
+  }
+};
+
+window.printReport = function() {
+  const data = window._reportData || [];
+  const priceMap = window._reportPriceMap || new Map();
+  const now = new Date();
+  const timestamp = _dateFmt.format(now) + " " + _timeFmt.format(now);
+
+  const rows = data.map((item, idx) => {
+    const avgPrice = priceMap.get(item.productName) || 0;
+    return `
+      <tr>
+        <td>${idx + 1}</td>
+        <td>${escapeAttr(item.productName)}</td>
+        <td>${escapeAttr(item.material || "—")}</td>
+        <td>${avgPrice > 0 ? "₹" + formatIndianMoneyWhole(avgPrice) : "—"}</td>
+        <td style="text-align:right;">${roundQty(item.quantity || 0)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const printHTML = `
+    <div class="report-print-wrapper">
+      <div class="report-print-title">Product Sales Report</div>
+      <div class="report-print-timestamp">Generated: ${escapeAttr(timestamp)}</div>
+      <table class="report-print-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Product Name</th>
+            <th>Material</th>
+            <th>Avg Price</th>
+            <th style="text-align:right;">Qty</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+
+  printInvoice.innerHTML = printHTML;
+  window.print();
+  printInvoice.innerHTML = "";
+};
+
+/* ================================
    APP SWITCHER
 ================================ */
 document.getElementById("appTitleLink").addEventListener("click", (e) => {
@@ -4741,6 +5003,28 @@ window.doneReceivedBill =
             transaction.update(
               doc(db, "bills", id),
               { isLocked: true }
+            );
+          });
+
+          // REPORT: update productSales after bill is finalized.
+          // Only runs on successful Done completion — never on create/edit/revise/print.
+          const items = bill.items || [];
+          items.forEach(item => {
+            if (!item.productName) return;
+            const salesRef = doc(
+              db,
+              "productSales",
+              item.productName
+            );
+            transaction.set(
+              salesRef,
+              {
+                productName: item.productName,
+                material: item.material || "",
+                quantity: increment(roundQty(item.qty) || 0),
+                updatedAt: serverTimestamp()
+              },
+              { merge: true }
             );
           });
         }
