@@ -313,6 +313,64 @@ function requireAdminPassword() {
   return true;
 }
 
+/**
+ * Opens the Done password modal and resolves with
+ * { confirmed: true, bulkAll: boolean } or { confirmed: false }.
+ * Resets checkbox state on every open.
+ */
+function showDonePasswordDialog() {
+  return new Promise(resolve => {
+    const modal    = document.getElementById("donePasswordModal");
+    const input    = document.getElementById("donePasswordInput");
+    const checkbox = document.getElementById("doneAllTodayCheckbox");
+    const btnOk    = document.getElementById("donePasswordOk");
+    const btnCancel = document.getElementById("donePasswordCancel");
+
+    // Reset state
+    input.value        = "";
+    checkbox.checked   = false;
+    btnOk.disabled     = false;
+    modal.style.display = "flex";
+    input.focus();
+
+    function cleanup() {
+      modal.style.display = "none";
+      btnOk.removeEventListener("click", onOk);
+      btnCancel.removeEventListener("click", onCancel);
+      input.removeEventListener("keydown", onKeydown);
+    }
+
+    function onOk() {
+      const entered = input.value;
+
+      if (entered !== ADMIN_PASSWORD) {
+        alert("Incorrect password.");
+        input.value = "";
+        input.focus();
+        return;
+      }
+
+      const bulkAll = checkbox.checked;
+      cleanup();
+      resolve({ confirmed: true, bulkAll });
+    }
+
+    function onCancel() {
+      cleanup();
+      resolve({ confirmed: false });
+    }
+
+    function onKeydown(e) {
+      if (e.key === "Enter") onOk();
+      if (e.key === "Escape") onCancel();
+    }
+
+    btnOk.addEventListener("click", onOk);
+    btnCancel.addEventListener("click", onCancel);
+    input.addEventListener("keydown", onKeydown);
+  });
+}
+
 function getIndiaDateInfo() {
   const now = new Date();
   return {
@@ -4656,12 +4714,108 @@ window.doneReceivedBill =
       return;
     }
 
-    if (
-      !requireAdminPassword()
-    ) {
+    const { confirmed, bulkAll } =
+      await showDonePasswordDialog();
+
+    if (!confirmed) {
       return;
     }
 
+    // ── BULK: move every eligible today's printed bill ──
+    if (bulkAll) {
+      const todayStr = getIndiaTodayDate();
+
+      const eligibleIds =
+        Object.keys(incomingBillCache)
+          .filter(id => {
+            const b = incomingBillCache[id];
+            return (
+              b.effectiveVersion !== false &&
+              b.status === "printed" &&
+              b.date === todayStr
+            );
+          });
+
+      if (!eligibleIds.length) {
+        showToast(
+          "No pending Receiver bills found for today.",
+          "info"
+        );
+        return;
+      }
+
+      isReceiverBusy = true;
+
+      let movedCount = 0;
+      let hadError   = false;
+
+      try {
+        await runTransaction(
+          db,
+          async transaction => {
+            // Read all bills inside the transaction first (Firestore requirement)
+            const snaps = await Promise.all(
+              eligibleIds.map(id =>
+                transaction.get(doc(db, "bills", id))
+              )
+            );
+
+            // Validate and queue writes
+            snaps.forEach((billSnap, i) => {
+              if (!billSnap.exists()) return;
+
+              const bill = billSnap.data();
+
+              if (bill.status !== "printed") return;
+              if (bill.date !== todayStr)    return;
+
+              const id          = eligibleIds[i];
+              const billRef     = doc(db, "bills", id);
+              const chainIds    = getBillChainIds(id);
+              const chainToLock = chainIds.filter(cid => cid !== id);
+
+              transaction.set(
+                doc(daybookCollection),
+                {
+                  date:         bill.date,
+                  serialNumber: bill.serialNumber,
+                  customerName: bill.customerName,
+                  amount:       bill.grandTotal,
+                  mode:         bill.mode || "W",
+                  createdAt:    serverTimestamp()
+                }
+              );
+
+              transaction.delete(billRef);
+
+              chainToLock.forEach(cid => {
+                transaction.update(
+                  doc(db, "bills", cid),
+                  { isLocked: true }
+                );
+              });
+
+              movedCount++;
+            });
+          }
+        );
+
+        showToast(
+          `Successfully moved ${movedCount} bill${movedCount !== 1 ? "s" : ""} to Daybook.`,
+          "success"
+        );
+      } catch (err) {
+        console.error(err);
+        hadError = true;
+        showToast("Failed to complete bills", "error");
+      } finally {
+        isReceiverBusy = false;
+      }
+
+      return;
+    }
+
+    // ── SINGLE BILL (original behaviour) ──
     isReceiverBusy =
       true;
 
