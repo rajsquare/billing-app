@@ -4723,16 +4723,15 @@ window.doneReceivedBill =
 
     // ── BULK: move every eligible today's printed bill ──
     if (bulkAll) {
-      const todayStr = getIndiaTodayDate();
-
+      // incomingBillCache is already scoped to today by the Firestore query
+      // (where createdAt >= startOfToday), so no date comparison is needed.
       const eligibleIds =
         Object.keys(incomingBillCache)
           .filter(id => {
             const b = incomingBillCache[id];
             return (
               b.effectiveVersion !== false &&
-              b.status === "printed" &&
-              b.date === todayStr
+              b.status === "printed"
             );
           });
 
@@ -4747,29 +4746,28 @@ window.doneReceivedBill =
       isReceiverBusy = true;
 
       let movedCount = 0;
-      let hadError   = false;
 
       try {
         await runTransaction(
           db,
           async transaction => {
-            // Read all bills inside the transaction first (Firestore requirement)
-            const snaps = await Promise.all(
-              eligibleIds.map(id =>
-                transaction.get(doc(db, "bills", id))
-              )
-            );
+            // Firestore requires all reads to complete before any writes inside
+            // a transaction. Read sequentially to satisfy this constraint.
+            const snaps = [];
+            for (const id of eligibleIds) {
+              const snap = await transaction.get(doc(db, "bills", id));
+              snaps.push({ id, snap });
+            }
 
-            // Validate and queue writes
-            snaps.forEach((billSnap, i) => {
-              if (!billSnap.exists()) return;
+            // Queue all writes after reads are done
+            for (const { id, snap } of snaps) {
+              if (!snap.exists()) continue;
 
-              const bill = billSnap.data();
+              const bill = snap.data();
 
-              if (bill.status !== "printed") return;
-              if (bill.date !== todayStr)    return;
+              // Re-validate inside transaction (Firestore server state may differ)
+              if (bill.status !== "printed") continue;
 
-              const id          = eligibleIds[i];
               const billRef     = doc(db, "bills", id);
               const chainIds    = getBillChainIds(id);
               const chainToLock = chainIds.filter(cid => cid !== id);
@@ -4796,7 +4794,7 @@ window.doneReceivedBill =
               });
 
               movedCount++;
-            });
+            }
           }
         );
 
@@ -4806,7 +4804,6 @@ window.doneReceivedBill =
         );
       } catch (err) {
         console.error(err);
-        hadError = true;
         showToast("Failed to complete bills", "error");
       } finally {
         isReceiverBusy = false;
