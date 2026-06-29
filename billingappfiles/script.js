@@ -14,7 +14,6 @@ import {
   Timestamp,
   runTransaction,
   getDocs,
-  getDoc,
   writeBatch
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -1939,88 +1938,143 @@ window.switchRevisionView =
 /* ================================
    PRODUCTS
 ================================ */
-async function loadProducts() {
-  try {
-    const todayStr = getIndiaTodayDate();
-    const cacheRaw =
-      localStorage.getItem("catalogCache");
+let _catalogInitialized = false;
+let _catalogSnapshotHash = "";
 
-    let catalogData = null;
+function applyCatalogData(catalogData) {
+  products = (catalogData.products || []).map(
+    product => {
+      const searchableText =
+        normalize(
+          `${product.productName} ${product.material || ""}`
+        );
 
-    if (cacheRaw) {
-      try {
-        const cached = JSON.parse(cacheRaw);
-
-        if (cached && cached.date === todayStr && cached.data) {
-          catalogData = cached.data;
-          console.log(
-            "Using cached catalog from localStorage"
-          );
-        }
-      } catch (e) {
-        localStorage.removeItem("catalogCache");
-      }
+      return {
+        ...product,
+        searchableText,
+        searchableTokens:
+          tokenize(searchableText)
+      };
     }
+  );
 
-    if (!catalogData) {
-      const catalogRef = doc(
-        pricelistDb,
-        "catalog",
-        "current"
-      );
-      const catalogSnap = await getDoc(catalogRef);
+  productsBySr.clear();
 
+  products.forEach(
+    p => productsBySr.set(p.sr, p)
+  );
+}
+
+function catalogContentHash(catalogData) {
+  const raw = JSON.stringify(catalogData.products || []);
+  let hash = 0;
+  for (let i = 0; i < raw.length; i++) {
+    hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+    hash |= 0;
+  }
+  return String(hash);
+}
+
+function loadProducts() {
+  /* --- Phase 1: Instant startup from localStorage cache --- */
+  const cacheRaw =
+    localStorage.getItem("catalogCache");
+
+  if (cacheRaw) {
+    try {
+      const cached = JSON.parse(cacheRaw);
+
+      if (cached && cached.data) {
+        applyCatalogData(cached.data);
+        _catalogSnapshotHash =
+          catalogContentHash(cached.data);
+        _catalogInitialized = true;
+        restoreDraft();
+        console.log(
+          "Instant startup from cached catalog"
+        );
+      }
+    } catch (e) {
+      localStorage.removeItem("catalogCache");
+    }
+  }
+
+  /* --- Phase 2: onSnapshot listener for real-time updates --- */
+  const catalogRef = doc(
+    pricelistDb,
+    "catalog",
+    "current"
+  );
+
+  onSnapshot(
+    catalogRef,
+    catalogSnap => {
       if (!catalogSnap.exists()) {
-        throw new Error("Catalog snapshot not found");
+        if (!_catalogInitialized) {
+          showToast("Catalog not found", "error");
+        }
+        return;
       }
 
-      catalogData = catalogSnap.data();
+      const catalogData = catalogSnap.data();
+      const newHash = catalogContentHash(catalogData);
 
+      /* Skip if data is identical to what we already have */
+      if (newHash === _catalogSnapshotHash) {
+        if (!_catalogInitialized) {
+          _catalogInitialized = true;
+          restoreDraft();
+        }
+        console.log(
+          "Catalog snapshot unchanged, skipping update"
+        );
+        return;
+      }
+
+      const isUpdate = _catalogInitialized;
+
+      applyCatalogData(catalogData);
+      _catalogSnapshotHash = newHash;
+
+      /* Persist to localStorage for fast startup next time */
       try {
         localStorage.setItem(
           "catalogCache",
           JSON.stringify({
-            date: todayStr,
+            date: getIndiaTodayDate(),
             data: catalogData
           })
         );
       } catch (e) {
-        console.warn("Could not cache catalog to localStorage:", e);
+        console.warn(
+          "Could not cache catalog to localStorage:",
+          e
+        );
       }
 
-      console.log(
-        "Fetched catalog from Firestore and cached"
-      );
+      if (!isUpdate) {
+        /* First load — restore draft if not already done */
+        _catalogInitialized = true;
+        restoreDraft();
+        console.log(
+          "Catalog loaded from Firestore snapshot"
+        );
+      } else {
+        /* Mid-session update — notify user */
+        console.log(
+          "Catalog updated in real-time from Firestore"
+        );
+        showToast("Price list updated ✓");
+      }
+    },
+    err => {
+      console.error("Catalog listener error:", err);
+
+      if (!_catalogInitialized) {
+        showToast("Failed to load products", "error");
+      }
     }
-
-    products = (catalogData.products || []).map(
-      product => {
-        const searchableText =
-          normalize(
-            `${product.productName} ${product.material || ""}`
-          );
-
-        return {
-          ...product,
-          searchableText,
-          searchableTokens:
-            tokenize(searchableText)
-        };
-      }
-    );
-
-    productsBySr.clear();
-
-    products.forEach(
-      p => productsBySr.set(p.sr, p)
-    );
-
-    restoreDraft();
-
-  } catch (err) {
-    console.error(err);
-    showToast("Failed to load products", "error");
-  }
+  );
 }
 
 loadProducts();
