@@ -103,21 +103,6 @@ input {
   min-width: 80px;
 }
 
-.update-tab-btn {
-  flex: 0 0 auto;
-  min-width: 70px;
-}
-
-.tab-btn:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
-.tab-btn:disabled:hover {
-  background: #f1f5f9;
-  color: #64748b;
-}
-
 /* ================================
    MAIN
 ================================ */
