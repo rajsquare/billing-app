@@ -103,6 +103,21 @@ input {
   min-width: 80px;
 }
 
+.update-tab-btn {
+  flex: 0 0 auto;
+  min-width: 70px;
+}
+
+.tab-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.tab-btn:disabled:hover {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
 /* ================================
    MAIN
 ================================ */
@@ -368,6 +383,19 @@ input {
   font-weight: 800;
   color: #1a202c;
   letter-spacing: -0.01em;
+}
+
+.admin-signal-btn {
+  width: 6px;
+  height: 6px;
+  min-width: 0;
+  border-radius: 50%;
+  background: #e5e7eb;
+  border: none;
+  padding: 0;
+  margin-left: 8px;
+  vertical-align: middle;
+  display: inline-block;
 }
 
 .receiver-subtitle {
