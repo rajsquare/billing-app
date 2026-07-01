@@ -172,8 +172,6 @@ const receiverTab =
   document.getElementById("receiverTab");
 const daybookTab =
   document.getElementById("daybookTab");
-const updateCatalogBtn =
-  document.getElementById("updateCatalogBtn");
 
 const billingView =
   document.getElementById("billingView");
@@ -229,6 +227,10 @@ const daybookEntries =
   document.getElementById("daybookEntries");
 const adminSignalBtn =
   document.getElementById("adminSignalBtn");
+const updatePricelistModal =
+  document.getElementById("updatePricelistModal");
+const updatePricelistBtn =
+  document.getElementById("updatePricelistBtn");
 
 const materialFilterDiv =
   document.getElementById("materialFilter");
@@ -2365,6 +2367,8 @@ daybookTab.addEventListener(
    MANUAL PRICE UPDATE SIGNAL
 ================================ */
 let latestUpdateSignal = 0;
+let isUpdatingCatalog = false;
+let updatePopupVisible = false;
 
 adminSignalBtn.addEventListener(
   "click",
@@ -2384,17 +2388,24 @@ adminSignalBtn.addEventListener(
   }
 );
 
-updateCatalogBtn.addEventListener(
+updatePricelistBtn.addEventListener(
   "click",
   async () => {
-    if (updateCatalogBtn.disabled) {
+    if (isUpdatingCatalog) {
       return;
     }
 
-    updateCatalogBtn.disabled = true;
+    isUpdatingCatalog = true;
+    updatePricelistBtn.disabled = true;
 
     const success =
       await loadProducts({ forceRefresh: true });
+
+    isUpdatingCatalog = false;
+    updatePricelistBtn.disabled = false;
+
+    updatePricelistModal.style.display = "none";
+    updatePopupVisible = false;
 
     if (success) {
       try {
@@ -2409,9 +2420,15 @@ updateCatalogBtn.addEventListener(
         );
       }
 
-      showToast("Prices updated", "success");
+      showToast(
+        "Pricelist updated successfully.",
+        "success"
+      );
     } else {
-      updateCatalogBtn.disabled = false;
+      showToast(
+        "Failed to update pricelist.",
+        "error"
+      );
     }
   }
 );
@@ -4601,8 +4618,13 @@ onSnapshot(
         ) || 0;
     } catch (e) {}
 
-    if (remoteSignal > localSignal) {
-      updateCatalogBtn.disabled = false;
+    if (
+      remoteSignal > localSignal &&
+      !isUpdatingCatalog &&
+      !updatePopupVisible
+    ) {
+      updatePopupVisible = true;
+      updatePricelistModal.style.display = "flex";
     }
   }
 );
