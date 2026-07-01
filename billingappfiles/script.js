@@ -15,7 +15,8 @@ import {
   runTransaction,
   getDocs,
   getDoc,
-  writeBatch
+  writeBatch,
+  increment
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* ================================
@@ -102,12 +103,19 @@ const serialDocRef = doc(
   "serials"
 );
 
+const updateSignalRef = doc(
+  db,
+  "appConfig",
+  "updateSignal"
+);
+
 /* ================================
    CONSTANTS
 ================================ */
 const ADMIN_PASSWORD = "1110";
 const BILL_DRAFT_KEY = "billingAppDraftV4";
 const DAYBOOK_PRINTED_KEY = "daybookPrintedOnce";
+const LAST_PROCESSED_SIGNAL_KEY = "lastProcessedSignal";
 const DRAFT_MAX_AGE_MS =
   24 * 60 * 60 * 1000;
 
@@ -164,6 +172,8 @@ const receiverTab =
   document.getElementById("receiverTab");
 const daybookTab =
   document.getElementById("daybookTab");
+const updateCatalogBtn =
+  document.getElementById("updateCatalogBtn");
 
 const billingView =
   document.getElementById("billingView");
@@ -217,6 +227,8 @@ const daybookActions =
   document.getElementById("daybookActions");
 const daybookEntries =
   document.getElementById("daybookEntries");
+const adminSignalBtn =
+  document.getElementById("adminSignalBtn");
 
 const materialFilterDiv =
   document.getElementById("materialFilter");
@@ -1939,11 +1951,13 @@ window.switchRevisionView =
 /* ================================
    PRODUCTS
 ================================ */
-async function loadProducts() {
+async function loadProducts({ forceRefresh = false } = {}) {
   try {
     const todayStr = getIndiaTodayDate();
     const cacheRaw =
-      localStorage.getItem("catalogCache");
+      forceRefresh
+        ? null
+        : localStorage.getItem("catalogCache");
 
     let catalogData = null;
 
@@ -2015,11 +2029,21 @@ async function loadProducts() {
       p => productsBySr.set(p.sr, p)
     );
 
-    restoreDraft();
+    if (!forceRefresh) {
+      restoreDraft();
+    }
+
+    return true;
 
   } catch (err) {
     console.error(err);
-    showToast("Failed to load products", "error");
+    showToast(
+      forceRefresh
+        ? "Failed to update prices"
+        : "Failed to load products",
+      "error"
+    );
+    return false;
   }
 }
 
@@ -2336,6 +2360,62 @@ daybookTab.addEventListener(
     renderDaybook();
   }
 );
+
+/* ================================
+   MANUAL PRICE UPDATE SIGNAL
+================================ */
+let latestUpdateSignal = 0;
+
+adminSignalBtn.addEventListener(
+  "click",
+  async () => {
+    try {
+      await setDoc(
+        updateSignalRef,
+        {
+          signal: increment(1),
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  }
+);
+
+updateCatalogBtn.addEventListener(
+  "click",
+  async () => {
+    if (updateCatalogBtn.disabled) {
+      return;
+    }
+
+    updateCatalogBtn.disabled = true;
+
+    const success =
+      await loadProducts({ forceRefresh: true });
+
+    if (success) {
+      try {
+        localStorage.setItem(
+          LAST_PROCESSED_SIGNAL_KEY,
+          String(latestUpdateSignal)
+        );
+      } catch (e) {
+        console.warn(
+          "Could not save lastProcessedSignal:",
+          e
+        );
+      }
+
+      showToast("Prices updated", "success");
+    } else {
+      updateCatalogBtn.disabled = false;
+    }
+  }
+);
+
 /* ================================
    MODE + SEARCH UI
 ================================ */
@@ -4495,6 +4575,35 @@ onSnapshot(
     );
 
     renderDaybook();
+  }
+);
+
+onSnapshot(
+  updateSignalRef,
+  snap => {
+    if (!snap.exists()) {
+      return;
+    }
+
+    const remoteSignal =
+      snap.data().signal || 0;
+
+    latestUpdateSignal = remoteSignal;
+
+    let localSignal = 0;
+
+    try {
+      localSignal =
+        Number(
+          localStorage.getItem(
+            LAST_PROCESSED_SIGNAL_KEY
+          )
+        ) || 0;
+    } catch (e) {}
+
+    if (remoteSignal > localSignal) {
+      updateCatalogBtn.disabled = false;
+    }
   }
 );
 
