@@ -4595,10 +4595,13 @@ onSnapshot(
   }
 );
 
+let isInitialSnapshot = true;
+
 onSnapshot(
   updateSignalRef,
   snap => {
     if (!snap.exists()) {
+      isInitialSnapshot = false;
       return;
     }
 
@@ -4606,6 +4609,11 @@ onSnapshot(
       snap.data().signal || 0;
 
     latestUpdateSignal = remoteSignal;
+
+    if (isInitialSnapshot) {
+      isInitialSnapshot = false;
+      return;
+    }
 
     let localSignal = 0;
 
