@@ -5,6 +5,7 @@ import {
   onSnapshot,
   doc,
   setDoc,
+  updateDoc,
   deleteDoc,
   serverTimestamp,
   query,
@@ -18,6 +19,7 @@ import {
   writeBatch,
   increment
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import bcrypt from "https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/+esm";
 
 /* ================================
    FIREBASE
@@ -109,10 +111,19 @@ const updateSignalRef = doc(
   "updateSignal"
 );
 
+/* Universal Pricelist catalog doc — single doc holding the whole products array */
+const catalogDocRef = doc(
+  pricelistDb,
+  "catalog",
+  "current"
+);
+
 /* ================================
    CONSTANTS
 ================================ */
 const ADMIN_PASSWORD = "1110";
+const INVENTORY_PASSWORD_HASH =
+  "$2a$12$UO6q.7CCCVEKHx5nnv3YQ.zmnzHH1EVzq/UNs9OoK2F.hnItQBkDy";
 const BILL_DRAFT_KEY = "billingAppDraftV4";
 const DAYBOOK_PRINTED_KEY = "daybookPrintedOnce";
 const LAST_PROCESSED_SIGNAL_KEY = "lastProcessedSignal";
@@ -231,6 +242,39 @@ const updatePricelistModal =
   document.getElementById("updatePricelistModal");
 const updatePricelistBtn =
   document.getElementById("updatePricelistBtn");
+
+const daybookFooterDate =
+  document.getElementById("daybookFooterDate");
+
+const inventoryPasswordModal =
+  document.getElementById("inventoryPasswordModal");
+const inventoryPasswordInput =
+  document.getElementById("inventoryPasswordInput");
+const inventoryPasswordContinue =
+  document.getElementById("inventoryPasswordContinue");
+
+const inventoryModal =
+  document.getElementById("inventoryModal");
+const inventoryCloseBtn =
+  document.getElementById("inventoryCloseBtn");
+const inventorySearchView =
+  document.getElementById("inventorySearchView");
+const inventorySearchBox =
+  document.getElementById("inventorySearchBox");
+const inventorySuggestions =
+  document.getElementById("inventorySuggestions");
+const inventoryClearSearch =
+  document.getElementById("inventoryClearSearch");
+const inventoryEditorView =
+  document.getElementById("inventoryEditorView");
+const inventoryProductName =
+  document.getElementById("inventoryProductName");
+const inventoryCodeInput =
+  document.getElementById("inventoryCodeInput");
+const inventorySaveBtn =
+  document.getElementById("inventorySaveBtn");
+const inventoryCancelBtn =
+  document.getElementById("inventoryCancelBtn");
 
 const materialFilterDiv =
   document.getElementById("materialFilter");
@@ -3189,6 +3233,9 @@ function createBillData() {
     items:
       billItems.map(
         item => ({
+          sr:
+            item.product.sr,
+
           productName:
             item.displayName ||
             item.product.productName,
@@ -4845,6 +4892,333 @@ window.printReceivedBill =
     }
   };
 
+/* ================================
+   INVENTORY (STOCK MANAGEMENT)
+================================ */
+daybookFooterDate.textContent =
+  getIndiaDateInfo().displayDate;
+
+let _inventorySelectedSr = null;
+let _inventorySearchTimer = null;
+let _inventorySaving = false;
+
+function openInventoryPasswordModal() {
+  inventoryPasswordInput.value = "";
+  inventoryPasswordModal.style.display = "flex";
+  inventoryPasswordInput.focus();
+}
+
+async function verifyInventoryPassword() {
+  const entered = inventoryPasswordInput.value;
+  inventoryPasswordModal.style.display = "none";
+
+  if (!entered) {
+    return;
+  }
+
+  try {
+    const ok = await bcrypt.compare(
+      entered,
+      INVENTORY_PASSWORD_HASH
+    );
+
+    if (ok) {
+      openInventoryModal();
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+daybookFooterDate.addEventListener(
+  "click",
+  openInventoryPasswordModal
+);
+
+inventoryPasswordContinue.addEventListener(
+  "click",
+  verifyInventoryPassword
+);
+
+inventoryPasswordInput.addEventListener(
+  "keydown",
+  e => {
+    if (e.key === "Enter") {
+      verifyInventoryPassword();
+    }
+    if (e.key === "Escape") {
+      inventoryPasswordModal.style.display = "none";
+    }
+  }
+);
+
+function openInventoryModal() {
+  _inventorySelectedSr = null;
+  inventorySearchBox.value = "";
+  inventorySuggestions.innerHTML = "";
+  inventoryClearSearch.style.display = "none";
+  inventoryEditorView.style.display = "none";
+  inventorySearchView.style.display = "block";
+  inventoryModal.style.display = "flex";
+  inventorySearchBox.focus();
+}
+
+function closeInventoryModal() {
+  inventoryModal.style.display = "none";
+}
+
+inventoryCloseBtn.addEventListener(
+  "click",
+  closeInventoryModal
+);
+
+/* Reuses searchProducts()/escapeAttr()/getMaterialClass() exactly as used
+   by the Billing search — only the rendered card and click target differ,
+   since selecting a product here opens the stock editor instead of adding
+   it to the bill. */
+function renderInventorySuggestions(results) {
+  if (!results.length) {
+    inventorySuggestions.innerHTML = "";
+    return;
+  }
+
+  let html = "";
+
+  results.forEach(product => {
+    html += `
+      <div
+        class="suggestion-card"
+        onclick="selectInventoryProduct(${product.sr})"
+      >
+        <div class="suggestion-layout">
+          <div class="suggestion-info">
+            <div class="suggestion-name">
+              ${escapeAttr(product.productName)}
+            </div>
+            <div class="badge-row">
+              <div class="unit">
+                ${escapeAttr(product.priceType || "")}
+              </div>
+              ${
+                product.material
+                  ? `<div class="unit ${getMaterialClass(product.material)}">${escapeAttr(product.material)}</div>`
+                  : ""
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  inventorySuggestions.innerHTML = html;
+}
+
+inventorySearchBox.addEventListener(
+  "input",
+  e => {
+    const value = e.target.value;
+
+    inventoryClearSearch.style.display =
+      value ? "flex" : "none";
+
+    if (!value.trim()) {
+      if (_inventorySearchTimer) {
+        clearTimeout(_inventorySearchTimer);
+        _inventorySearchTimer = null;
+      }
+      inventorySuggestions.innerHTML = "";
+      return;
+    }
+
+    if (_inventorySearchTimer) {
+      clearTimeout(_inventorySearchTimer);
+    }
+
+    _inventorySearchTimer = setTimeout(() => {
+      renderInventorySuggestions(
+        searchProducts(value)
+      );
+    }, 60);
+  }
+);
+
+inventoryClearSearch.addEventListener(
+  "click",
+  () => {
+    inventorySearchBox.value = "";
+    inventorySuggestions.innerHTML = "";
+    inventoryClearSearch.style.display = "none";
+    inventorySearchBox.focus();
+  }
+);
+
+window.selectInventoryProduct = function(sr) {
+  const product = productsBySr.get(sr);
+
+  if (!product) {
+    return;
+  }
+
+  _inventorySelectedSr = sr;
+  inventoryProductName.textContent = product.productName;
+  inventoryCodeInput.value = product.s ?? 0;
+
+  inventorySearchView.style.display = "none";
+  inventoryEditorView.style.display = "block";
+};
+
+inventoryCancelBtn.addEventListener(
+  "click",
+  () => {
+    _inventorySelectedSr = null;
+    inventoryEditorView.style.display = "none";
+    inventorySearchView.style.display = "block";
+    inventorySearchBox.focus();
+  }
+);
+
+/**
+ * Persists product.s for a single product. The catalog is a single
+ * Firestore document holding the whole products array (there is no
+ * per-product document in this architecture), so this reads the array,
+ * replaces only the matching product's "s" field, and writes the array
+ * back with a single updateDoc call touching only the "products" field.
+ */
+async function saveProductStockValue(sr, newValue) {
+  const snap = await getDoc(catalogDocRef);
+
+  if (!snap.exists()) {
+    throw new Error("Catalog document not found");
+  }
+
+  const data = snap.data();
+  const arr = Array.isArray(data.products) ? data.products : [];
+  let found = false;
+
+  const updated = arr.map(p => {
+    if (p.sr === sr) {
+      found = true;
+      return { ...p, s: newValue };
+    }
+    return p;
+  });
+
+  if (!found) {
+    throw new Error("Product not found in catalog");
+  }
+
+  await updateDoc(catalogDocRef, { products: updated });
+
+  const local = productsBySr.get(sr);
+  if (local) {
+    local.s = newValue;
+  }
+}
+
+inventorySaveBtn.addEventListener(
+  "click",
+  async () => {
+    if (_inventorySaving || _inventorySelectedSr == null) {
+      return;
+    }
+
+    const newValue = Number(inventoryCodeInput.value);
+
+    if (!Number.isFinite(newValue)) {
+      return;
+    }
+
+    _inventorySaving = true;
+    inventorySaveBtn.disabled = true;
+
+    try {
+      await saveProductStockValue(
+        _inventorySelectedSr,
+        newValue
+      );
+    } catch (err) {
+      console.error("Failed to save stock:", err);
+    } finally {
+      _inventorySaving = false;
+      inventorySaveBtn.disabled = false;
+    }
+
+    _inventorySelectedSr = null;
+    inventoryEditorView.style.display = "none";
+    inventorySearchView.style.display = "block";
+    inventorySearchBox.value = "";
+    inventorySuggestions.innerHTML = "";
+    inventorySearchBox.focus();
+  }
+);
+
+/**
+ * Best-effort stock deduction, called only after a bill has already been
+ * successfully moved to Daybook (i.e. after that Firestore transaction
+ * has committed). Aggregates quantities per product sr and performs a
+ * single read + single write against the catalog document. Items from
+ * bills finalized before this feature shipped won't carry "sr" and are
+ * silently skipped, per spec (only future bills affect stock). Any
+ * failure here is only logged — it must never surface to the user or
+ * affect billing/Daybook, which have already succeeded by this point.
+ */
+async function deductStockForBillItems(items) {
+  if (!Array.isArray(items) || !items.length) {
+    return;
+  }
+
+  const deltas = new Map();
+
+  items.forEach(item => {
+    if (item.sr == null) {
+      return;
+    }
+    const qty = Number(item.qty) || 0;
+    deltas.set(item.sr, (deltas.get(item.sr) || 0) + qty);
+  });
+
+  if (!deltas.size) {
+    return;
+  }
+
+  try {
+    const snap = await getDoc(catalogDocRef);
+
+    if (!snap.exists()) {
+      return;
+    }
+
+    const data = snap.data();
+    const arr = Array.isArray(data.products) ? data.products : [];
+    let changed = false;
+
+    const updated = arr.map(p => {
+      if (deltas.has(p.sr)) {
+        changed = true;
+        const currentStock = p.s ?? 0;
+        return { ...p, s: currentStock - deltas.get(p.sr) };
+      }
+      return p;
+    });
+
+    if (!changed) {
+      return;
+    }
+
+    await updateDoc(catalogDocRef, { products: updated });
+
+    deltas.forEach((qty, sr) => {
+      const local = productsBySr.get(sr);
+      if (local) {
+        local.s = (local.s ?? 0) - qty;
+      }
+    });
+  } catch (err) {
+    console.error("Stock deduction failed:", err);
+  }
+}
+
 window.doneReceivedBill =
   async function(docId) {
     if (
@@ -4885,11 +5259,16 @@ window.doneReceivedBill =
       isReceiverBusy = true;
 
       let movedCount = 0;
+      let committedItems = [];
 
       try {
         await runTransaction(
           db,
           async transaction => {
+            // Reset on every attempt so a retried transaction callback can't
+            // accumulate items from a prior, discarded attempt.
+            committedItems = [];
+
             // Firestore requires all reads to complete before any writes inside
             // a transaction. Read sequentially to satisfy this constraint.
             const snaps = [];
@@ -4932,6 +5311,10 @@ window.doneReceivedBill =
                 );
               });
 
+              if (Array.isArray(bill.items)) {
+                committedItems.push(...bill.items);
+              }
+
               movedCount++;
             }
           }
@@ -4941,6 +5324,9 @@ window.doneReceivedBill =
           `Successfully moved ${movedCount} bill${movedCount !== 1 ? "s" : ""} to Daybook.`,
           "success"
         );
+
+        // Best-effort — must never affect the success path above.
+        deductStockForBillItems(committedItems);
       } catch (err) {
         console.error(err);
         showToast("Failed to complete bills", "error");
@@ -4971,6 +5357,8 @@ window.doneReceivedBill =
       chainIds.filter(
         id => id !== docId
       );
+
+    let committedBillItems = null;
 
     try {
       await runTransaction(
@@ -5033,8 +5421,15 @@ window.doneReceivedBill =
               { isLocked: true }
             );
           });
+
+          // Reset on every attempt so a retried transaction callback can't
+          // carry over items from a prior, discarded attempt.
+          committedBillItems = bill.items;
         }
       );
+
+      // Best-effort — must never affect the success path above.
+      deductStockForBillItems(committedBillItems);
     } catch (err) {
       console.error(err);
 
