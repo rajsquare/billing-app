@@ -5079,6 +5079,34 @@ inventoryCancelBtn.addEventListener(
 );
 
 /**
+ * loadProducts() caches the whole catalog document in localStorage for the
+ * rest of the day (keyed by date only) to avoid a Firestore read on every
+ * page load. Stock writes go straight to Firestore via updateDoc and never
+ * passed through loadProducts(), so that cache was going stale on hard
+ * refresh — this keeps it in sync with whatever was just written, using
+ * the exact same "updated" array that was written to Firestore, and the
+ * same localStorage key/shape loadProducts() already uses.
+ */
+function syncLocalCatalogCache(updatedProductsArray) {
+  try {
+    const cacheRaw = localStorage.getItem("catalogCache");
+    if (!cacheRaw) {
+      return;
+    }
+
+    const cached = JSON.parse(cacheRaw);
+    if (!cached || !cached.data) {
+      return;
+    }
+
+    cached.data.products = updatedProductsArray;
+    localStorage.setItem("catalogCache", JSON.stringify(cached));
+  } catch (e) {
+    console.warn("Could not sync stock update to catalogCache:", e);
+  }
+}
+
+/**
  * Persists product.s for a single product. The catalog is a single
  * Firestore document holding the whole products array (there is no
  * per-product document in this architecture), so this reads the array,
@@ -5109,6 +5137,7 @@ async function saveProductStockValue(sr, newValue) {
   }
 
   await updateDoc(catalogDocRef, { products: updated });
+  syncLocalCatalogCache(updated);
 
   const local = productsBySr.get(sr);
   if (local) {
@@ -5207,6 +5236,7 @@ async function deductStockForBillItems(items) {
     }
 
     await updateDoc(catalogDocRef, { products: updated });
+    syncLocalCatalogCache(updated);
 
     deltas.forEach((qty, sr) => {
       const local = productsBySr.get(sr);
