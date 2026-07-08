@@ -151,6 +151,8 @@
 
       <div id="daybookEntries"></div>
     </div>
+
+    <div id="daybookFooterDate" class="daybook-footer-date"></div>
   </div>
 
   <!-- SEND MODAL -->
@@ -351,6 +353,100 @@
         >
           Update Pricelist
         </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INVENTORY PASSWORD MODAL -->
+  <div
+    id="inventoryPasswordModal"
+    class="modal-overlay"
+    style="display:none;"
+  >
+    <div class="modal-card">
+
+      <div class="modal-title">
+        Inventory
+      </div>
+
+      <div class="modal-group">
+        Enter password to access the inventory page.
+        <input
+          type="password"
+          id="inventoryPasswordInput"
+          autocomplete="off"
+        >
+      </div>
+
+      <div class="modal-actions">
+        <button
+          id="inventoryPasswordContinue"
+          class="send-btn"
+        >
+          Continue
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INVENTORY MODAL -->
+  <div
+    id="inventoryModal"
+    class="modal-overlay"
+    style="display:none;"
+  >
+    <div class="live-modal-card">
+
+      <div class="inventory-modal-topbar">
+        <button id="inventoryCloseBtn" class="live-close-btn">✕</button>
+      </div>
+
+      <div id="inventorySearchView">
+        <div class="search-wrapper">
+          <input
+            type="text"
+            id="inventorySearchBox"
+            placeholder="Search product..."
+            autocomplete="off"
+          >
+
+          <div id="inventoryClearSearch">
+            <span class="clear-x">✕</span>
+          </div>
+        </div>
+
+        <div id="inventorySuggestions"></div>
+      </div>
+
+      <div id="inventoryEditorView" style="display:none;">
+        <div id="inventoryProductName" class="suggestion-name"></div>
+
+        <div class="modal-group">
+          <label for="inventoryCodeInput">Code</label>
+          <input
+            type="number"
+            id="inventoryCodeInput"
+            autocomplete="off"
+          >
+        </div>
+
+        <div class="modal-actions">
+          <button
+            id="inventoryCancelBtn"
+            class="secondary-btn"
+          >
+            Cancel
+          </button>
+
+          <button
+            id="inventorySaveBtn"
+            class="send-btn"
+          >
+            Save
+          </button>
+        </div>
       </div>
 
     </div>
