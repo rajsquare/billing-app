@@ -179,7 +179,8 @@ input {
   position: relative;
 }
 
-#searchBox {
+#searchBox,
+#inventorySearchBox {
   width: 100%;
   padding: 15px 50px 15px 16px;
   border-radius: 12px;
@@ -191,16 +192,19 @@ input {
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-#searchBox:focus {
+#searchBox:focus,
+#inventorySearchBox:focus {
   border-color: #2f3f64;
   box-shadow: 0 0 0 3px rgba(47,63,100,0.12), 0 1px 3px rgba(0,0,0,0.05);
 }
 
-#searchBox::placeholder {
+#searchBox::placeholder,
+#inventorySearchBox::placeholder {
   color: #9ca3af;
 }
 
-#clearSearch {
+#clearSearch,
+#inventoryClearSearch {
   position: absolute;
   right: 12px;
   top: 50%;
@@ -216,7 +220,8 @@ input {
   transition: background 0.15s ease;
 }
 
-#clearSearch:hover {
+#clearSearch:hover,
+#inventoryClearSearch:hover {
   background: #d1d5db;
 }
 
@@ -226,7 +231,8 @@ input {
   font-weight: 700;
 }
 
-#suggestions {
+#suggestions,
+#inventorySuggestions {
   margin-top: 10px;
 }
 
@@ -1354,6 +1360,21 @@ input {
 /* ================================
    LIVE DRAFT MODAL
 ================================ */
+.daybook-footer-date {
+  margin-top: 18px;
+  padding-bottom: 6px;
+  text-align: center;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.inventory-modal-topbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
 .live-modal-card {
   background: white;
   width: min(95vw, 440px);
@@ -1395,7 +1416,9 @@ input {
 }
 
 #liveDraftListView,
-#liveDraftDetailView {
+#liveDraftDetailView,
+#inventorySearchView,
+#inventoryEditorView {
   overflow-y: auto;
   flex: 1;
   min-height: 0;
