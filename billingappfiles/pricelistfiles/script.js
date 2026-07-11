@@ -423,14 +423,12 @@ modeToggle.addEventListener("click", () => {
 
     currentMode = "R";
 
-    modeToggle.innerText = "R";
     modeToggle.style.background = "#d65353";
 
   } else {
 
     currentMode = "W";
 
-    modeToggle.innerText = "W";
     modeToggle.style.background = "#2f3f64";
   }
 
