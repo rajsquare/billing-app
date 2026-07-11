@@ -2481,6 +2481,7 @@ updatePricelistBtn.addEventListener(
    MODE + SEARCH UI
 ================================ */
 function applyModeStyle(mode) {
+  modeToggle.innerText = mode;
   modeToggle.style.background =
     mode === "W" ? "#2f3f64" : "#d65353";
 }
