@@ -47,7 +47,7 @@ document.getElementById("billingSwitchBtn").addEventListener("click", () => {
 /* ================================
    INITIAL BUTTON STATE
 ================================ */
-modeToggle.innerText = "W";
+modeToggle.innerText = " ";
 modeToggle.style.background = "#2f3f64";
 
 /* ================================
