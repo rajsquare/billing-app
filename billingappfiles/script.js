@@ -5,7 +5,6 @@ import {
   onSnapshot,
   doc,
   setDoc,
-  updateDoc,
   deleteDoc,
   serverTimestamp,
   query,
@@ -109,13 +108,6 @@ const updateSignalRef = doc(
   db,
   "appConfig",
   "updateSignal"
-);
-
-/* Universal Pricelist catalog doc — single doc holding the whole products array */
-const catalogDocRef = doc(
-  pricelistDb,
-  "catalog",
-  "current"
 );
 
 /* ================================
@@ -346,6 +338,17 @@ function normalize(text) {
 
 function tokenize(text) {
   return normalize(text)
+    .split(" ")
+    .filter(Boolean);
+}
+
+/*
+ * Same output as tokenize(normalize(text)), but for callers that already
+ * hold normalized text (normalize() is idempotent, so re-running it is a
+ * guaranteed no-op) — skips the redundant regex/toLowerCase/trim pass.
+ */
+function tokenizeNormalized(normalizedText) {
+  return normalizedText
     .split(" ")
     .filter(Boolean);
 }
@@ -2069,6 +2072,41 @@ async function loadProducts({ forceRefresh = false } = {}) {
       }
     );
 
+    /*
+     * Stock ("s") is authoritative in appConfig/updateSignal.stock, NOT in
+     * catalog/current — the separate Universal Pricelist app periodically
+     * overwrites the whole catalog/current.products array from its own
+     * price-editing form, which has no concept of stock, wiping any "s"
+     * stored there. Reading from a document that tool never touches means
+     * pricelist updates can no longer affect stock.
+     *
+     * Any product whose stock is only known via catalog/current (e.g. a
+     * value saved before this fix shipped) is opportunistically copied
+     * into the durable ledger here, so it survives future pricelist
+     * updates too — this is what makes a one-off migration unnecessary.
+     */
+    try {
+      const stockSnap = await getDoc(updateSignalRef);
+      const stockLedger =
+        (stockSnap.exists() && stockSnap.data().stock) || {};
+      const backfill = {};
+
+      products.forEach(p => {
+        const key = String(p.sr);
+        if (Object.prototype.hasOwnProperty.call(stockLedger, key)) {
+          p.s = stockLedger[key];
+        } else if (p.s !== undefined) {
+          backfill[key] = p.s;
+        }
+      });
+
+      if (Object.keys(backfill).length) {
+        backfillStockLedger(backfill);
+      }
+    } catch (err) {
+      console.warn("Could not load stock ledger:", err);
+    }
+
     productsBySr.clear();
 
     products.forEach(
@@ -2481,10 +2519,10 @@ updatePricelistBtn.addEventListener(
    MODE + SEARCH UI
 ================================ */
 function applyModeStyle(mode) {
+  modeToggle.innerText = mode;
   modeToggle.style.background =
     mode === "W" ? "#2f3f64" : "#d65353";
 }
-
 
 modeToggle.addEventListener(
   "click",
@@ -5079,65 +5117,45 @@ inventoryCancelBtn.addEventListener(
 );
 
 /**
- * loadProducts() caches the whole catalog document in localStorage for the
- * rest of the day (keyed by date only) to avoid a Firestore read on every
- * page load. Stock writes go straight to Firestore via updateDoc and never
- * passed through loadProducts(), so that cache was going stale on hard
- * refresh — this keeps it in sync with whatever was just written, using
- * the exact same "updated" array that was written to Firestore, and the
- * same localStorage key/shape loadProducts() already uses.
+ * Best-effort: persists any stock values into the durable ledger
+ * (appConfig/updateSignal.stock) that were only known via catalog/current
+ * at load time. Failures are logged only — this is opportunistic, never
+ * required for correctness of the current session.
  */
-function syncLocalCatalogCache(updatedProductsArray) {
+async function backfillStockLedger(map) {
   try {
-    const cacheRaw = localStorage.getItem("catalogCache");
-    if (!cacheRaw) {
-      return;
-    }
+    const updates = {};
+    Object.entries(map).forEach(([sr, val]) => {
+      updates[`stock.${sr}`] = val;
+    });
 
-    const cached = JSON.parse(cacheRaw);
-    if (!cached || !cached.data) {
-      return;
-    }
-
-    cached.data.products = updatedProductsArray;
-    localStorage.setItem("catalogCache", JSON.stringify(cached));
-  } catch (e) {
-    console.warn("Could not sync stock update to catalogCache:", e);
+    await setDoc(
+      updateSignalRef,
+      updates,
+      { merge: true }
+    );
+  } catch (err) {
+    console.warn("Stock ledger backfill failed:", err);
   }
 }
 
 /**
- * Persists product.s for a single product. The catalog is a single
- * Firestore document holding the whole products array (there is no
- * per-product document in this architecture), so this reads the array,
- * replaces only the matching product's "s" field, and writes the array
- * back with a single updateDoc call touching only the "products" field.
+ * Persists product.s for a single product into the durable stock ledger
+ * (appConfig/updateSignal.stock), NOT into catalog/current — the separate
+ * Universal Pricelist app periodically overwrites the whole
+ * catalog/current.products array from its own price-editing form, which
+ * has no concept of stock, so anything stored there is not durable.
+ * updateSignalRef is a document this app already owns and the pricelist
+ * tool never touches, so writing here survives pricelist updates. A
+ * dotted field path keeps this a single, minimal Firestore write that
+ * touches only this one product's entry in the map.
  */
 async function saveProductStockValue(sr, newValue) {
-  const snap = await getDoc(catalogDocRef);
-
-  if (!snap.exists()) {
-    throw new Error("Catalog document not found");
-  }
-
-  const data = snap.data();
-  const arr = Array.isArray(data.products) ? data.products : [];
-  let found = false;
-
-  const updated = arr.map(p => {
-    if (p.sr === sr) {
-      found = true;
-      return { ...p, s: newValue };
-    }
-    return p;
-  });
-
-  if (!found) {
-    throw new Error("Product not found in catalog");
-  }
-
-  await updateDoc(catalogDocRef, { products: updated });
-  syncLocalCatalogCache(updated);
+  await setDoc(
+    updateSignalRef,
+    { [`stock.${sr}`]: newValue },
+    { merge: true }
+  );
 
   const local = productsBySr.get(sr);
   if (local) {
@@ -5185,12 +5203,16 @@ inventorySaveBtn.addEventListener(
 /**
  * Best-effort stock deduction, called only after a bill has already been
  * successfully moved to Daybook (i.e. after that Firestore transaction
- * has committed). Aggregates quantities per product sr and performs a
- * single read + single write against the catalog document. Items from
- * bills finalized before this feature shipped won't carry "sr" and are
- * silently skipped, per spec (only future bills affect stock). Any
- * failure here is only logged — it must never surface to the user or
- * affect billing/Daybook, which have already succeeded by this point.
+ * has committed). Aggregates quantities per product sr, reads current
+ * values from the durable stock ledger (falling back to the in-memory
+ * product cache for anything not yet in the ledger), and performs a
+ * single read + single write against appConfig/updateSignal — never
+ * against catalog/current, so pricelist updates can't erase deductions
+ * either. Items from bills finalized before this feature shipped won't
+ * carry "sr" and are silently skipped, per spec (only future bills affect
+ * stock). Any failure here is only logged — it must never surface to the
+ * user or affect billing/Daybook, which have already succeeded by this
+ * point.
  */
 async function deductStockForBillItems(items) {
   if (!Array.isArray(items) || !items.length) {
@@ -5212,31 +5234,27 @@ async function deductStockForBillItems(items) {
   }
 
   try {
-    const snap = await getDoc(catalogDocRef);
+    const stockSnap = await getDoc(updateSignalRef);
+    const stockLedger =
+      (stockSnap.exists() && stockSnap.data().stock) || {};
 
-    if (!snap.exists()) {
-      return;
-    }
+    const updates = {};
 
-    const data = snap.data();
-    const arr = Array.isArray(data.products) ? data.products : [];
-    let changed = false;
+    deltas.forEach((qty, sr) => {
+      const key = String(sr);
+      const currentStock =
+        Object.prototype.hasOwnProperty.call(stockLedger, key)
+          ? stockLedger[key]
+          : (productsBySr.get(sr)?.s ?? 0);
 
-    const updated = arr.map(p => {
-      if (deltas.has(p.sr)) {
-        changed = true;
-        const currentStock = p.s ?? 0;
-        return { ...p, s: currentStock - deltas.get(p.sr) };
-      }
-      return p;
+      updates[`stock.${key}`] = currentStock - qty;
     });
 
-    if (!changed) {
-      return;
-    }
-
-    await updateDoc(catalogDocRef, { products: updated });
-    syncLocalCatalogCache(updated);
+    await setDoc(
+      updateSignalRef,
+      updates,
+      { merge: true }
+    );
 
     deltas.forEach((qty, sr) => {
       const local = productsBySr.get(sr);
