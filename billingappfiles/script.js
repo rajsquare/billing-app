@@ -2056,6 +2056,23 @@ async function loadProducts({ forceRefresh = false } = {}) {
       );
     }
 
+    /*
+     * Snapshot last-known stock from the in-memory products BEFORE they're
+     * replaced below. catalog/current never carries a stock field (the
+     * separate Universal Pricelist app's schema has no concept of stock),
+     * so on every refresh p.s starts out undefined for every product and
+     * is normally restored by the ledger read further down. If that read
+     * fails (network blip, transient rule/permission hiccup, offline),
+     * this snapshot is the fallback — so a single failed read can no
+     * longer zero out every product's visible stock. It only ever holds
+     * what was already showing in the UI, so this is strictly safer than
+     * the previous behavior, never less accurate.
+     */
+    const previousStockBySr = new Map();
+    productsBySr.forEach((p, sr) => {
+      if (p.s !== undefined) previousStockBySr.set(sr, p.s);
+    });
+
     products = (catalogData.products || []).map(
       product => {
         const searchableText =
@@ -2097,6 +2114,11 @@ async function loadProducts({ forceRefresh = false } = {}) {
           p.s = stockLedger[key];
         } else if (p.s !== undefined) {
           backfill[key] = p.s;
+        } else if (previousStockBySr.has(p.sr)) {
+          // Ledger doesn't have this product yet (e.g. this exact write
+          // hasn't replicated to this read) — don't drop what the UI
+          // already showed; carry it forward instead of falling to 0.
+          p.s = previousStockBySr.get(p.sr);
         }
       });
 
@@ -2104,7 +2126,15 @@ async function loadProducts({ forceRefresh = false } = {}) {
         backfillStockLedger(backfill);
       }
     } catch (err) {
-      console.warn("Could not load stock ledger:", err);
+      console.warn("Could not load stock ledger, keeping last-known stock values:", err);
+      // The ledger read itself failed — fall back to whatever was already
+      // in memory for every product, instead of leaving p.s undefined
+      // (which the UI would render as 0) for the entire catalog.
+      products.forEach(p => {
+        if (previousStockBySr.has(p.sr)) {
+          p.s = previousStockBySr.get(p.sr);
+        }
+      });
     }
 
     productsBySr.clear();
