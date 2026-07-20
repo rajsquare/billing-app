@@ -2108,9 +2108,25 @@ async function loadProducts({ forceRefresh = false } = {}) {
         (stockSnap.exists() && stockSnap.data().stock) || {};
       const backfill = {};
 
+      console.log(
+        "[STOCK-DEBUG] ledger keys from Firestore:",
+        Object.keys(stockLedger),
+        "| ledger contents:",
+        JSON.parse(JSON.stringify(stockLedger))
+      );
+      console.log(
+        "[STOCK-DEBUG] previousStockBySr (in-memory before this refresh):",
+        Array.from(previousStockBySr.entries())
+      );
+      console.log(
+        "[STOCK-DEBUG] first 5 products' sr + type after catalog fetch:",
+        products.slice(0, 5).map(p => ({ sr: p.sr, type: typeof p.sr }))
+      );
+
       products.forEach(p => {
         const key = String(p.sr);
-        if (Object.prototype.hasOwnProperty.call(stockLedger, key)) {
+        const matched = Object.prototype.hasOwnProperty.call(stockLedger, key);
+        if (matched) {
           p.s = stockLedger[key];
         } else if (p.s !== undefined) {
           backfill[key] = p.s;
@@ -2119,6 +2135,15 @@ async function loadProducts({ forceRefresh = false } = {}) {
           // hasn't replicated to this read) — don't drop what the UI
           // already showed; carry it forward instead of falling to 0.
           p.s = previousStockBySr.get(p.sr);
+        }
+        if (previousStockBySr.has(p.sr) || matched) {
+          console.log(
+            "[STOCK-DEBUG] sr=", p.sr,
+            "key=", JSON.stringify(key),
+            "matchedInLedger=", matched,
+            "hadPreviousInMemory=", previousStockBySr.has(p.sr),
+            "-> final p.s=", p.s
+          );
         }
       });
 
@@ -5121,6 +5146,14 @@ inventoryClearSearch.addEventListener(
 
 window.selectInventoryProduct = function(sr) {
   const product = productsBySr.get(sr);
+
+  console.log(
+    "[STOCK-DEBUG] selectInventoryProduct called with sr=", sr,
+    "typeof sr=", typeof sr,
+    "productsBySr has this key=", productsBySr.has(sr),
+    "product found=", !!product,
+    "product.s=", product ? product.s : "N/A"
+  );
 
   if (!product) {
     return;
