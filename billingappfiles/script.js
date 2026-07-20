@@ -16,7 +16,8 @@ import {
   getDocs,
   getDoc,
   writeBatch,
-  increment
+  increment,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import bcrypt from "https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/+esm";
 
@@ -2108,25 +2109,9 @@ async function loadProducts({ forceRefresh = false } = {}) {
         (stockSnap.exists() && stockSnap.data().stock) || {};
       const backfill = {};
 
-      console.log(
-        "[STOCK-DEBUG] ledger keys from Firestore:",
-        Object.keys(stockLedger),
-        "| ledger contents:",
-        JSON.parse(JSON.stringify(stockLedger))
-      );
-      console.log(
-        "[STOCK-DEBUG] previousStockBySr (in-memory before this refresh):",
-        Array.from(previousStockBySr.entries())
-      );
-      console.log(
-        "[STOCK-DEBUG] first 5 products' sr + type after catalog fetch:",
-        products.slice(0, 5).map(p => ({ sr: p.sr, type: typeof p.sr }))
-      );
-
       products.forEach(p => {
         const key = String(p.sr);
-        const matched = Object.prototype.hasOwnProperty.call(stockLedger, key);
-        if (matched) {
+        if (Object.prototype.hasOwnProperty.call(stockLedger, key)) {
           p.s = stockLedger[key];
         } else if (p.s !== undefined) {
           backfill[key] = p.s;
@@ -2135,15 +2120,6 @@ async function loadProducts({ forceRefresh = false } = {}) {
           // hasn't replicated to this read) — don't drop what the UI
           // already showed; carry it forward instead of falling to 0.
           p.s = previousStockBySr.get(p.sr);
-        }
-        if (previousStockBySr.has(p.sr) || matched) {
-          console.log(
-            "[STOCK-DEBUG] sr=", p.sr,
-            "key=", JSON.stringify(key),
-            "matchedInLedger=", matched,
-            "hadPreviousInMemory=", previousStockBySr.has(p.sr),
-            "-> final p.s=", p.s
-          );
         }
       });
 
@@ -5147,14 +5123,6 @@ inventoryClearSearch.addEventListener(
 window.selectInventoryProduct = function(sr) {
   const product = productsBySr.get(sr);
 
-  console.log(
-    "[STOCK-DEBUG] selectInventoryProduct called with sr=", sr,
-    "typeof sr=", typeof sr,
-    "productsBySr has this key=", productsBySr.has(sr),
-    "product found=", !!product,
-    "product.s=", product ? product.s : "N/A"
-  );
-
   if (!product) {
     return;
   }
@@ -5178,6 +5146,28 @@ inventoryCancelBtn.addEventListener(
 );
 
 /**
+ * Writes dotted-path field updates (e.g. "stock.451") to updateSignalRef
+ * as genuine nested-field merges. setDoc(ref, {"stock.451": 1}, {merge:
+ * true}) does NOT do this — that writes a literal top-level field named
+ * "stock.451" (dot included in the field name), not a nested field under
+ * a "stock" map, so reads expecting doc.data().stock never see it. Only
+ * updateDoc() (or setDoc's separate mergeFields array) actually parses
+ * dotted keys as field paths. updateDoc() throws if the document doesn't
+ * exist yet, so this falls back to a one-time setDoc to create it.
+ */
+async function writeStockFields(updates) {
+  try {
+    await updateDoc(updateSignalRef, updates);
+  } catch (err) {
+    if (err && err.code === "not-found") {
+      await setDoc(updateSignalRef, updates, { merge: true });
+    } else {
+      throw err;
+    }
+  }
+}
+
+/**
  * Best-effort: persists any stock values into the durable ledger
  * (appConfig/updateSignal.stock) that were only known via catalog/current
  * at load time. Failures are logged only — this is opportunistic, never
@@ -5190,11 +5180,7 @@ async function backfillStockLedger(map) {
       updates[`stock.${sr}`] = val;
     });
 
-    await setDoc(
-      updateSignalRef,
-      updates,
-      { merge: true }
-    );
+    await writeStockFields(updates);
   } catch (err) {
     console.warn("Stock ledger backfill failed:", err);
   }
@@ -5212,11 +5198,7 @@ async function backfillStockLedger(map) {
  * touches only this one product's entry in the map.
  */
 async function saveProductStockValue(sr, newValue) {
-  await setDoc(
-    updateSignalRef,
-    { [`stock.${sr}`]: newValue },
-    { merge: true }
-  );
+  await writeStockFields({ [`stock.${sr}`]: newValue });
 
   const local = productsBySr.get(sr);
   if (local) {
@@ -5311,11 +5293,7 @@ async function deductStockForBillItems(items) {
       updates[`stock.${key}`] = currentStock - qty;
     });
 
-    await setDoc(
-      updateSignalRef,
-      updates,
-      { merge: true }
-    );
+    await writeStockFields(updates);
 
     deltas.forEach((qty, sr) => {
       const local = productsBySr.get(sr);
