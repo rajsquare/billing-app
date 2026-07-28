@@ -19,11 +19,38 @@
   --color-text-primary:   #1a202c;
   --color-text-secondary: #64748b;
   --color-text-muted:     #9ca3af;
+
+  /* Subtle, low-opacity material plate tints (Apple-style translucent surfaces) */
+  --plate-brass-a:   rgba(201, 155, 33, 0.10);
+  --plate-brass-b:   rgba(201, 155, 33, 0.035);
+  --plate-brass-border: rgba(201, 155, 33, 0.22);
+
+  --plate-copper-a:  rgba(196, 97, 46, 0.10);
+  --plate-copper-b:  rgba(196, 97, 46, 0.035);
+  --plate-copper-border: rgba(196, 97, 46, 0.22);
+
+  --plate-kansa-a:   rgba(139, 111, 38, 0.10);
+  --plate-kansa-b:   rgba(139, 111, 38, 0.035);
+  --plate-kansa-border: rgba(139, 111, 38, 0.22);
 }
 
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Reduces tap-response delay on touch devices so buttons/cards register
+   the first press immediately instead of waiting on the browser's
+   double-tap-to-zoom detection window. */
+button,
+.suggestion-card,
+.bill-card,
+.filter-chip,
+.receiver-card,
+.daybook-entry,
+.unit,
+.live-draft-card {
+  touch-action: manipulation;
 }
 
 body {
@@ -339,6 +366,17 @@ input {
   transition: box-shadow 0.15s ease, transform 0.12s ease, border-color 0.15s ease;
 }
 
+/* Skips layout/paint work for cards scrolled out of view, which keeps
+   long bill/receiver/daybook lists smooth to scroll and quick to render.
+   contain-intrinsic-size reserves realistic space up front so scrollbar
+   position and scroll-to behavior stay accurate before a card is measured. */
+.bill-card,
+.receiver-card,
+.daybook-entry {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 140px;
+}
+
 .suggestion-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06);
@@ -348,6 +386,56 @@ input {
 .suggestion-card:active {
   transform: translateY(0);
   box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+/* ================================
+   MATERIAL-TINTED PRODUCT PLATES
+   Soft, low-opacity, glass-like tint across the whole card so the
+   material reads instantly at a glance — badge colors are unchanged.
+================================ */
+.suggestion-card.material-brass {
+  background:
+    linear-gradient(165deg, var(--plate-brass-a), var(--plate-brass-b)),
+    #ffffff;
+  border-color: var(--plate-brass-border);
+}
+
+.suggestion-card.material-copper {
+  background:
+    linear-gradient(165deg, var(--plate-copper-a), var(--plate-copper-b)),
+    #ffffff;
+  border-color: var(--plate-copper-border);
+}
+
+.suggestion-card.material-kansa {
+  background:
+    linear-gradient(165deg, var(--plate-kansa-a), var(--plate-kansa-b)),
+    #ffffff;
+  border-color: var(--plate-kansa-border);
+}
+
+.suggestion-card.material-brass:hover {
+  border-color: var(--plate-brass-border);
+  box-shadow: 0 4px 14px rgba(201, 155, 33, 0.12), 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.suggestion-card.material-copper:hover {
+  border-color: var(--plate-copper-border);
+  box-shadow: 0 4px 14px rgba(196, 97, 46, 0.12), 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.suggestion-card.material-kansa:hover {
+  border-color: var(--plate-kansa-border);
+  box-shadow: 0 4px 14px rgba(139, 111, 38, 0.12), 0 1px 4px rgba(0,0,0,0.05);
+}
+
+/* Loading / busy state for async action buttons (e.g. Send) so a press
+   is visibly acknowledged immediately instead of appearing unresponsive
+   while the network request is in flight. */
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .suggestion-top {
