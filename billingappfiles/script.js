@@ -2686,7 +2686,7 @@ function renderSuggestions(
       const price = getCurrentPrice(product);
       html += `
         <div
-          class="suggestion-card"
+          class="suggestion-card ${product.material ? getMaterialClass(product.material) : ""}"
           onclick="selectProduct(${product.sr})"
         >
           <div class="suggestion-layout">
@@ -3348,6 +3348,10 @@ confirmSend.addEventListener(
     isSendingBill =
       true;
 
+    confirmSend.disabled = true;
+    const _confirmSendOriginalLabel = confirmSend.textContent;
+    confirmSend.textContent = "Sending…";
+
     try {
       const billData =
         createBillData();
@@ -3441,6 +3445,9 @@ confirmSend.addEventListener(
     } finally {
       isSendingBill =
         false;
+
+      confirmSend.disabled = false;
+      confirmSend.textContent = _confirmSendOriginalLabel;
     }
   }
 );
@@ -5054,7 +5061,7 @@ function renderInventorySuggestions(results) {
   results.forEach(product => {
     html += `
       <div
-        class="suggestion-card"
+        class="suggestion-card ${product.material ? getMaterialClass(product.material) : ""}"
         onclick="selectInventoryProduct(${product.sr})"
       >
         <div class="suggestion-layout">
