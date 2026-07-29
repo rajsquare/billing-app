@@ -2,10 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Billing App</title>
   <link rel="stylesheet" href="style.css">
   <script>
@@ -28,26 +25,9 @@
 
   <!-- APP TABS -->
   <div class="app-tabs">
-    <button
-      id="billingTab"
-      class="tab-btn active"
-    >
-      Billing
-    </button>
-
-    <button
-      id="receiverTab"
-      class="tab-btn"
-    >
-      Receiver
-    </button>
-
-    <button
-      id="daybookTab"
-      class="tab-btn daybook-mini"
-    >
-      Daybook
-    </button>
+    <button id="billingTab" class="tab-btn active">Billing</button>
+    <button id="receiverTab" class="tab-btn">Receiver</button>
+    <button id="daybookTab" class="tab-btn daybook-mini">Daybook</button>
   </div>
 
   <!-- BILLING VIEW -->
@@ -59,29 +39,17 @@
 
       <div class="header-row">
         <h1>
-          <button
-            id="appTitleLink"
-            class="app-title-switch"
-            type="button"
-            aria-label="Switch to Pricelist App"
-          >
-            Billing
-          </button>
+          <button id="appTitleLink" class="app-title-switch" type="button" aria-label="Switch to Pricelist App">Billing</button>
         </h1>
 
         <div class="header-controls">
           <button id="liveBtn">LIVE (0)</button>
-       <button id="modeToggle">&nbsp;</button>
+          <button id="modeToggle">&nbsp;</button>
         </div>
       </div>
 
       <div class="search-wrapper">
-        <input
-          type="text"
-          id="searchBox"
-          placeholder="Search product..."
-          autocomplete="off"
-        >
+        <input type="text" id="searchBox" placeholder="Search product..." autocomplete="off">
 
         <div id="clearSearch">
           <span class="clear-x">✕</span>
@@ -119,14 +87,8 @@
   <!-- RECEIVER VIEW -->
   <div id="receiverView" style="display:none;">
     <div class="receiver-card">
-      <div class="receiver-title">
-        Receiver Mode
-      </div>
-
-      <div class="receiver-subtitle">
-        Waiting for incoming bills...
-      </div>
-
+      <div class="receiver-title">Receiver Mode</div>
+      <div class="receiver-subtitle">Waiting for incoming bills...</div>
       <div id="incomingBills"></div>
     </div>
   </div>
@@ -136,13 +98,7 @@
     <div class="receiver-card">
       <div class="receiver-title">
         Daybook
-        <button
-          id="adminSignalBtn"
-          class="admin-signal-btn"
-          type="button"
-          aria-hidden="true"
-          tabindex="-1"
-        ></button>
+        <button id="adminSignalBtn" class="admin-signal-btn" type="button" aria-hidden="true" tabindex="-1"></button>
       </div>
 
       <div id="daybookSummary">Total: ₹0</div>
@@ -156,107 +112,48 @@
   </div>
 
   <!-- SEND MODAL -->
-  <div
-    id="printModal"
-    class="modal-overlay"
-    style="display:none;"
-  >
+  <div id="printModal" class="modal-overlay" style="display:none;">
     <div class="modal-card">
 
-      <div class="modal-title">
-        Send Details
-      </div>
+      <div class="modal-title">Send Details</div>
 
       <div id="modalBillSummary" class="modal-bill-summary"></div>
 
-      <div
-        class="modal-group"
-        id="customerGroup"
-      >
+      <div class="modal-group" id="customerGroup">
         <label for="customerName">Customer Name</label>
-
-        <input
-          type="text"
-          id="customerName"
-          placeholder="Enter customer name"
-        >
+        <input type="text" id="customerName" placeholder="Enter customer name">
       </div>
 
       <div class="modal-actions">
-        <button
-          id="cancelPrint"
-          class="secondary-btn"
-        >
-          Back
-        </button>
-
-        <button
-          id="confirmSend"
-          class="send-btn"
-        >
-          Send
-        </button>
+        <button id="cancelPrint" class="secondary-btn">Back</button>
+        <button id="confirmSend" class="send-btn">Send</button>
       </div>
 
     </div>
   </div>
 
   <!-- PREVIEW MODAL -->
-  <div
-    id="previewModal"
-    class="modal-overlay"
-    style="display:none;"
-  >
+  <div id="previewModal" class="modal-overlay" style="display:none;">
     <div class="preview-card">
 
-      <div class="modal-title">
-        Bill Preview
+      <div class="modal-title">Bill Preview</div>
+
+      <div id="revisionViewTabs" class="revision-view-tabs" style="display:none;">
+        <button id="revisionViewOriginalBtn" class="revision-view-tab" onclick="switchRevisionView('original')">View Original</button>
+        <button id="revisionViewRevisedBtn" class="revision-view-tab" onclick="switchRevisionView('revised')">View Revised</button>
       </div>
 
-      <div
-        id="revisionViewTabs"
-        class="revision-view-tabs"
-        style="display:none;"
-      >
-        <button
-          id="revisionViewOriginalBtn"
-          class="revision-view-tab"
-          onclick="switchRevisionView('original')"
-        >
-          View Original
-        </button>
-        <button
-          id="revisionViewRevisedBtn"
-          class="revision-view-tab"
-          onclick="switchRevisionView('revised')"
-        >
-          View Revised
-        </button>
-      </div>
-
-      <div
-        id="previewContent"
-        class="preview-content"
-      ></div>
+      <div id="previewContent" class="preview-content"></div>
 
       <div class="modal-actions">
-        <button
-          id="closePreview"
-          class="secondary-btn"
-        >
-          Close
-        </button>
+        <button id="closePreview" class="secondary-btn">Close</button>
       </div>
 
     </div>
   </div>
 
   <!-- LIVE DRAFT MONITOR MODAL -->
-  <div
-    id="liveDraftModal"
-    class="modal-overlay"
-    style="display:none;"
-  >
+  <div id="liveDraftModal" class="modal-overlay" style="display:none;">
     <div class="live-modal-card">
       <div class="live-modal-header">
         <div class="modal-title">Live Drafts</div>
@@ -278,125 +175,63 @@
   <div id="printInvoice"></div>
 
   <!-- DONE PASSWORD MODAL -->
-  <div
-    id="donePasswordModal"
-    class="modal-overlay"
-    style="display:none;"
-  >
+  <div id="donePasswordModal" class="modal-overlay" style="display:none;">
     <div class="modal-card">
 
-      <div class="modal-title">
-        Confirm Action
-      </div>
+      <div class="modal-title">Confirm Action</div>
 
       <div class="modal-group">
         <label for="donePasswordInput">Password</label>
-        <input
-          type="password"
-          id="donePasswordInput"
-          placeholder="Enter admin password"
-          autocomplete="off"
-        >
+        <input type="password" id="donePasswordInput" placeholder="Enter admin password" autocomplete="off">
       </div>
 
       <div class="modal-group" style="flex-direction:row;align-items:center;gap:10px;padding-top:4px;">
-        <input
-          type="checkbox"
-          id="doneAllTodayCheckbox"
-          style="width:18px;height:18px;cursor:pointer;flex-shrink:0;"
-        >
-        <label for="doneAllTodayCheckbox" style="font-size:14px;cursor:pointer;user-select:none;margin:0;">
-          Move all bills to Daybook
-        </label>
+        <input type="checkbox" id="doneAllTodayCheckbox" style="width:18px;height:18px;cursor:pointer;flex-shrink:0;">
+        <label for="doneAllTodayCheckbox" style="font-size:14px;cursor:pointer;user-select:none;margin:0;">Move all bills to Daybook</label>
       </div>
 
       <div class="modal-actions">
-        <button
-          id="donePasswordCancel"
-          class="secondary-btn"
-        >
-          Back
-        </button>
-
-        <button
-          id="donePasswordOk"
-          class="send-btn"
-        >
-          OK
-        </button>
+        <button id="donePasswordCancel" class="secondary-btn">Back</button>
+        <button id="donePasswordOk" class="send-btn">OK</button>
       </div>
 
     </div>
   </div>
 
   <!-- UPDATE PRICELIST MODAL -->
-  <div
-    id="updatePricelistModal"
-    class="modal-overlay"
-    style="display:none;"
-  >
+  <div id="updatePricelistModal" class="modal-overlay" style="display:none;">
     <div class="modal-card">
 
-      <div class="modal-title">
-        Update Pricelist
-      </div>
+      <div class="modal-title">Update Pricelist</div>
 
-      <div class="modal-group">
-        A newer pricelist is available.
-      </div>
+      <div class="modal-group">A newer pricelist is available.</div>
 
       <div class="modal-actions">
-        <button
-          id="updatePricelistBtn"
-          class="primary-btn"
-          type="button"
-        >
-          Update Pricelist
-        </button>
+        <button id="updatePricelistBtn" class="primary-btn" type="button">Update Pricelist</button>
       </div>
 
     </div>
   </div>
 
   <!-- INVENTORY PASSWORD MODAL -->
-  <div
-    id="inventoryPasswordModal"
-    class="modal-overlay"
-    style="display:none;"
-  >
+  <div id="inventoryPasswordModal" class="modal-overlay" style="display:none;">
     <div class="modal-card">
 
-      <div class="modal-title">
-        Feedback
-      </div>
+      <div class="modal-title">Feedback</div>
 
       <div class="modal-group">
-        
-        <input
-          type="password"
-          id="inventoryPasswordInput"
-          autocomplete="off"
-        >
+        <input type="password" id="inventoryPasswordInput" autocomplete="off">
       </div>
 
       <div class="modal-actions">
-        <button
-          id="inventoryPasswordContinue"
-          class="send-btn"
-        >
-          Submit
-        </button>
+        <button id="inventoryPasswordContinue" class="send-btn">Submit</button>
       </div>
 
     </div>
   </div>
 
   <!-- INVENTORY MODAL -->
-  <div
-    id="inventoryModal"
-    class="modal-overlay"
-    style="display:none;"
-  >
+  <div id="inventoryModal" class="modal-overlay" style="display:none;">
     <div class="live-modal-card">
 
       <div class="inventory-modal-topbar">
@@ -405,12 +240,7 @@
 
       <div id="inventorySearchView">
         <div class="search-wrapper">
-          <input
-            type="text"
-            id="inventorySearchBox"
-            placeholder="Search product..."
-            autocomplete="off"
-          >
+          <input type="text" id="inventorySearchBox" placeholder="Search product..." autocomplete="off">
 
           <div id="inventoryClearSearch">
             <span class="clear-x">✕</span>
@@ -425,27 +255,12 @@
 
         <div class="modal-group">
           <label for="inventoryCodeInput">Code</label>
-          <input
-            type="number"
-            id="inventoryCodeInput"
-            autocomplete="off"
-          >
+          <input type="number" id="inventoryCodeInput" autocomplete="off">
         </div>
 
         <div class="modal-actions">
-          <button
-            id="inventoryCancelBtn"
-            class="secondary-btn"
-          >
-            Back
-          </button>
-
-          <button
-            id="inventorySaveBtn"
-            class="send-btn"
-          >
-            Save
-          </button>
+          <button id="inventoryCancelBtn" class="secondary-btn">Back</button>
+          <button id="inventorySaveBtn" class="send-btn">Save</button>
         </div>
       </div>
 
