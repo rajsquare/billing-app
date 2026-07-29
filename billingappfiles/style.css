@@ -394,7 +394,12 @@ input {
    material reads instantly at a glance — badge colors are unchanged.
 ================================ */
 .suggestion-card.material-brass {
-  /* Intentionally neutral — same as no-material cards, per request */
+  /* Neutral — same as no-material cards, per request. Explicitly set
+     to override the generic .material-brass badge-chip background
+     rule further down the file, which would otherwise also match
+     this element since it shares the same class. */
+  background: white;
+  border-color: #f0f2f5;
 }
 
 .suggestion-card.material-copper {
