@@ -73,6 +73,15 @@ button {
   transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
 }
 
+/* Loading / busy state for async action buttons (e.g. Send) so a press
+   is visibly acknowledged immediately instead of appearing unresponsive
+   while the network request is in flight. */
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 input {
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -283,6 +292,7 @@ input {
   color: #64748b;
   border: 1.5px solid transparent;
   letter-spacing: 0.01em;
+  min-height: 36px; /* touch target */
 }
 
 .filter-chip:hover {
@@ -426,15 +436,6 @@ input {
   box-shadow: 0 4px 14px rgba(139, 111, 38, 0.12), 0 1px 4px rgba(0,0,0,0.05);
 }
 
-/* Loading / busy state for async action buttons (e.g. Send) so a press
-   is visibly acknowledged immediately instead of appearing unresponsive
-   while the network request is in flight. */
-button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
 .suggestion-top {
   display: flex;
   justify-content: space-between;
@@ -445,12 +446,6 @@ button:disabled {
 .bill-title {
   font-weight: 700;
   font-size: 15px;
-  color: #1a202c;
-}
-
-.suggestion-price {
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
   color: #1a202c;
 }
 
@@ -692,6 +687,7 @@ button:disabled {
   font-weight: 700;
   border: 1px solid #fecaca;
   letter-spacing: 0.01em;
+  min-height: 40px; /* touch target */
 }
 
 .delete-btn:hover {
@@ -1352,15 +1348,15 @@ button:disabled {
     display: none !important;
   }
 
- #printInvoice {
-  display: block !important;
-  margin: 0;
-  padding: 0;
-  background: white;
-  width: 100%;
-  /* No zoom/scale workaround — layout is designed to fit the 80mm×190mm
-     printable area natively via correct @page size and margins. */
-}
+  #printInvoice {
+    display: block !important;
+    margin: 0;
+    padding: 0;
+    background: white;
+    width: 100%;
+    /* No zoom/scale workaround — layout is designed to fit the 80mm×190mm
+       printable area natively via correct @page size and margins. */
+  }
 
   .receipt-copy {
     height: 182mm;
@@ -1949,15 +1945,6 @@ button:disabled {
   font-variant-numeric: tabular-nums;
   color: var(--color-text-primary);
   letter-spacing: -0.01em;
-}
-
-/* Touch targets */
-.delete-btn {
-  min-height: 40px;
-}
-
-.filter-chip {
-  min-height: 36px;
 }
 
 /* Responsive: header controls compress gracefully on narrow screens */
