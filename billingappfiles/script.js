@@ -1548,7 +1548,8 @@ function buildRevisionOfficeSinglePage(
 
   const custName =
     revisedBill.customerName &&
-    revisedBill.customerName !== "Retail Bill"
+    revisedBill.customerName !== "Retail Bill" &&
+    revisedBill.customerName.trim().toLowerCase() !== "test"
       ? diff.customerNameChanged
         ? `<div class="print-customer print-cell-changed-block">${escapeAttr(revisedBill.customerName)}</div>`
         : `<div class="print-customer">${escapeAttr(revisedBill.customerName)}</div>`
@@ -3897,7 +3898,7 @@ function buildStandardPrintPageHTML(
         <div class="copy-label${label === 'OFFICE COPY' ? ' office-copy-label' : ''}" ${label === 'OFFICE COPY' ? 'style="background-color:#000000;color:#ffffff;width:fit-content;margin:0 auto;padding:1px 6px;box-sizing:border-box;"' : ''}>${label}</div>
 
         <div class="print-header-row">
-          ${billData.customerName && billData.customerName !== "Retail Bill"
+          ${billData.customerName && billData.customerName !== "Retail Bill" && billData.customerName.trim().toLowerCase() !== "test"
             ? `<div class="print-customer">${escapeAttr(billData.customerName)}</div>`
             : ""}
 
@@ -4902,7 +4903,7 @@ window.printReceivedBill =
 
             const serial =
               isTestBill
-                ? "TEST"
+                ? ""
                 : nextSerial(lastIssuedSerial);
 
             if (!isTestBill) {
