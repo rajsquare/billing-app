@@ -59,6 +59,14 @@ const billsCollection = collection(db, "bills");
 const daybookCollection = collection(db, "daybook");
 const liveDraftBillsCollection = collection(db, "liveDraftBills");
 
+/* View casting uses a single, dedicated document as a lightweight handoff
+   signal between Billing and the View (wall display) screen — the same
+   pattern already used by updateSignalRef below for the pricelist-update
+   signal. It is NOT the liveDraftBills collection: View only ever attaches
+   to this one document (cheap, rare writes) and, only while a cast is
+   active, to the one specific liveDraftBills document being cast. */
+const viewCastRef = doc(db, "viewCast", "state");
+
 /* ================================
    INTL FORMATTERS (module-level, reused across all renders)
 ================================ */
@@ -167,6 +175,18 @@ let _lastDraftHash = "";
 let _lastStaleCleanup = 0;
 let productsBySr = new Map();
 
+/* ---- VIEW / CAST STATE ---- */
+let isCastingActive = false;
+let viewCastControlUnsub = null;
+let viewDraftUnsub = null;
+let viewCastCurrentDraftId = null;
+
+/* ---- VIEW SLIDESHOW STATE (local-only, no Firestore) ---- */
+let viewSlideshowImages = [];
+let viewSlideshowIndex = 0;
+let viewSlideshowDurationSec = 10;
+let viewSlideshowTimer = null;
+
 /* ================================
    DOM
 ================================ */
@@ -174,6 +194,8 @@ const billingTab =
   document.getElementById("billingTab");
 const receiverTab =
   document.getElementById("receiverTab");
+const viewTab =
+  document.getElementById("viewTab");
 const daybookTab =
   document.getElementById("daybookTab");
 
@@ -181,8 +203,50 @@ const billingView =
   document.getElementById("billingView");
 const receiverView =
   document.getElementById("receiverView");
+const viewView =
+  document.getElementById("viewView");
 const daybookView =
   document.getElementById("daybookView");
+
+/* ---- VIEW (wall display) elements ---- */
+const castViewBtn =
+  document.getElementById("castViewBtn");
+const viewSlideshowStage =
+  document.getElementById("viewSlideshowStage");
+const viewSlideshowEmpty =
+  document.getElementById("viewSlideshowEmpty");
+const viewSlideshowLayers =
+  document.getElementById("viewSlideshowLayers");
+const viewLiveStage =
+  document.getElementById("viewLiveStage");
+const viewLiveCustomer =
+  document.getElementById("viewLiveCustomer");
+const viewLiveMeta =
+  document.getElementById("viewLiveMeta");
+const viewLiveItems =
+  document.getElementById("viewLiveItems");
+const viewLiveTotal =
+  document.getElementById("viewLiveTotal");
+const viewSettingsBtn =
+  document.getElementById("viewSettingsBtn");
+const viewSettingsModal =
+  document.getElementById("viewSettingsModal");
+const closeViewSettings =
+  document.getElementById("closeViewSettings");
+const viewAddPhotosBtn =
+  document.getElementById("viewAddPhotosBtn");
+const viewAddPhotosInput =
+  document.getElementById("viewAddPhotosInput");
+const viewImportPptBtn =
+  document.getElementById("viewImportPptBtn");
+const viewImportPptInput =
+  document.getElementById("viewImportPptInput");
+const viewSlideList =
+  document.getElementById("viewSlideList");
+const viewDurationInput =
+  document.getElementById("viewDurationInput");
+const viewSettingsSave =
+  document.getElementById("viewSettingsSave");
 
 const searchBox =
   document.getElementById("searchBox");
@@ -910,12 +974,629 @@ async function deleteLiveDraft() {
 
     await deleteDoc(draftRef);
     liveDraftActive = false;
+
+    // This session's live draft is gone (bill cleared, cancelled, or
+    // finalized) — any cast pointing at it is no longer meaningful.
+    // Ending it here covers every place deleteLiveDraft() is already
+    // called (finalize, empty bill, revision cancel, etc.) without
+    // duplicating a termination hook at each call site.
+    if (isCastingActive) {
+      await endViewCast();
+    }
   } catch (err) {
     console.error(
       "Live draft delete failed:",
       err
     );
   }
+}
+
+/* ================================
+   VIEW CASTING (Billing side)
+   Billing writes to viewCastRef only when the operator explicitly
+   presses "Cast to View" / "End Cast" — a handful of writes per day,
+   not per keystroke. The bill content itself is never duplicated here;
+   View reads it straight from the existing liveDraftBills document.
+================================ */
+function updateCastButtonUI() {
+  if (!castViewBtn) {
+    return;
+  }
+
+  castViewBtn.style.display =
+    billItems.length ? "inline-flex" : "none";
+
+  castViewBtn.textContent =
+    isCastingActive ? "End Cast" : "Cast to View";
+
+  castViewBtn.classList.toggle(
+    "cast-view-btn-active",
+    isCastingActive
+  );
+}
+
+async function startViewCast() {
+  if (!billItems.length || isCastingActive) {
+    return;
+  }
+
+  castViewBtn.disabled = true;
+
+  try {
+    const castSnap = await getDoc(viewCastRef);
+
+    if (castSnap.exists()) {
+      const castData = castSnap.data();
+
+      if (castData.sessionId && castData.sessionId !== sessionId) {
+        // Reuse the existing staleness convention (isDraftStale, 120s)
+        // instead of a heartbeat: a cast is only "still active" if the
+        // draft it points to is still being updated.
+        const otherDraftSnap = await getDoc(
+          doc(db, "liveDraftBills", castData.sessionId)
+        );
+
+        const otherCastStillLive =
+          otherDraftSnap.exists() &&
+          !isDraftStale(otherDraftSnap.data());
+
+        if (otherCastStillLive) {
+          showToast(
+            "View is currently being used by another billing session.",
+            "error"
+          );
+          return;
+        }
+      }
+    }
+
+    // Make sure View has fresh data the instant it attaches, rather than
+    // waiting out the 1s debounce on the very first frame.
+    if (_syncDraftTimer) {
+      clearTimeout(_syncDraftTimer);
+      _syncDraftTimer = null;
+    }
+    _lastDraftHash = simpleDraftHash(billItems, customerName.value);
+    await syncLiveDraft();
+
+    await setDoc(viewCastRef, {
+      sessionId,
+      startedAt: serverTimestamp()
+    });
+
+    isCastingActive = true;
+    updateCastButtonUI();
+  } catch (err) {
+    console.error("Failed to start cast:", err);
+    showToast("Failed to start cast", "error");
+  } finally {
+    castViewBtn.disabled = false;
+  }
+}
+
+async function endViewCast() {
+  if (!isCastingActive) {
+    return;
+  }
+
+  isCastingActive = false;
+  updateCastButtonUI();
+
+  try {
+    const snap = await getDoc(viewCastRef);
+    if (snap.exists() && snap.data().sessionId === sessionId) {
+      await deleteDoc(viewCastRef);
+    }
+  } catch (err) {
+    console.error("Failed to end cast:", err);
+  }
+}
+
+/* ================================
+   VIEW SCREEN (wall display side)
+================================ */
+
+/* --- Local slideshow persistence (IndexedDB for images, localStorage
+   for the small duration setting). No Firestore involved at all. --- */
+const VIEW_IMAGES_DB_NAME = "viewSlideshowImages";
+const VIEW_IMAGES_STORE_NAME = "images";
+const VIEW_DURATION_KEY = "viewSlideshowDurationSec";
+
+function openViewImagesDb() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(VIEW_IMAGES_DB_NAME, 1);
+
+    req.onupgradeneeded = () => {
+      const dbi = req.result;
+      if (!dbi.objectStoreNames.contains(VIEW_IMAGES_STORE_NAME)) {
+        dbi.createObjectStore(VIEW_IMAGES_STORE_NAME, { keyPath: "id" });
+      }
+    };
+
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function viewDbGetAllImages() {
+  const dbi = await openViewImagesDb();
+  return new Promise((resolve, reject) => {
+    const tx = dbi.transaction(VIEW_IMAGES_STORE_NAME, "readonly");
+    const req = tx.objectStore(VIEW_IMAGES_STORE_NAME).getAll();
+    req.onsuccess = () =>
+      resolve(req.result.sort((a, b) => a.order - b.order));
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function viewDbPutImage(record) {
+  const dbi = await openViewImagesDb();
+  return new Promise((resolve, reject) => {
+    const tx = dbi.transaction(VIEW_IMAGES_STORE_NAME, "readwrite");
+    tx.objectStore(VIEW_IMAGES_STORE_NAME).put(record);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function viewDbDeleteImage(id) {
+  const dbi = await openViewImagesDb();
+  return new Promise((resolve, reject) => {
+    const tx = dbi.transaction(VIEW_IMAGES_STORE_NAME, "readwrite");
+    tx.objectStore(VIEW_IMAGES_STORE_NAME).delete(id);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+function loadSlideshowDurationConfig() {
+  const stored = Number(localStorage.getItem(VIEW_DURATION_KEY));
+  viewSlideshowDurationSec = stored > 0 ? stored : 10;
+}
+
+/* --- Slideshow playback (purely local, no network activity) --- */
+async function loadSlideshowImagesIntoMemory() {
+  const records = await viewDbGetAllImages().catch(() => []);
+
+  viewSlideshowImages.forEach(img => URL.revokeObjectURL(img.url));
+
+  viewSlideshowImages = records.map(r => ({
+    id: r.id,
+    url: URL.createObjectURL(r.blob)
+  }));
+
+  if (viewSlideshowIndex >= viewSlideshowImages.length) {
+    viewSlideshowIndex = 0;
+  }
+
+  renderSlideshowFrame();
+}
+
+function renderSlideshowFrame() {
+  if (!viewSlideshowLayers || !viewSlideshowEmpty) {
+    return;
+  }
+
+  if (!viewSlideshowImages.length) {
+    viewSlideshowEmpty.style.display = "flex";
+    viewSlideshowLayers.style.display = "none";
+    return;
+  }
+
+  viewSlideshowEmpty.style.display = "none";
+  viewSlideshowLayers.style.display = "block";
+
+  const img = viewSlideshowImages[viewSlideshowIndex];
+  viewSlideshowLayers.innerHTML =
+    `<img src="${img.url}" class="view-slide-img" alt="">`;
+}
+
+function stopSlideshowTimer() {
+  if (viewSlideshowTimer) {
+    clearInterval(viewSlideshowTimer);
+    viewSlideshowTimer = null;
+  }
+}
+
+function startSlideshowTimer() {
+  stopSlideshowTimer();
+
+  if (viewSlideshowImages.length < 2) {
+    return;
+  }
+
+  viewSlideshowTimer = setInterval(() => {
+    viewSlideshowIndex =
+      (viewSlideshowIndex + 1) % viewSlideshowImages.length;
+    renderSlideshowFrame();
+  }, viewSlideshowDurationSec * 1000);
+}
+
+function pauseSlideshow() {
+  stopSlideshowTimer();
+}
+
+function resumeSlideshow() {
+  renderSlideshowFrame();
+  startSlideshowTimer();
+}
+
+function showSlideshowStage() {
+  if (viewLiveStage) viewLiveStage.style.display = "none";
+  if (viewSlideshowStage) viewSlideshowStage.style.display = "block";
+  resumeSlideshow();
+}
+
+function showLiveStage() {
+  pauseSlideshow();
+  if (viewSlideshowStage) viewSlideshowStage.style.display = "none";
+  if (viewLiveStage) viewLiveStage.style.display = "block";
+}
+
+/* --- Live bill rendering (read-only, reuses the existing draft shape —
+   no second bill/total calculation is implemented here) --- */
+function renderViewLiveBill(draft) {
+  if (!viewLiveCustomer) {
+    return;
+  }
+
+  viewLiveCustomer.textContent =
+    draft.customerName || "WALK-IN";
+
+  viewLiveMeta.textContent =
+    (draft.mode === "W" ? "Wholesale" : "Retail") +
+    (draft.revisionLabel ? " · " + draft.revisionLabel : "");
+
+  const items = draft.items || [];
+
+  viewLiveItems.innerHTML = items
+    .map(
+      item => `
+      <tr>
+        <td>${escapeAttr(item.productName)}</td>
+        <td>${item.qty > 0 ? item.qty : "—"}</td>
+        <td>${item.price > 0 ? "₹" + formatIndianMoneyWhole(item.price) : "—"}</td>
+        <td>${item.qty > 0 && item.price > 0 ? "₹" + formatIndianMoneyWhole(Math.abs(item.total)) : "—"}</td>
+      </tr>
+    `
+    )
+    .join("");
+
+  viewLiveTotal.textContent =
+    "₹" + formatIndianMoneyWhole(draft.subtotal || 0);
+}
+
+/* --- Cast handoff (View side) ---
+   viewCastRef is the ONLY permanent listener the View screen keeps. It
+   is a single small document, not the liveDraftBills collection, and it
+   only changes on explicit Cast/End Cast actions (a few times a day) —
+   see the Firestore cost report for why a listener here is unavoidable
+   for automatic, no-touch switching across two separate devices. */
+function detachDraftOnly() {
+  if (viewDraftUnsub) {
+    viewDraftUnsub();
+    viewDraftUnsub = null;
+  }
+  viewCastCurrentDraftId = null;
+}
+
+function detachViewFromDraft() {
+  detachDraftOnly();
+  showSlideshowStage();
+}
+
+function attachViewToDraft(draftId) {
+  if (!draftId) {
+    detachViewFromDraft();
+    return;
+  }
+
+  if (viewDraftUnsub && viewCastCurrentDraftId === draftId) {
+    return;
+  }
+
+  detachDraftOnly();
+  viewCastCurrentDraftId = draftId;
+  showLiveStage();
+
+  viewDraftUnsub = onSnapshot(
+    doc(db, "liveDraftBills", draftId),
+    draftSnap => {
+      if (!draftSnap.exists()) {
+        // Draft disappeared (bill finalized/cleared elsewhere, or stale
+        // cleanup). Fail safe back to the slideshow rather than showing
+        // stale customer data.
+        detachViewFromDraft();
+        return;
+      }
+      renderViewLiveBill(draftSnap.data());
+    },
+    err => {
+      console.error("View draft listener error:", err);
+      detachViewFromDraft();
+    }
+  );
+}
+
+function initViewCastListener() {
+  if (viewCastControlUnsub) {
+    return;
+  }
+
+  viewCastControlUnsub = onSnapshot(
+    viewCastRef,
+    snap => {
+      if (snap.exists()) {
+        attachViewToDraft(snap.data().sessionId);
+      } else {
+        detachViewFromDraft();
+      }
+    },
+    err => {
+      console.error("View cast listener error:", err);
+      detachViewFromDraft();
+    }
+  );
+}
+
+/* --- Entry point: called only when the View tab is actually opened, so
+   Billing-only devices never pay for this listener. --- */
+async function enterViewScreen() {
+  loadSlideshowDurationConfig();
+  await loadSlideshowImagesIntoMemory();
+  initViewCastListener();
+
+  // Only resume the slideshow clock if we're not already attached to a
+  // live cast (the cast listener above will call showLiveStage()/
+  // pauseSlideshow() on its own if a cast is in fact active).
+  if (!viewCastCurrentDraftId) {
+    startSlideshowTimer();
+  }
+}
+
+/* ================================
+   VIEW SLIDESHOW SETTINGS (config UI)
+================================ */
+let _viewSettingsRecords = [];
+let _viewSettingsThumbUrls = [];
+
+async function refreshViewSettingsRecords() {
+  _viewSettingsThumbUrls.forEach(u => URL.revokeObjectURL(u));
+  _viewSettingsThumbUrls = [];
+
+  _viewSettingsRecords = await viewDbGetAllImages().catch(() => []);
+
+  renderViewSettingsList();
+}
+
+function renderViewSettingsList() {
+  if (!viewSlideList) {
+    return;
+  }
+
+  if (!_viewSettingsRecords.length) {
+    viewSlideList.innerHTML =
+      `<div class="receiver-subtitle" style="padding:10px 0;">No photos yet</div>`;
+    return;
+  }
+
+  viewSlideList.innerHTML = _viewSettingsRecords
+    .map((rec, i) => {
+      const url = URL.createObjectURL(rec.blob);
+      _viewSettingsThumbUrls.push(url);
+
+      return `
+        <div class="view-slide-row" data-id="${escapeAttr(rec.id)}">
+          <img src="${url}" class="view-slide-thumb" alt="">
+          <div class="view-slide-name">${escapeAttr(rec.name || "Photo " + (i + 1))}</div>
+          <div class="view-slide-row-actions">
+            <button type="button" class="view-slide-move" data-action="up" ${i === 0 ? "disabled" : ""}>↑</button>
+            <button type="button" class="view-slide-move" data-action="down" ${i === _viewSettingsRecords.length - 1 ? "disabled" : ""}>↓</button>
+            <button type="button" class="view-slide-remove" data-action="remove">Remove</button>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+async function addViewSlideshowFiles(files) {
+  const existing = await viewDbGetAllImages().catch(() => []);
+  let nextOrder =
+    existing.length
+      ? Math.max(...existing.map(r => r.order)) + 1
+      : 0;
+
+  for (const file of files) {
+    if (!file.type || !file.type.startsWith("image/")) {
+      continue;
+    }
+
+    await viewDbPutImage({
+      id: crypto.randomUUID(),
+      blob: file,
+      name: file.name,
+      order: nextOrder++
+    });
+  }
+
+  await refreshViewSettingsRecords();
+}
+
+async function moveViewSlideshowImage(id, direction) {
+  const idx = _viewSettingsRecords.findIndex(r => r.id === id);
+  const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+
+  if (idx < 0 || swapIdx < 0 || swapIdx >= _viewSettingsRecords.length) {
+    return;
+  }
+
+  const a = _viewSettingsRecords[idx];
+  const b = _viewSettingsRecords[swapIdx];
+  const aOrder = a.order;
+
+  a.order = b.order;
+  b.order = aOrder;
+
+  await viewDbPutImage(a);
+  await viewDbPutImage(b);
+  await refreshViewSettingsRecords();
+}
+
+async function removeViewSlideshowImage(id) {
+  await viewDbDeleteImage(id);
+  await refreshViewSettingsRecords();
+}
+
+/* PPT/PPTX import — isolated, best-effort convenience.
+   A browser cannot faithfully render arbitrary PPTX slide layouts/text
+   as a reliable full-screen slideshow without a large rendering engine
+   or server-side conversion, which this frontend-only app doesn't have.
+   What IS safely and reliably doable here: a .pptx file is a zip archive,
+   so we extract the photos already embedded in it (ppt/media/*) and add
+   them to the slideshow as images. This never touches the core casting
+   feature even if it fails. */
+async function importPptPhotos(file) {
+  if (!file) {
+    return;
+  }
+
+  try {
+    const JSZipModule = await import(
+      "https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm"
+    );
+    const JSZip = JSZipModule.default || JSZipModule;
+
+    const zip = await JSZip.loadAsync(file);
+    const mediaFiles = Object.keys(zip.files).filter(
+      name =>
+        /^ppt\/media\//i.test(name) &&
+        /\.(png|jpe?g|gif|bmp|webp)$/i.test(name)
+    );
+
+    if (!mediaFiles.length) {
+      showToast("No photos found inside that file", "error");
+      return;
+    }
+
+    const existing = await viewDbGetAllImages().catch(() => []);
+    let nextOrder =
+      existing.length
+        ? Math.max(...existing.map(r => r.order)) + 1
+        : 0;
+
+    for (const name of mediaFiles) {
+      const blob = await zip.files[name].async("blob");
+
+      await viewDbPutImage({
+        id: crypto.randomUUID(),
+        blob,
+        name: name.split("/").pop(),
+        order: nextOrder++
+      });
+    }
+
+    await refreshViewSettingsRecords();
+    showToast(
+      `Imported ${mediaFiles.length} photo${mediaFiles.length !== 1 ? "s" : ""} from PPT`,
+      "success"
+    );
+  } catch (err) {
+    console.error("PPT import failed:", err);
+    showToast("Could not import photos from that file", "error");
+  }
+}
+
+if (viewSettingsBtn) {
+  viewSettingsBtn.addEventListener("click", async () => {
+    loadSlideshowDurationConfig();
+    if (viewDurationInput) {
+      viewDurationInput.value = viewSlideshowDurationSec;
+    }
+    await refreshViewSettingsRecords();
+    viewSettingsModal.style.display = "flex";
+  });
+}
+
+if (closeViewSettings) {
+  closeViewSettings.addEventListener("click", () => {
+    viewSettingsModal.style.display = "none";
+  });
+}
+
+if (viewAddPhotosBtn) {
+  viewAddPhotosBtn.addEventListener("click", () => {
+    viewAddPhotosInput.click();
+  });
+}
+
+if (viewAddPhotosInput) {
+  viewAddPhotosInput.addEventListener("change", async () => {
+    if (viewAddPhotosInput.files.length) {
+      await addViewSlideshowFiles(Array.from(viewAddPhotosInput.files));
+    }
+    viewAddPhotosInput.value = "";
+  });
+}
+
+if (viewImportPptBtn) {
+  viewImportPptBtn.addEventListener("click", () => {
+    viewImportPptInput.click();
+  });
+}
+
+if (viewImportPptInput) {
+  viewImportPptInput.addEventListener("change", async () => {
+    if (viewImportPptInput.files.length) {
+      await importPptPhotos(viewImportPptInput.files[0]);
+    }
+    viewImportPptInput.value = "";
+  });
+}
+
+if (viewSlideList) {
+  viewSlideList.addEventListener("click", e => {
+    const btn = e.target.closest("button[data-action]");
+    if (!btn) {
+      return;
+    }
+
+    const row = btn.closest(".view-slide-row");
+    const id = row && row.dataset.id;
+    if (!id) {
+      return;
+    }
+
+    const action = btn.dataset.action;
+
+    if (action === "up" || action === "down") {
+      moveViewSlideshowImage(id, action);
+    } else if (action === "remove") {
+      removeViewSlideshowImage(id);
+    }
+  });
+}
+
+if (viewSettingsSave) {
+  viewSettingsSave.addEventListener("click", async () => {
+    const seconds = Math.max(
+      2,
+      Math.min(120, Number(viewDurationInput.value) || 10)
+    );
+
+    localStorage.setItem(VIEW_DURATION_KEY, String(seconds));
+    viewSlideshowDurationSec = seconds;
+
+    viewSettingsModal.style.display = "none";
+
+    await loadSlideshowImagesIntoMemory();
+
+    // Only restart the clock if the slideshow is actually the visible
+    // stage right now (i.e. no cast is active).
+    if (!viewCastCurrentDraftId) {
+      startSlideshowTimer();
+    }
+  });
 }
 
 function isDraftStale(draft) {
@@ -2401,6 +3082,8 @@ function activateView(
     "none";
   receiverView.style.display =
     "none";
+  viewView.style.display =
+    "none";
   daybookView.style.display =
     "none";
 
@@ -2410,9 +3093,19 @@ function activateView(
   receiverTab.classList.remove(
     "active"
   );
+  viewTab.classList.remove(
+    "active"
+  );
   daybookTab.classList.remove(
     "active"
   );
+
+  // Leaving the View screen: stop the slideshow timer so a hidden tab
+  // doesn't keep ticking in the background. It resumes from the same
+  // position (viewSlideshowIndex is untouched) when View is reopened.
+  if (view !== "view") {
+    pauseSlideshow();
+  }
 
   if (
     view ===
@@ -2436,6 +3129,17 @@ function activateView(
     receiverTab.classList.add(
       "active"
     );
+  }
+
+  if (view === "view") {
+    viewView.style.display =
+      "block";
+
+    viewTab.classList.add(
+      "active"
+    );
+
+    enterViewScreen();
   }
 
   if (
@@ -2465,6 +3169,11 @@ receiverTab.addEventListener(
     activateView("receiver");
     renderIncomingBills();
   }
+);
+
+viewTab.addEventListener(
+  "click",
+  () => activateView("view")
 );
 
 daybookTab.addEventListener(
@@ -2776,6 +3485,8 @@ window.selectProduct =
   };
 
 function renderBill() {
+  updateCastButtonUI();
+
   if (billItemCountEl) {
     billItemCountEl.textContent = billItems.length
       ? `${billItems.length} item${billItems.length !== 1 ? "s" : ""}`
@@ -3190,6 +3901,17 @@ closePreview.addEventListener(
       null;
 
     revisionDiffCache = {};
+  }
+);
+
+castViewBtn.addEventListener(
+  "click",
+  () => {
+    if (isCastingActive) {
+      endViewCast();
+    } else {
+      startViewCast();
+    }
   }
 );
 
@@ -4664,6 +5386,21 @@ document.getElementById("appTitleLink").addEventListener("click", (e) => {
    FIREBASE LISTENERS
 ================================ */
 subscribeToLiveDrafts();
+
+// One-time check (not a listener) so that if Billing is refreshed while
+// this session owns an active cast, the "End Cast" button state is
+// restored instead of drifting out of sync with viewCastRef.
+(async function restoreCastOwnershipOnLoad() {
+  try {
+    const snap = await getDoc(viewCastRef);
+    if (snap.exists() && snap.data().sessionId === sessionId) {
+      isCastingActive = true;
+      updateCastButtonUI();
+    }
+  } catch (err) {
+    // Non-fatal — button simply stays in the default "Cast to View" state.
+  }
+})();
 
 onSnapshot(
   billsQuery,

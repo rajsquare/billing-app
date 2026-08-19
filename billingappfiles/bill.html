@@ -27,6 +27,7 @@
   <div class="app-tabs">
     <button id="billingTab" class="tab-btn active">Billing</button>
     <button id="receiverTab" class="tab-btn">Receiver</button>
+    <button id="viewTab" class="tab-btn daybook-mini">View</button>
     <button id="daybookTab" class="tab-btn daybook-mini">Daybook</button>
   </div>
 
@@ -43,6 +44,7 @@
         </h1>
 
         <div class="header-controls">
+          <button id="castViewBtn" class="cast-view-btn" style="display:none;">Cast to View</button>
           <button id="liveBtn">LIVE (0)</button>
           <button id="modeToggle">&nbsp;</button>
         </div>
@@ -91,6 +93,44 @@
       <div class="receiver-subtitle">Waiting for incoming bills...</div>
       <div id="incomingBills"></div>
     </div>
+  </div>
+
+  <!-- VIEW (WALL DISPLAY) -->
+  <div id="viewView" style="display:none;">
+
+    <div id="viewSlideshowStage" class="view-stage">
+      <div id="viewSlideshowEmpty" class="view-slideshow-empty">
+        <div class="view-slideshow-empty-title">Slideshow not configured</div>
+        <div class="view-slideshow-empty-sub">Tap the gear icon to add photos.</div>
+      </div>
+      <div id="viewSlideshowLayers" class="view-slideshow-layers"></div>
+    </div>
+
+    <div id="viewLiveStage" class="view-stage view-live-stage" style="display:none;">
+      <div class="view-live-header">
+        <div id="viewLiveCustomer" class="view-live-customer">WALK-IN</div>
+        <div id="viewLiveMeta" class="view-live-meta"></div>
+      </div>
+
+      <table class="view-live-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Wt/Qty</th>
+            <th>Rate</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="viewLiveItems"></tbody>
+      </table>
+
+      <div class="view-live-total-row">
+        <span>Total</span>
+        <span id="viewLiveTotal">₹0</span>
+      </div>
+    </div>
+
+    <button id="viewSettingsBtn" class="view-settings-btn" type="button" aria-label="Slideshow settings">⚙</button>
   </div>
 
   <!-- DAYBOOK VIEW -->
@@ -195,6 +235,37 @@
         <button id="donePasswordOk" class="send-btn">OK</button>
       </div>
 
+    </div>
+  </div>
+
+  <!-- VIEW SLIDESHOW SETTINGS MODAL -->
+  <div id="viewSettingsModal" class="modal-overlay" style="display:none;">
+    <div class="live-modal-card">
+      <div class="live-modal-header">
+        <div class="modal-title">Slideshow</div>
+        <button id="closeViewSettings" class="live-close-btn">✕</button>
+      </div>
+
+      <div class="view-settings-body">
+        <div class="view-settings-row">
+          <button id="viewAddPhotosBtn" class="secondary-btn">Add Photos</button>
+          <input type="file" id="viewAddPhotosInput" accept="image/*" multiple style="display:none;">
+          <button id="viewImportPptBtn" class="secondary-btn">Import PPT</button>
+          <input type="file" id="viewImportPptInput" accept=".ppt,.pptx" style="display:none;">
+        </div>
+
+        <div id="viewSlideList" class="view-slide-list"></div>
+
+        <div class="view-settings-row view-duration-row">
+          <label for="viewDurationInput">Duration per image</label>
+          <input type="number" id="viewDurationInput" min="2" max="120" value="10" style="width:70px;">
+          <span>seconds</span>
+        </div>
+
+        <div class="modal-actions">
+          <button id="viewSettingsSave" class="send-btn">Save</button>
+        </div>
+      </div>
     </div>
   </div>
 
