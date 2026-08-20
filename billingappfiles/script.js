@@ -175,11 +175,19 @@ let _lastDraftHash = "";
 let _lastStaleCleanup = 0;
 let productsBySr = new Map();
 
-/* ---- VIEW / CAST STATE ---- */
-let isCastingActive = false;
+/* ---- VIEW / CAST STATE ----
+   viewCast/state now holds an ARRAY of up to MAX_ACTIVE_CASTS casts:
+     { casts: [ { sessionId, draftId, displayPrice }, ... ] }
+   normalizeCasts() below also accepts the legacy single-cast schema
+   ({ sessionId, startedAt }) so an already-active old cast is not
+   broken by this deploy. All new writes use only the array schema. */
+const MAX_ACTIVE_CASTS = 4;
+let myCastActive = false;
+let myCastDisplayPrice = false;
 let viewCastControlUnsub = null;
-let viewDraftUnsub = null;
-let viewCastCurrentDraftId = null;
+let viewActiveCasts = [];
+let viewDraftUnsubs = {};
+let viewDraftCache = {};
 
 /* ---- VIEW SLIDESHOW STATE (local-only, no Firestore) ---- */
 let viewSlideshowImages = [];
@@ -211,6 +219,8 @@ const daybookView =
 /* ---- VIEW (wall display) elements ---- */
 const castViewBtn =
   document.getElementById("castViewBtn");
+const showPricesToggle =
+  document.getElementById("showPricesToggle");
 const viewSlideshowStage =
   document.getElementById("viewSlideshowStage");
 const viewSlideshowEmpty =
@@ -219,14 +229,8 @@ const viewSlideshowLayers =
   document.getElementById("viewSlideshowLayers");
 const viewLiveStage =
   document.getElementById("viewLiveStage");
-const viewLiveCustomer =
-  document.getElementById("viewLiveCustomer");
-const viewLiveMeta =
-  document.getElementById("viewLiveMeta");
-const viewLiveItems =
-  document.getElementById("viewLiveItems");
-const viewLiveTotal =
-  document.getElementById("viewLiveTotal");
+const viewFullscreenBtn =
+  document.getElementById("viewFullscreenBtn");
 const viewSettingsBtn =
   document.getElementById("viewSettingsBtn");
 const viewSettingsModal =
@@ -980,7 +984,7 @@ async function deleteLiveDraft() {
     // Ending it here covers every place deleteLiveDraft() is already
     // called (finalize, empty bill, revision cancel, etc.) without
     // duplicating a termination hook at each call site.
-    if (isCastingActive) {
+    if (myCastActive) {
       await endViewCast();
     }
   } catch (err) {
@@ -994,10 +998,37 @@ async function deleteLiveDraft() {
 /* ================================
    VIEW CASTING (Billing side)
    Billing writes to viewCastRef only when the operator explicitly
-   presses "Cast to View" / "End Cast" — a handful of writes per day,
-   not per keystroke. The bill content itself is never duplicated here;
-   View reads it straight from the existing liveDraftBills document.
+   presses "Cast to View" / "End Cast" / toggles Show Prices — a handful
+   of writes per day, not per keystroke. The bill content itself is
+   never duplicated here; View reads it straight from the existing
+   liveDraftBills document. viewCastRef now holds an array of up to
+   MAX_ACTIVE_CASTS casts, written/read via a Firestore transaction so
+   the 4-cast ceiling holds under concurrent Billing sessions.
 ================================ */
+
+/* Accepts either the new { casts: [...] } schema or the legacy
+   single-cast { sessionId, startedAt } schema written by the previous
+   version of this feature, so an already-active old cast survives this
+   deploy. Every write from this point on uses only the new schema. */
+function normalizeCasts(data) {
+  if (!data) {
+    return [];
+  }
+  if (Array.isArray(data.casts)) {
+    return data.casts;
+  }
+  if (data.sessionId) {
+    return [
+      {
+        sessionId: data.sessionId,
+        draftId: data.sessionId,
+        displayPrice: false
+      }
+    ];
+  }
+  return [];
+}
+
 function updateCastButtonUI() {
   if (!castViewBtn) {
     return;
@@ -1007,49 +1038,93 @@ function updateCastButtonUI() {
     billItems.length ? "inline-flex" : "none";
 
   castViewBtn.textContent =
-    isCastingActive ? "End Cast" : "Cast to View";
+    myCastActive ? "End Cast" : "Cast to View";
 
   castViewBtn.classList.toggle(
     "cast-view-btn-active",
-    isCastingActive
+    myCastActive
   );
+
+  if (showPricesToggle) {
+    showPricesToggle.style.display =
+      myCastActive ? "inline-flex" : "none";
+
+    showPricesToggle.textContent =
+      myCastDisplayPrice ? "Show Prices: ON" : "Show Prices: OFF";
+
+    showPricesToggle.classList.toggle(
+      "show-prices-toggle-on",
+      myCastDisplayPrice
+    );
+
+    showPricesToggle.setAttribute(
+      "aria-pressed",
+      myCastDisplayPrice ? "true" : "false"
+    );
+  }
+}
+
+/* One atomic attempt to add this session to the shared cast array.
+   Returns { ok: true } on success (including the idempotent case where
+   this session is already casting), or { ok: false, casts } if the
+   array is already at MAX_ACTIVE_CASTS. */
+async function attemptCastTransaction() {
+  return runTransaction(db, async tx => {
+    const snap = await tx.get(viewCastRef);
+    const casts = normalizeCasts(snap.exists() ? snap.data() : null);
+
+    if (casts.find(c => c.sessionId === sessionId)) {
+      return { ok: true, casts };
+    }
+
+    if (casts.length >= MAX_ACTIVE_CASTS) {
+      return { ok: false, casts };
+    }
+
+    const nextCasts = casts.concat([
+      {
+        sessionId,
+        draftId: sessionId,
+        displayPrice: false
+      }
+    ]);
+
+    tx.set(viewCastRef, { casts: nextCasts });
+    return { ok: true, casts: nextCasts };
+  });
+}
+
+/* Removes exactly one cast entry by sessionId, atomically. Used both by
+   Billing ending its own cast and by View self-healing a cast whose
+   underlying draft has disappeared (see attachCastDraftListener). A
+   no-op write is skipped so repeated calls are safe (idempotent). */
+async function removeCastFromControlDoc(targetSessionId) {
+  try {
+    await runTransaction(db, async tx => {
+      const snap = await tx.get(viewCastRef);
+      if (!snap.exists()) {
+        return;
+      }
+      const casts = normalizeCasts(snap.data());
+      const filtered = casts.filter(c => c.sessionId !== targetSessionId);
+      if (filtered.length === casts.length) {
+        return;
+      }
+      tx.set(viewCastRef, { casts: filtered });
+    });
+  } catch (err) {
+    console.error("Failed to remove cast:", err);
+  }
 }
 
 async function startViewCast() {
-  if (!billItems.length || isCastingActive) {
+  if (!billItems.length || myCastActive) {
     return;
   }
 
   castViewBtn.disabled = true;
 
   try {
-    const castSnap = await getDoc(viewCastRef);
-
-    if (castSnap.exists()) {
-      const castData = castSnap.data();
-
-      if (castData.sessionId && castData.sessionId !== sessionId) {
-        // Reuse the existing staleness convention (isDraftStale, 120s)
-        // instead of a heartbeat: a cast is only "still active" if the
-        // draft it points to is still being updated.
-        const otherDraftSnap = await getDoc(
-          doc(db, "liveDraftBills", castData.sessionId)
-        );
-
-        const otherCastStillLive =
-          otherDraftSnap.exists() &&
-          !isDraftStale(otherDraftSnap.data());
-
-        if (otherCastStillLive) {
-          showToast(
-            "View is currently being used by another billing session.",
-            "error"
-          );
-          return;
-        }
-      }
-    }
-
     // Make sure View has fresh data the instant it attaches, rather than
     // waiting out the 1s debounce on the very first frame.
     if (_syncDraftTimer) {
@@ -1059,12 +1134,40 @@ async function startViewCast() {
     _lastDraftHash = simpleDraftHash(billItems, customerName.value);
     await syncLiveDraft();
 
-    await setDoc(viewCastRef, {
-      sessionId,
-      startedAt: serverTimestamp()
-    });
+    let result = await attemptCastTransaction();
 
-    isCastingActive = true;
+    if (!result.ok) {
+      // All 4 slots are taken. Before giving up, check whether any of
+      // those casts is actually abandoned (its draft is gone or hasn't
+      // been touched in 2+ minutes, reusing the existing isDraftStale
+      // convention) and free that slot. This only runs in the rare
+      // case the deck is already full — not a recurring cost.
+      const staleIds = [];
+
+      for (const c of result.casts) {
+        const draftSnap = await getDoc(
+          doc(db, "liveDraftBills", c.draftId || c.sessionId)
+        );
+        if (!draftSnap.exists() || isDraftStale(draftSnap.data())) {
+          staleIds.push(c.sessionId);
+        }
+      }
+
+      if (staleIds.length) {
+        for (const id of staleIds) {
+          await removeCastFromControlDoc(id);
+        }
+        result = await attemptCastTransaction();
+      }
+    }
+
+    if (!result.ok) {
+      showToast("View is already displaying 4 bills.", "error");
+      return;
+    }
+
+    myCastActive = true;
+    myCastDisplayPrice = false;
     updateCastButtonUI();
   } catch (err) {
     console.error("Failed to start cast:", err);
@@ -1075,20 +1178,47 @@ async function startViewCast() {
 }
 
 async function endViewCast() {
-  if (!isCastingActive) {
+  if (!myCastActive) {
     return;
   }
 
-  isCastingActive = false;
+  myCastActive = false;
+  myCastDisplayPrice = false;
   updateCastButtonUI();
 
+  await removeCastFromControlDoc(sessionId);
+}
+
+/* Presentation-only: flips whether THIS session's cast shows monetary
+   information on View. Never touches the bill/live draft. */
+async function toggleShowPrices() {
+  if (!myCastActive) {
+    return;
+  }
+
+  const nextValue = !myCastDisplayPrice;
+
   try {
-    const snap = await getDoc(viewCastRef);
-    if (snap.exists() && snap.data().sessionId === sessionId) {
-      await deleteDoc(viewCastRef);
-    }
+    await runTransaction(db, async tx => {
+      const snap = await tx.get(viewCastRef);
+      const casts = normalizeCasts(snap.exists() ? snap.data() : null);
+      const idx = casts.findIndex(c => c.sessionId === sessionId);
+
+      if (idx === -1) {
+        // Our cast entry vanished (e.g. removed by stale cleanup) —
+        // nothing to toggle.
+        return;
+      }
+
+      casts[idx] = { ...casts[idx], displayPrice: nextValue };
+      tx.set(viewCastRef, { casts });
+    });
+
+    myCastDisplayPrice = nextValue;
+    updateCastButtonUI();
   } catch (err) {
-    console.error("Failed to end cast:", err);
+    console.error("Failed to toggle Show Prices:", err);
+    showToast("Failed to update Show Prices", "error");
   }
 }
 
@@ -1230,92 +1360,138 @@ function showSlideshowStage() {
 function showLiveStage() {
   pauseSlideshow();
   if (viewSlideshowStage) viewSlideshowStage.style.display = "none";
-  if (viewLiveStage) viewLiveStage.style.display = "block";
+  if (viewLiveStage) viewLiveStage.style.display = "grid";
 }
 
 /* --- Live bill rendering (read-only, reuses the existing draft shape —
-   no second bill/total calculation is implemented here) --- */
-function renderViewLiveBill(draft) {
-  if (!viewLiveCustomer) {
+   no second bill/total calculation is implemented here). Renders one
+   panel per active cast, N equal-width columns, driven entirely by
+   viewActiveCasts.length. displayPrice is presentation-only: it never
+   changes which fields exist on the underlying draft, only which of
+   the already-computed fields this panel shows. --- */
+function renderViewCastPanelHTML(cast, draft) {
+  if (!draft) {
+    return `<div class="view-cast-panel view-cast-panel-loading"></div>`;
+  }
+
+  const showPrices = !!cast.displayPrice;
+  const items = draft.items || [];
+
+  const headerCells = showPrices
+    ? `<th>Product</th><th>Wt/Qty</th><th>Rate</th><th>Amount</th>`
+    : `<th>Product</th><th>Wt/Qty</th>`;
+
+  const rows = items
+    .map(item => {
+      const nameCell = `<td>${escapeAttr(item.productName)}</td>`;
+      const qtyCell = `<td>${item.qty > 0 ? item.qty : "—"}</td>`;
+
+      if (!showPrices) {
+        return `<tr>${nameCell}${qtyCell}</tr>`;
+      }
+
+      const rateCell =
+        `<td>${item.price > 0 ? "₹" + formatIndianMoneyWhole(item.price) : "—"}</td>`;
+      const amountCell =
+        `<td>${item.qty > 0 && item.price > 0 ? "₹" + formatIndianMoneyWhole(Math.abs(item.total)) : "—"}</td>`;
+
+      return `<tr>${nameCell}${qtyCell}${rateCell}${amountCell}</tr>`;
+    })
+    .join("");
+
+  const totalRow = showPrices
+    ? `<div class="view-live-total-row"><span>Total</span><span>₹${formatIndianMoneyWhole(draft.subtotal || 0)}</span></div>`
+    : "";
+
+  return `
+    <div class="view-cast-panel">
+      <div class="view-live-header">
+        <div class="view-live-customer">${escapeAttr(draft.customerName || "WALK-IN")}</div>
+      </div>
+      <table class="view-live-table view-live-table--${showPrices ? "priced" : "plain"}">
+        <thead><tr>${headerCells}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      ${totalRow}
+    </div>
+  `;
+}
+
+function renderViewLivePanels() {
+  if (!viewLiveStage || !viewActiveCasts.length) {
     return;
   }
 
-  viewLiveCustomer.textContent =
-    draft.customerName || "WALK-IN";
+  viewLiveStage.style.gridTemplateColumns =
+    `repeat(${viewActiveCasts.length}, 1fr)`;
 
-  viewLiveMeta.textContent =
-    (draft.mode === "W" ? "Wholesale" : "Retail") +
-    (draft.revisionLabel ? " · " + draft.revisionLabel : "");
-
-  const items = draft.items || [];
-
-  viewLiveItems.innerHTML = items
-    .map(
-      item => `
-      <tr>
-        <td>${escapeAttr(item.productName)}</td>
-        <td>${item.qty > 0 ? item.qty : "—"}</td>
-        <td>${item.price > 0 ? "₹" + formatIndianMoneyWhole(item.price) : "—"}</td>
-        <td>${item.qty > 0 && item.price > 0 ? "₹" + formatIndianMoneyWhole(Math.abs(item.total)) : "—"}</td>
-      </tr>
-    `
+  viewLiveStage.innerHTML = viewActiveCasts
+    .map(cast =>
+      renderViewCastPanelHTML(cast, viewDraftCache[cast.sessionId])
     )
     .join("");
-
-  viewLiveTotal.textContent =
-    "₹" + formatIndianMoneyWhole(draft.subtotal || 0);
 }
 
 /* --- Cast handoff (View side) ---
    viewCastRef is the ONLY permanent listener the View screen keeps. It
    is a single small document, not the liveDraftBills collection, and it
-   only changes on explicit Cast/End Cast actions (a few times a day) —
-   see the Firestore cost report for why a listener here is unavoidable
-   for automatic, no-touch switching across two separate devices. */
-function detachDraftOnly() {
-  if (viewDraftUnsub) {
-    viewDraftUnsub();
-    viewDraftUnsub = null;
-  }
-  viewCastCurrentDraftId = null;
-}
-
-function detachViewFromDraft() {
-  detachDraftOnly();
-  showSlideshowStage();
-}
-
-function attachViewToDraft(draftId) {
-  if (!draftId) {
-    detachViewFromDraft();
-    return;
-  }
-
-  if (viewDraftUnsub && viewCastCurrentDraftId === draftId) {
-    return;
-  }
-
-  detachDraftOnly();
-  viewCastCurrentDraftId = draftId;
-  showLiveStage();
-
-  viewDraftUnsub = onSnapshot(
-    doc(db, "liveDraftBills", draftId),
+   only changes on explicit Cast/End Cast/Show-Prices actions (a
+   handful of times a day) — see the Firestore cost report for why a
+   listener here is unavoidable for automatic, no-touch switching
+   across separate devices. Only while casts are active does View also
+   hold one temporary listener PER active cast (max 4), each directly
+   on its existing liveDraftBills document — never the collection. */
+function attachCastDraftListener(watchSessionId) {
+  viewDraftUnsubs[watchSessionId] = onSnapshot(
+    doc(db, "liveDraftBills", watchSessionId),
     draftSnap => {
       if (!draftSnap.exists()) {
-        // Draft disappeared (bill finalized/cleared elsewhere, or stale
-        // cleanup). Fail safe back to the slideshow rather than showing
-        // stale customer data.
-        detachViewFromDraft();
+        // This cast's draft is gone (finalized/cleared elsewhere, or an
+        // abandoned session). Self-heal: remove just this cast from the
+        // shared control doc so its slot frees up and the remaining
+        // casts reflow — no heartbeat required for this to happen.
+        delete viewDraftCache[watchSessionId];
+        removeCastFromControlDoc(watchSessionId);
         return;
       }
-      renderViewLiveBill(draftSnap.data());
+      viewDraftCache[watchSessionId] = draftSnap.data();
+      renderViewLivePanels();
     },
     err => {
       console.error("View draft listener error:", err);
-      detachViewFromDraft();
     }
   );
+}
+
+function applyViewCasts(casts) {
+  viewActiveCasts = casts;
+
+  const activeIds = new Set(casts.map(c => c.sessionId));
+
+  // Detach + drop cached data for any session no longer in the array
+  // (only that one cast's listener is touched; the rest are untouched).
+  for (const id of Object.keys(viewDraftUnsubs)) {
+    if (!activeIds.has(id)) {
+      viewDraftUnsubs[id]();
+      delete viewDraftUnsubs[id];
+      delete viewDraftCache[id];
+    }
+  }
+
+  // Attach a listener for any newly-added session (idempotent — skips
+  // sessions that already have one).
+  casts.forEach(cast => {
+    if (!viewDraftUnsubs[cast.sessionId]) {
+      attachCastDraftListener(cast.sessionId);
+    }
+  });
+
+  if (!casts.length) {
+    showSlideshowStage();
+  } else {
+    showLiveStage();
+    renderViewLivePanels();
+  }
 }
 
 function initViewCastListener() {
@@ -1326,15 +1502,12 @@ function initViewCastListener() {
   viewCastControlUnsub = onSnapshot(
     viewCastRef,
     snap => {
-      if (snap.exists()) {
-        attachViewToDraft(snap.data().sessionId);
-      } else {
-        detachViewFromDraft();
-      }
+      const casts = snap.exists() ? normalizeCasts(snap.data()) : [];
+      applyViewCasts(casts);
     },
     err => {
       console.error("View cast listener error:", err);
-      detachViewFromDraft();
+      applyViewCasts([]);
     }
   );
 }
@@ -1346,10 +1519,10 @@ async function enterViewScreen() {
   await loadSlideshowImagesIntoMemory();
   initViewCastListener();
 
-  // Only resume the slideshow clock if we're not already attached to a
-  // live cast (the cast listener above will call showLiveStage()/
-  // pauseSlideshow() on its own if a cast is in fact active).
-  if (!viewCastCurrentDraftId) {
+  // Only resume the slideshow clock if we're not already showing one or
+  // more live casts (the cast listener above will call showLiveStage()
+  // on its own if casts are in fact active).
+  if (!viewActiveCasts.length) {
     startSlideshowTimer();
   }
 }
@@ -1592,12 +1765,38 @@ if (viewSettingsSave) {
     await loadSlideshowImagesIntoMemory();
 
     // Only restart the clock if the slideshow is actually the visible
-    // stage right now (i.e. no cast is active).
-    if (!viewCastCurrentDraftId) {
+    // stage right now (i.e. no casts are active).
+    if (!viewActiveCasts.length) {
       startSlideshowTimer();
     }
   });
 }
+
+/* --- Fullscreen (wall display) ---
+   Uses the browser's native Fullscreen API only. When #viewView is the
+   fullscreen element, the browser itself removes the rest of the page
+   (nav tabs, everything outside #viewView) from view — no extra CSS is
+   needed for that part. We only need to hide the small settings/
+   fullscreen buttons that live inside #viewView itself (see CSS
+   ":fullscreen" rules), and keep them back in sync on exit (Esc/F11). */
+if (viewFullscreenBtn) {
+  viewFullscreenBtn.addEventListener("click", () => {
+    if (!document.fullscreenElement) {
+      viewView.requestFullscreen().catch(err => {
+        console.error("Failed to enter fullscreen:", err);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  });
+}
+
+document.addEventListener("fullscreenchange", () => {
+  document.body.classList.toggle(
+    "view-fullscreen-mode",
+    document.fullscreenElement === viewView
+  );
+});
 
 function isDraftStale(draft) {
   if (!draft.updatedAt) {
@@ -3907,13 +4106,19 @@ closePreview.addEventListener(
 castViewBtn.addEventListener(
   "click",
   () => {
-    if (isCastingActive) {
+    if (myCastActive) {
       endViewCast();
     } else {
       startViewCast();
     }
   }
 );
+
+if (showPricesToggle) {
+  showPricesToggle.addEventListener("click", () => {
+    toggleShowPrices();
+  });
+}
 
 liveBtn.addEventListener(
   "click",
@@ -5388,13 +5593,17 @@ document.getElementById("appTitleLink").addEventListener("click", (e) => {
 subscribeToLiveDrafts();
 
 // One-time check (not a listener) so that if Billing is refreshed while
-// this session owns an active cast, the "End Cast" button state is
-// restored instead of drifting out of sync with viewCastRef.
+// this session owns an active cast, the "End Cast" / Show Prices button
+// state is restored instead of drifting out of sync with viewCastRef.
 (async function restoreCastOwnershipOnLoad() {
   try {
     const snap = await getDoc(viewCastRef);
-    if (snap.exists() && snap.data().sessionId === sessionId) {
-      isCastingActive = true;
+    const casts = snap.exists() ? normalizeCasts(snap.data()) : [];
+    const mine = casts.find(c => c.sessionId === sessionId);
+
+    if (mine) {
+      myCastActive = true;
+      myCastDisplayPrice = !!mine.displayPrice;
       updateCastButtonUI();
     }
   } catch (err) {

@@ -2368,47 +2368,71 @@ input {
   to { opacity: 1; }
 }
 
-/* --- Live bill (wall display, read-only, large text) --- */
+/* --- Live bill (wall display, read-only, large text) ---
+   .view-live-stage is a CSS Grid container; grid-template-columns is
+   set inline by renderViewLivePanels() as repeat(N, 1fr) — N equal
+   columns driven purely by how many casts are active (1-4). Each
+   .view-cast-panel is one independent, self-contained bill. */
 .view-live-stage {
-  display: flex;
-  flex-direction: column;
-  padding: 48px 64px;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: stretch;
   background: var(--color-bg);
   color: var(--color-text-primary);
   animation: viewSlideFadeIn 0.5s ease;
+  height: 100%;
+}
+
+.view-cast-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 40px 36px;
+  border-right: 1px solid var(--color-border);
+  overflow: hidden;
+  min-width: 0;
+}
+
+.view-cast-panel:last-child {
+  border-right: none;
+}
+
+.view-cast-panel-loading {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--color-bg),
+    var(--color-bg) 10px,
+    var(--color-border) 10px,
+    var(--color-border) 11px
+  );
+  opacity: 0.4;
 }
 
 .view-live-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
   border-bottom: 3px solid var(--color-primary);
-  padding-bottom: 20px;
-  margin-bottom: 28px;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .view-live-customer {
-  font-size: 44px;
+  font-size: 32px;
   font-weight: 800;
   color: var(--color-primary);
-}
-
-.view-live-meta {
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .view-live-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 26px;
+  font-size: 19px;
+  table-layout: fixed;
 }
 
 .view-live-table th {
   text-align: left;
-  padding: 12px 10px;
-  font-size: 18px;
+  padding: 10px 6px;
+  font-size: 13px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--color-text-secondary);
@@ -2416,14 +2440,21 @@ input {
 }
 
 .view-live-table td {
-  padding: 16px 10px;
+  padding: 12px 6px;
   border-bottom: 1px solid var(--color-border);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.view-live-table th:last-child,
-.view-live-table td:last-child,
-.view-live-table th:nth-child(3),
-.view-live-table td:nth-child(3) {
+/* Priced panels: 4 columns, money columns right-aligned.
+   Plain (Show Prices OFF) panels: only 2 columns exist at all — no
+   empty Rate/Amount cells are ever rendered, so no extra rule is
+   needed to hide them. */
+.view-live-table--priced th:last-child,
+.view-live-table--priced td:last-child,
+.view-live-table--priced th:nth-child(3),
+.view-live-table--priced td:nth-child(3) {
   text-align: right;
 }
 
@@ -2432,17 +2463,18 @@ input {
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
-  padding-top: 28px;
-  font-size: 40px;
+  padding-top: 20px;
+  font-size: 28px;
   font-weight: 800;
   color: var(--color-primary);
 }
 
-/* --- Settings gear (unobtrusive, only visible on the View tab) --- */
-.view-settings-btn {
+/* --- Settings gear + fullscreen (unobtrusive, only visible on the View
+   tab, and hidden automatically while fullscreen) --- */
+.view-settings-btn,
+.view-fullscreen-btn {
   position: absolute;
   bottom: 18px;
-  right: 18px;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -2455,9 +2487,26 @@ input {
   z-index: 5;
 }
 
-.view-settings-btn:hover {
+.view-settings-btn {
+  right: 18px;
+}
+
+.view-fullscreen-btn {
+  right: 68px;
+}
+
+.view-settings-btn:hover,
+.view-fullscreen-btn:hover {
   background: rgba(255,255,255,0.22);
   color: #fff;
+}
+
+/* Native Fullscreen API already removes everything outside #viewView
+   from the screen (nav tabs, etc). We only need to hide the two small
+   controls that live inside #viewView itself. */
+#viewView:fullscreen .view-settings-btn,
+#viewView:fullscreen .view-fullscreen-btn {
+  display: none;
 }
 
 /* --- Slideshow settings modal --- */
@@ -2556,16 +2605,76 @@ input {
    VIEW RESPONSIVE (large wall display + normal browser testing)
 ================================ */
 @media (min-width: 1600px) {
-  .view-live-customer { font-size: 64px; }
-  .view-live-meta { font-size: 28px; }
-  .view-live-table { font-size: 34px; }
-  .view-live-total-row { font-size: 56px; }
+  .view-live-customer { font-size: 46px; }
+  .view-live-table { font-size: 26px; }
+  .view-live-total-row { font-size: 38px; }
 }
 
-@media (max-width: 640px) {
-  .view-live-stage { padding: 24px 20px; }
-  .view-live-customer { font-size: 28px; }
-  .view-live-meta { font-size: 15px; }
-  .view-live-table { font-size: 16px; }
-  .view-live-total-row { font-size: 26px; }
+@media (max-width: 900px) {
+  /* Small/normal browser windows: stack panels instead of squeezing
+     several equal-width columns into a narrow viewport. The wall
+     display itself is expected to be well over this width. */
+  .view-live-stage {
+    grid-auto-flow: row;
+    grid-template-columns: 1fr !important;
+  }
+
+  .view-cast-panel {
+    padding: 20px 18px;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .view-live-customer { font-size: 24px; }
+  .view-live-table { font-size: 15px; }
+  .view-live-total-row { font-size: 22px; }
+}
+
+/* ================================
+   NAV ICON BUTTONS (View / Daybook)
+================================ */
+.tab-btn.daybook-mini svg {
+  display: block;
+  margin: 0 auto;
+}
+
+/* ================================
+   SHOW PRICES TOGGLE (Billing header, per-cast, defaults OFF)
+================================ */
+.show-prices-toggle {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 1px solid #e2e8f0;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.show-prices-toggle:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.show-prices-toggle-on {
+  background: var(--color-success);
+  color: white;
+  border-color: var(--color-success-dark);
+}
+
+.show-prices-toggle-on:hover {
+  background: var(--color-success-dark);
+}
+
+/* ================================
+   FULLSCREEN MODE
+   Native Fullscreen API already strips the rest of the page; this class
+   is a defensive backup (kept in sync via the fullscreenchange listener)
+   in case any browser chrome needs an explicit nudge to hide.
+================================ */
+body.view-fullscreen-mode .app-tabs {
+  display: none;
 }

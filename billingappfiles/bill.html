@@ -27,8 +27,18 @@
   <div class="app-tabs">
     <button id="billingTab" class="tab-btn active">Billing</button>
     <button id="receiverTab" class="tab-btn">Receiver</button>
-    <button id="viewTab" class="tab-btn daybook-mini">View</button>
-    <button id="daybookTab" class="tab-btn daybook-mini">Daybook</button>
+    <button id="viewTab" class="tab-btn daybook-mini" aria-label="View" title="View">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>
+    </button>
+    <button id="daybookTab" class="tab-btn daybook-mini" aria-label="Daybook" title="Daybook">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5v-17Z"></path>
+        <path d="M4 19a2.5 2.5 0 0 1 2.5-2.5H20"></path>
+      </svg>
+    </button>
   </div>
 
   <!-- BILLING VIEW -->
@@ -45,6 +55,7 @@
 
         <div class="header-controls">
           <button id="castViewBtn" class="cast-view-btn" style="display:none;">Cast to View</button>
+          <button id="showPricesToggle" class="show-prices-toggle" style="display:none;" aria-pressed="false">Show Prices: OFF</button>
           <button id="liveBtn">LIVE (0)</button>
           <button id="modeToggle">&nbsp;</button>
         </div>
@@ -106,30 +117,18 @@
       <div id="viewSlideshowLayers" class="view-slideshow-layers"></div>
     </div>
 
-    <div id="viewLiveStage" class="view-stage view-live-stage" style="display:none;">
-      <div class="view-live-header">
-        <div id="viewLiveCustomer" class="view-live-customer">WALK-IN</div>
-        <div id="viewLiveMeta" class="view-live-meta"></div>
-      </div>
+    <!-- Populated dynamically with 1-4 .view-cast-panel columns, one per
+         active cast (see renderViewLivePanels in script.js). -->
+    <div id="viewLiveStage" class="view-stage view-live-stage" style="display:none;"></div>
 
-      <table class="view-live-table">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Wt/Qty</th>
-            <th>Rate</th>
-            <th>Amount</th>
-          </tr>
-        </thead>
-        <tbody id="viewLiveItems"></tbody>
-      </table>
-
-      <div class="view-live-total-row">
-        <span>Total</span>
-        <span id="viewLiveTotal">₹0</span>
-      </div>
-    </div>
-
+    <button id="viewFullscreenBtn" class="view-fullscreen-btn" type="button" aria-label="Fullscreen" title="Fullscreen">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M8 3H5a2 2 0 0 0-2 2v3"></path>
+        <path d="M16 3h3a2 2 0 0 1 2 2v3"></path>
+        <path d="M8 21H5a2 2 0 0 1-2-2v-3"></path>
+        <path d="M16 21h3a2 2 0 0 0 2-2v-3"></path>
+      </svg>
+    </button>
     <button id="viewSettingsBtn" class="view-settings-btn" type="button" aria-label="Slideshow settings">⚙</button>
   </div>
 
