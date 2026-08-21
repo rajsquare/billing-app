@@ -1039,7 +1039,7 @@ function updateCastButtonUI() {
     billItems.length ? "inline-flex" : "none";
 
   castViewBtn.textContent =
-    myCastActive ? "End Cast" : "Cast to View";
+    myCastActive ? "End" : "Cast to View";
 
   castViewBtn.classList.toggle(
     "cast-view-btn-active",
@@ -1050,8 +1050,18 @@ function updateCastButtonUI() {
     showPricesToggle.style.display =
       myCastActive ? "inline-flex" : "none";
 
-    showPricesToggle.textContent =
-      myCastDisplayPrice ? "Show Prices: ON" : "Show Prices: OFF";
+    // Compact ₹ + switch presentation — no "Show Prices: ON/OFF" text.
+    // State is communicated visually (switch position/color) and via
+    // aria-pressed/aria-label for accessibility; the click handler and
+    // toggleShowPrices() behavior are untouched.
+    showPricesToggle.innerHTML =
+      `<span class="price-toggle-symbol">₹</span>` +
+      `<span class="price-toggle-switch"><span class="price-toggle-knob"></span></span>`;
+
+    showPricesToggle.setAttribute(
+      "aria-label",
+      myCastDisplayPrice ? "Show prices: on" : "Show prices: off"
+    );
 
     showPricesToggle.classList.toggle(
       "show-prices-toggle-on",

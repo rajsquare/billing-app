@@ -193,11 +193,11 @@ input {
 }
 
 #modeToggle {
-  padding: 10px 14px;
+  padding: 8px 11px;
   border-radius: 8px;
   background: #2f3f64;
   color: white;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.03em;
   box-shadow: 0 1px 4px rgba(47,63,100,0.22);
@@ -1399,7 +1399,7 @@ input {
 ================================ */
 .header-controls {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
 }
 
@@ -1407,13 +1407,13 @@ input {
    LIVE BUTTON
 ================================ */
 #liveBtn {
-  padding: 10px 14px;
+  padding: 8px 11px;
   border-radius: 8px;
   background: #374151;
   color: #9ca3af;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   box-shadow: 0 1px 3px rgba(0,0,0,0.15);
   white-space: nowrap;
   transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
@@ -1951,17 +1951,46 @@ input {
 /* Responsive: header controls compress gracefully on narrow screens */
 @media (max-width: 360px) {
   .header-controls {
-    gap: 5px;
+    gap: 4px;
   }
 
   #modeToggle {
-    padding: 8px 10px;
+    padding: 7px 9px;
     font-size: 11px;
   }
 
   #liveBtn {
-    padding: 8px 10px;
+    padding: 7px 9px;
     font-size: 11px;
+  }
+
+  .cast-view-btn {
+    padding: 7px 9px;
+    font-size: 11px;
+  }
+
+  .cast-view-btn-active {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .show-prices-toggle {
+    padding: 6px 7px;
+    gap: 5px;
+  }
+
+  .price-toggle-switch {
+    width: 26px;
+    height: 15px;
+  }
+
+  .price-toggle-knob {
+    width: 11px;
+    height: 11px;
+  }
+
+  .show-prices-toggle-on .price-toggle-knob {
+    transform: translateX(11px);
   }
 }
 
@@ -2278,11 +2307,11 @@ input {
    CAST TO VIEW BUTTON (Billing header)
 ================================ */
 .cast-view-btn {
-  padding: 10px 14px;
+  padding: 8px 11px;
   border-radius: 8px;
   background: #374151;
   color: #9ca3af;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
   box-shadow: 0 1px 3px rgba(0,0,0,0.15);
@@ -2300,6 +2329,8 @@ input {
 }
 
 .cast-view-btn-active {
+  padding-left: 12px;
+  padding-right: 12px;
   background: var(--color-danger-text);
   color: #fee2e2;
   box-shadow: 0 1px 4px rgba(185,28,28,0.35);
@@ -2804,33 +2835,70 @@ input {
 
 /* ================================
    SHOW PRICES TOGGLE (Billing header, per-cast, defaults OFF)
+   Compact ₹ indicator + switch — no "Show Prices: ON/OFF" text. State
+   is communicated purely visually (switch position/color); markup is
+   built in updateCastButtonUI(), click handler is unchanged.
 ================================ */
 .show-prices-toggle {
-  padding: 10px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 9px;
   border-radius: 8px;
   background: #f1f5f9;
-  color: #64748b;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
   border: 1px solid #e2e8f0;
   white-space: nowrap;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .show-prices-toggle:hover {
   background: #e2e8f0;
-  color: #1e293b;
+}
+
+.price-toggle-symbol {
+  font-size: 13px;
+  font-weight: 800;
+  color: #64748b;
+  line-height: 1;
+}
+
+.price-toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 30px;
+  height: 17px;
+  border-radius: 999px;
+  background: #cbd5e1;
+  transition: background 0.15s ease;
+}
+
+.price-toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+  transition: transform 0.15s ease;
 }
 
 .show-prices-toggle-on {
-  background: var(--color-success);
-  color: white;
-  border-color: var(--color-success-dark);
+  background: #f1f5f9;
+  border-color: #e2e8f0;
 }
 
-.show-prices-toggle-on:hover {
-  background: var(--color-success-dark);
+.show-prices-toggle-on .price-toggle-symbol {
+  color: var(--color-success-dark);
+}
+
+.show-prices-toggle-on .price-toggle-switch {
+  background: var(--color-success);
+}
+
+.show-prices-toggle-on .price-toggle-knob {
+  transform: translateX(13px);
 }
 
 /* ================================
