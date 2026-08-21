@@ -188,6 +188,7 @@ let viewCastControlUnsub = null;
 let viewActiveCasts = [];
 let viewDraftUnsubs = {};
 let viewDraftCache = {};
+let viewDraftItemCounts = {};
 
 /* ---- VIEW SLIDESHOW STATE (local-only, no Firestore) ---- */
 let viewSlideshowImages = [];
@@ -1368,7 +1369,87 @@ function showLiveStage() {
    panel per active cast, N equal-width columns, driven entirely by
    viewActiveCasts.length. displayPrice is presentation-only: it never
    changes which fields exist on the underlying draft, only which of
-   the already-computed fields this panel shows. --- */
+   the already-computed fields this panel shows.
+
+   Item ordering note: selectProduct() unshifts new items onto the
+   FRONT of billItems (confirmed — it is the only insertion path), and
+   buildDraftPayload() preserves that order into draft.items. So
+   items[0] is always the most recently added item — that is "current"
+   — and items.slice(1) is history, already newest-first. No existing
+   selected/edited-item state exists elsewhere in Billing to reuse. --- */
+function renderCurrentItemHTML(item, showPrices) {
+  const materialText = (item.material || "").trim();
+  const materialLine = materialText
+    ? `<div class="view-current-material ${getMaterialClass(materialText)}">${escapeAttr(materialText)}</div>`
+    : "";
+
+  const qtyLine =
+    `<div class="view-current-qty">${item.qty > 0 ? item.qty : "—"}</div>`;
+
+  let priceBlock = "";
+  if (showPrices) {
+    const rateText =
+      item.price > 0 ? "₹" + formatIndianMoneyWhole(item.price) : "—";
+    const amountText =
+      item.qty > 0 && item.price > 0
+        ? "₹" + formatIndianMoneyWhole(Math.abs(item.total))
+        : "—";
+
+    priceBlock = `
+      <div class="view-current-price-row">
+        <span class="view-current-price-label">Rate</span>
+        <span class="view-current-price-value">${rateText}</span>
+      </div>
+      <div class="view-current-price-row">
+        <span class="view-current-price-label">Amount</span>
+        <span class="view-current-price-value">${amountText}</span>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="view-current-name">${escapeAttr(item.productName)}</div>
+    ${materialLine}
+    ${qtyLine}
+    ${priceBlock}
+  `;
+}
+
+function renderHistoryItemHTML(item, showPrices) {
+  const materialText = (item.material || "").trim();
+  const qtyText = item.qty > 0 ? item.qty : "—";
+
+  const segments = [
+    `<span class="view-history-name">${escapeAttr(item.productName)}</span>`
+  ];
+
+  if (materialText) {
+    segments.push(
+      `<span class="view-history-material ${getMaterialClass(materialText)}">${escapeAttr(materialText)}</span>`
+    );
+  }
+
+  segments.push(`<span class="view-history-qty">${qtyText}</span>`);
+
+  if (showPrices) {
+    const rateText =
+      item.price > 0 ? "₹" + formatIndianMoneyWhole(item.price) : "—";
+    const amountText =
+      item.qty > 0 && item.price > 0
+        ? "₹" + formatIndianMoneyWhole(Math.abs(item.total))
+        : "—";
+    segments.push(
+      `<span class="view-history-money">${rateText} · ${amountText}</span>`
+    );
+  }
+
+  return (
+    `<div class="view-history-row">` +
+    segments.join(`<span class="view-history-sep">·</span>`) +
+    `</div>`
+  );
+}
+
 function renderViewCastPanelHTML(cast, draft) {
   if (!draft) {
     return `<div class="view-cast-panel view-cast-panel-loading"></div>`;
@@ -1376,30 +1457,28 @@ function renderViewCastPanelHTML(cast, draft) {
 
   const showPrices = !!cast.displayPrice;
   const items = draft.items || [];
+  const currentItem = items.length ? items[0] : null;
+  const historyItems = items.length > 1 ? items.slice(1) : [];
 
-  const headerCells = showPrices
-    ? `<th>Product</th><th>Wt/Qty</th><th>Rate</th><th>Amount</th>`
-    : `<th>Product</th><th>Wt/Qty</th>`;
+  // Only plays the entrance transition when a NEW item has actually
+  // arrived (see attachCastDraftListener), never on ordinary edits to
+  // the same current item (price/qty changes), so live updates are
+  // never delayed or interrupted by animation.
+  const enterClass = draft._viewIsNewCurrentItem
+    ? " view-current-item--enter"
+    : "";
 
-  const rows = items
-    .map(item => {
-      const nameCell = `<td>${escapeAttr(item.productName)}</td>`;
-      const qtyCell = `<td>${item.qty > 0 ? item.qty : "—"}</td>`;
+  const currentHTML = currentItem
+    ? `<div class="view-current-item${enterClass}">${renderCurrentItemHTML(currentItem, showPrices)}</div>`
+    : "";
 
-      if (!showPrices) {
-        return `<tr>${nameCell}${qtyCell}</tr>`;
-      }
+  const historyHTML = historyItems.length
+    ? `<div class="view-history-list">${historyItems
+        .map(item => renderHistoryItemHTML(item, showPrices))
+        .join("")}</div>`
+    : "";
 
-      const rateCell =
-        `<td>${item.price > 0 ? "₹" + formatIndianMoneyWhole(item.price) : "—"}</td>`;
-      const amountCell =
-        `<td>${item.qty > 0 && item.price > 0 ? "₹" + formatIndianMoneyWhole(Math.abs(item.total)) : "—"}</td>`;
-
-      return `<tr>${nameCell}${qtyCell}${rateCell}${amountCell}</tr>`;
-    })
-    .join("");
-
-  const totalRow = showPrices
+  const totalRow = showPrices && items.length
     ? `<div class="view-live-total-row"><span>Total</span><span>₹${formatIndianMoneyWhole(draft.subtotal || 0)}</span></div>`
     : "";
 
@@ -1408,10 +1487,8 @@ function renderViewCastPanelHTML(cast, draft) {
       <div class="view-live-header">
         <div class="view-live-customer">${escapeAttr(draft.customerName || "WALK-IN")}</div>
       </div>
-      <table class="view-live-table view-live-table--${showPrices ? "priced" : "plain"}">
-        <thead><tr>${headerCells}</tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
+      ${currentHTML}
+      ${historyHTML}
       ${totalRow}
     </div>
   `;
@@ -1424,6 +1501,11 @@ function renderViewLivePanels() {
 
   viewLiveStage.style.gridTemplateColumns =
     `repeat(${viewActiveCasts.length}, 1fr)`;
+
+  // Purely local, cosmetic hook so CSS can scale current-item typography
+  // down as more panels share the width (1/2/3/4 casts) — no Firestore
+  // involvement, just an attribute selector.
+  viewLiveStage.dataset.castCount = String(viewActiveCasts.length);
 
   viewLiveStage.innerHTML = viewActiveCasts
     .map(cast =>
@@ -1451,10 +1533,23 @@ function attachCastDraftListener(watchSessionId) {
         // shared control doc so its slot frees up and the remaining
         // casts reflow — no heartbeat required for this to happen.
         delete viewDraftCache[watchSessionId];
+        delete viewDraftItemCounts[watchSessionId];
         removeCastFromControlDoc(watchSessionId);
         return;
       }
-      viewDraftCache[watchSessionId] = draftSnap.data();
+
+      const data = draftSnap.data();
+      const itemCount = (data.items || []).length;
+      const prevCount = viewDraftItemCounts[watchSessionId] || 0;
+
+      // Local-only flag (never written back to Firestore) so the
+      // current-item panel can play its brief entrance transition only
+      // when a genuinely new item has arrived — not on every edit
+      // (price/qty change) to the item that was already current.
+      data._viewIsNewCurrentItem = itemCount > prevCount;
+      viewDraftItemCounts[watchSessionId] = itemCount;
+
+      viewDraftCache[watchSessionId] = data;
       renderViewLivePanels();
     },
     err => {
@@ -1475,6 +1570,7 @@ function applyViewCasts(casts) {
       viewDraftUnsubs[id]();
       delete viewDraftUnsubs[id];
       delete viewDraftCache[id];
+      delete viewDraftItemCounts[id];
     }
   }
 
