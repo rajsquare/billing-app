@@ -2375,6 +2375,18 @@ input {
    columns driven purely by how many casts are active (1-4). Each
    .view-cast-panel is one independent, self-contained bill. */
 .view-live-stage {
+  /* Local design tokens for the wall-display View only. These reuse the
+     app's existing color variables wherever possible (--color-*) and
+     only introduce the small set genuinely specific to this dense,
+     read-only, large-format layout. */
+  --view-space-xs: 4px;
+  --view-space-sm: 8px;
+  --view-space-md: 16px;
+  --view-space-lg: 28px;
+  --view-space-xl: 40px;
+  --view-radius: 8px;
+  --view-label-color: var(--color-text-muted);
+
   display: grid;
   grid-template-columns: 1fr;
   align-items: stretch;
@@ -2382,12 +2394,13 @@ input {
   color: var(--color-text-primary);
   animation: viewSlideFadeIn 0.5s ease;
   height: 100%;
+  font-variant-numeric: tabular-nums;
 }
 
 .view-cast-panel {
   display: flex;
   flex-direction: column;
-  padding: 40px 36px;
+  padding: var(--view-space-xl) var(--view-space-lg);
   border-right: 1px solid var(--color-border);
   overflow: hidden;
   min-width: 0;
@@ -2409,15 +2422,19 @@ input {
 }
 
 .view-live-header {
-  border-bottom: 3px solid var(--color-primary);
-  padding-bottom: 16px;
-  margin-bottom: 20px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--view-space-md);
+  margin-bottom: var(--view-space-lg);
 }
 
 .view-live-customer {
-  font-size: 32px;
-  font-weight: 800;
-  color: var(--color-primary);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2426,52 +2443,88 @@ input {
 /* --- Current item (visual focus) ---
    items[0] in the draft is always the most-recently-added item
    (selectProduct() unshifts to the front) — this is deliberately NOT a
-   generic "last item" fallback. */
+   generic "last item" fallback. This block is the strongest visual
+   element on the panel; everything below it (history) is deliberately
+   quieter. */
 .view-current-item {
-  padding: 20px 0 24px;
+  padding-bottom: var(--view-space-lg);
+  margin-bottom: var(--view-space-lg);
   border-bottom: 1px solid var(--color-border);
-  margin-bottom: 14px;
 }
 
 @keyframes viewCurrentItemEnter {
-  from { opacity: 0; transform: translateY(10px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .view-current-item--enter {
-  animation: viewCurrentItemEnter 250ms ease;
+  animation: viewCurrentItemEnter 220ms ease;
 }
 
 .view-current-name {
   font-size: 40px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.15;
+  letter-spacing: -0.01em;
   color: var(--color-text-primary);
   overflow-wrap: break-word;
 }
 
+/* Material: plain, neutral typography only — deliberately no badge,
+   background, or material-specific color. Distinction from the product
+   name comes from size/weight/spacing alone. */
 .view-current-material {
   font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--color-primary);
-  margin-top: 6px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-top: var(--view-space-xs);
 }
 
-.view-current-qty {
-  font-size: 26px;
+.view-current-qty-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: var(--view-space-md);
+}
+
+.view-current-qty-label {
+  font-size: 13px;
   font-weight: 600;
-  color: var(--color-text-secondary);
-  margin-top: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--view-label-color);
+}
+
+.view-current-qty-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.view-current-price-block {
+  margin-top: var(--view-space-md);
+  padding-top: var(--view-space-md);
+  border-top: 1px solid var(--color-border);
 }
 
 .view-current-price-row {
   display: flex;
   justify-content: space-between;
-  font-size: 18px;
-  color: var(--color-text-secondary);
-  margin-top: 8px;
+  align-items: baseline;
+  font-size: 16px;
+  margin-top: var(--view-space-xs);
+}
+
+.view-current-price-row:first-child {
+  margin-top: 0;
+}
+
+.view-current-price-label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--view-label-color);
 }
 
 .view-current-price-value {
@@ -2480,7 +2533,9 @@ input {
 }
 
 /* --- Previous items (compact history). Only this list scrolls if the
-   bill is long — the current item and total always stay in view. --- */
+   bill is long — the current item and total always stay in view. Each
+   row is a simple grid so name / material / Wt-Qty / money line up
+   consistently from row to row. --- */
 .view-history-list {
   flex: 1 1 auto;
   min-height: 0;
@@ -2488,27 +2543,52 @@ input {
 }
 
 .view-history-row {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
   align-items: baseline;
-  gap: 6px;
-  padding: 8px 0;
-  font-size: 15px;
+  column-gap: var(--view-space-md);
+  padding: 10px 0;
+  font-size: 14px;
   color: var(--color-text-secondary);
   border-bottom: 1px solid var(--color-border);
+}
+
+.view-history-row--priced {
+  grid-template-columns: 1fr auto auto auto;
 }
 
 .view-history-name {
   font-weight: 600;
   color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.view-history-sep {
-  opacity: 0.4;
+.view-history-material {
+  color: var(--color-text-secondary);
+}
+
+.view-history-material--empty {
+  min-width: 1px;
+}
+
+.view-history-qty {
+  text-align: right;
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.view-history-qty-label {
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--view-label-color);
+  margin-right: 6px;
 }
 
 .view-history-money {
-  margin-left: auto;
+  text-align: right;
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -2516,25 +2596,38 @@ input {
 .view-live-total-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding-top: 20px;
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--color-primary);
+  align-items: baseline;
+  padding-top: var(--view-space-md);
+  margin-top: var(--view-space-sm);
+  border-top: 1px solid var(--color-border-strong);
+}
+
+.view-live-total-label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--view-label-color);
+}
+
+.view-live-total-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-text-primary);
 }
 
 /* Current-item typography scales down as more panels share the width —
    purely cosmetic, driven by the data-cast-count set in
    renderViewLivePanels(); no Firestore involvement. */
 .view-live-stage[data-cast-count="2"] .view-current-name { font-size: 32px; }
-.view-live-stage[data-cast-count="2"] .view-current-qty { font-size: 22px; }
+.view-live-stage[data-cast-count="2"] .view-current-qty-value { font-size: 22px; }
 
 .view-live-stage[data-cast-count="3"] .view-current-name { font-size: 26px; }
-.view-live-stage[data-cast-count="3"] .view-current-qty { font-size: 19px; }
+.view-live-stage[data-cast-count="3"] .view-current-qty-value { font-size: 19px; }
 .view-live-stage[data-cast-count="3"] .view-current-material { font-size: 15px; }
 
 .view-live-stage[data-cast-count="4"] .view-current-name { font-size: 21px; }
-.view-live-stage[data-cast-count="4"] .view-current-qty { font-size: 16px; }
+.view-live-stage[data-cast-count="4"] .view-current-qty-value { font-size: 16px; }
 .view-live-stage[data-cast-count="4"] .view-current-material { font-size: 13px; }
 .view-live-stage[data-cast-count="4"] .view-current-price-row { font-size: 14px; }
 
@@ -2674,10 +2767,10 @@ input {
    VIEW RESPONSIVE (large wall display + normal browser testing)
 ================================ */
 @media (min-width: 1600px) {
-  .view-live-customer { font-size: 46px; }
+  .view-live-customer { font-size: 40px; }
   .view-current-name { font-size: 52px; }
-  .view-current-qty { font-size: 32px; }
-  .view-live-total-row { font-size: 38px; }
+  .view-current-qty-value { font-size: 32px; }
+  .view-live-total-value { font-size: 34px; }
 }
 
 @media (max-width: 900px) {
@@ -2695,10 +2788,10 @@ input {
     border-bottom: 1px solid var(--color-border);
   }
 
-  .view-live-customer { font-size: 24px; }
-  .view-current-name { font-size: 28px; }
-  .view-current-qty { font-size: 18px; }
-  .view-live-total-row { font-size: 22px; }
+  .view-live-customer { font-size: 22px; }
+  .view-current-name { font-size: 26px; }
+  .view-current-qty-value { font-size: 19px; }
+  .view-live-total-value { font-size: 20px; }
 }
 
 /* ================================

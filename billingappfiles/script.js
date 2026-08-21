@@ -1378,13 +1378,22 @@ function showLiveStage() {
    — and items.slice(1) is history, already newest-first. No existing
    selected/edited-item state exists elsewhere in Billing to reuse. --- */
 function renderCurrentItemHTML(item, showPrices) {
+  // Material is shown as plain, neutral typography — deliberately NOT
+  // passed through getMaterialClass() here, since that helper is what
+  // drives the colorful category badges used elsewhere (suggestion
+  // cards, filter chips). The View must never color-code material.
   const materialText = (item.material || "").trim();
   const materialLine = materialText
-    ? `<div class="view-current-material ${getMaterialClass(materialText)}">${escapeAttr(materialText)}</div>`
+    ? `<div class="view-current-material">${escapeAttr(materialText)}</div>`
     : "";
 
-  const qtyLine =
-    `<div class="view-current-qty">${item.qty > 0 ? item.qty : "—"}</div>`;
+  const qtyText = item.qty > 0 ? item.qty : "—";
+  const qtyLine = `
+    <div class="view-current-qty-row">
+      <span class="view-current-qty-label">Wt/Qty</span>
+      <span class="view-current-qty-value">${qtyText}</span>
+    </div>
+  `;
 
   let priceBlock = "";
   if (showPrices) {
@@ -1396,13 +1405,15 @@ function renderCurrentItemHTML(item, showPrices) {
         : "—";
 
     priceBlock = `
-      <div class="view-current-price-row">
-        <span class="view-current-price-label">Rate</span>
-        <span class="view-current-price-value">${rateText}</span>
-      </div>
-      <div class="view-current-price-row">
-        <span class="view-current-price-label">Amount</span>
-        <span class="view-current-price-value">${amountText}</span>
+      <div class="view-current-price-block">
+        <div class="view-current-price-row">
+          <span class="view-current-price-label">Rate</span>
+          <span class="view-current-price-value">${rateText}</span>
+        </div>
+        <div class="view-current-price-row">
+          <span class="view-current-price-label">Amount</span>
+          <span class="view-current-price-value">${amountText}</span>
+        </div>
       </div>
     `;
   }
@@ -1416,21 +1427,17 @@ function renderCurrentItemHTML(item, showPrices) {
 }
 
 function renderHistoryItemHTML(item, showPrices) {
+  // As with the current item, material is plain neutral text in the
+  // View — getMaterialClass() is intentionally not used here so no
+  // colorful category badge is applied.
   const materialText = (item.material || "").trim();
   const qtyText = item.qty > 0 ? item.qty : "—";
 
-  const segments = [
-    `<span class="view-history-name">${escapeAttr(item.productName)}</span>`
-  ];
+  const materialHTML = materialText
+    ? `<span class="view-history-material">${escapeAttr(materialText)}</span>`
+    : `<span class="view-history-material view-history-material--empty"></span>`;
 
-  if (materialText) {
-    segments.push(
-      `<span class="view-history-material ${getMaterialClass(materialText)}">${escapeAttr(materialText)}</span>`
-    );
-  }
-
-  segments.push(`<span class="view-history-qty">${qtyText}</span>`);
-
+  let moneyHTML = "";
   if (showPrices) {
     const rateText =
       item.price > 0 ? "₹" + formatIndianMoneyWhole(item.price) : "—";
@@ -1438,16 +1445,21 @@ function renderHistoryItemHTML(item, showPrices) {
       item.qty > 0 && item.price > 0
         ? "₹" + formatIndianMoneyWhole(Math.abs(item.total))
         : "—";
-    segments.push(
-      `<span class="view-history-money">${rateText} · ${amountText}</span>`
-    );
+    moneyHTML = `<span class="view-history-money">${rateText} · ${amountText}</span>`;
   }
 
-  return (
-    `<div class="view-history-row">` +
-    segments.join(`<span class="view-history-sep">·</span>`) +
-    `</div>`
-  );
+  const rowClass = showPrices
+    ? "view-history-row view-history-row--priced"
+    : "view-history-row";
+
+  return `
+    <div class="${rowClass}">
+      <span class="view-history-name">${escapeAttr(item.productName)}</span>
+      ${materialHTML}
+      <span class="view-history-qty"><span class="view-history-qty-label">Wt/Qty</span>${qtyText}</span>
+      ${moneyHTML}
+    </div>
+  `;
 }
 
 function renderViewCastPanelHTML(cast, draft) {
@@ -1479,7 +1491,7 @@ function renderViewCastPanelHTML(cast, draft) {
     : "";
 
   const totalRow = showPrices && items.length
-    ? `<div class="view-live-total-row"><span>Total</span><span>₹${formatIndianMoneyWhole(draft.subtotal || 0)}</span></div>`
+    ? `<div class="view-live-total-row"><span class="view-live-total-label">Total</span><span class="view-live-total-value">₹${formatIndianMoneyWhole(draft.subtotal || 0)}</span></div>`
     : "";
 
   return `
