@@ -1400,7 +1400,7 @@ function renderCurrentItemHTML(item, showPrices) {
   const qtyText = item.qty > 0 ? item.qty : "—";
   const qtyLine = `
     <div class="view-current-qty-row">
-      <span class="view-current-qty-label">Wt/Qty</span>
+      <span class="view-current-qty-label">Quantity</span>
       <span class="view-current-qty-value">${qtyText}</span>
     </div>
   `;
@@ -1428,11 +1428,21 @@ function renderCurrentItemHTML(item, showPrices) {
     `;
   }
 
+  // Split into a primary group (product name + quantity — the two most
+  // important facts) and a secondary group (material + financial info).
+  // At wide panel widths (1-2 active casts) these sit side by side via
+  // CSS Grid so the panel's width is used deliberately instead of
+  // leaving it empty; at narrow widths (3-4 casts) the same markup
+  // stacks vertically — see [data-cast-count] rules in style.css.
   return `
-    <div class="view-current-name">${escapeAttr(item.productName)}</div>
-    ${materialLine}
-    ${qtyLine}
-    ${priceBlock}
+    <div class="view-current-primary">
+      <div class="view-current-name">${escapeAttr(item.productName)}</div>
+      ${qtyLine}
+    </div>
+    <div class="view-current-secondary">
+      ${materialLine}
+      ${priceBlock}
+    </div>
   `;
 }
 
@@ -1466,7 +1476,7 @@ function renderHistoryItemHTML(item, showPrices) {
     <div class="${rowClass}">
       <span class="view-history-name">${escapeAttr(item.productName)}</span>
       ${materialHTML}
-      <span class="view-history-qty"><span class="view-history-qty-label">Wt/Qty</span>${qtyText}</span>
+      <span class="view-history-qty"><span class="view-history-qty-label">Quantity</span>${qtyText}</span>
       ${moneyHTML}
     </div>
   `;
