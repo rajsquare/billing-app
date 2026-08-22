@@ -189,6 +189,11 @@ let viewActiveCasts = [];
 let viewDraftUnsubs = {};
 let viewDraftCache = {};
 let viewDraftItemCounts = {};
+// Tracks the qty of each session's current (items[0]) item so the View
+// panel can play its brief "new/updated weight" blink only when that
+// value actually changes — never on unrelated re-renders. Local-only,
+// never written to Firestore.
+let viewDraftCurrentQty = {};
 
 /* ---- VIEW SLIDESHOW STATE (local-only, no Firestore) ---- */
 let viewSlideshowImages = [];
@@ -1387,7 +1392,13 @@ function showLiveStage() {
    items[0] is always the most recently added item — that is "current"
    — and items.slice(1) is history, already newest-first. No existing
    selected/edited-item state exists elsewhere in Billing to reuse. --- */
-function renderCurrentItemHTML(item, showPrices) {
+function formatViewQty(qty) {
+  // Display-only formatting: always exactly 2 decimal places. Never
+  // touches the underlying stored/calculated qty value.
+  return qty > 0 ? Number(qty).toFixed(2) : "—";
+}
+
+function renderCurrentItemHTML(item, showPrices, blinkQty) {
   // Material is shown as plain, neutral typography — deliberately NOT
   // passed through getMaterialClass() here, since that helper is what
   // drives the colorful category badges used elsewhere (suggestion
@@ -1397,11 +1408,14 @@ function renderCurrentItemHTML(item, showPrices) {
     ? `<div class="view-current-material">${escapeAttr(materialText)}</div>`
     : "";
 
-  const qtyText = item.qty > 0 ? item.qty : "—";
+  const qtyText = formatViewQty(item.qty);
+  const qtyValueClass = blinkQty
+    ? "view-current-qty-value view-current-qty-value--blink"
+    : "view-current-qty-value";
   const qtyLine = `
     <div class="view-current-qty-row">
       <span class="view-current-qty-label">Quantity</span>
-      <span class="view-current-qty-value">${qtyText}</span>
+      <span class="${qtyValueClass}">${qtyText}</span>
     </div>
   `;
 
@@ -1428,21 +1442,11 @@ function renderCurrentItemHTML(item, showPrices) {
     `;
   }
 
-  // Split into a primary group (product name + quantity — the two most
-  // important facts) and a secondary group (material + financial info).
-  // At wide panel widths (1-2 active casts) these sit side by side via
-  // CSS Grid so the panel's width is used deliberately instead of
-  // leaving it empty; at narrow widths (3-4 casts) the same markup
-  // stacks vertically — see [data-cast-count] rules in style.css.
   return `
-    <div class="view-current-primary">
-      <div class="view-current-name">${escapeAttr(item.productName)}</div>
-      ${qtyLine}
-    </div>
-    <div class="view-current-secondary">
-      ${materialLine}
-      ${priceBlock}
-    </div>
+    <div class="view-current-name">${escapeAttr(item.productName)}</div>
+    ${materialLine}
+    ${qtyLine}
+    ${priceBlock}
   `;
 }
 
@@ -1451,7 +1455,7 @@ function renderHistoryItemHTML(item, showPrices) {
   // View — getMaterialClass() is intentionally not used here so no
   // colorful category badge is applied.
   const materialText = (item.material || "").trim();
-  const qtyText = item.qty > 0 ? item.qty : "—";
+  const qtyText = formatViewQty(item.qty);
 
   const materialHTML = materialText
     ? `<span class="view-history-material">${escapeAttr(materialText)}</span>`
@@ -1476,7 +1480,7 @@ function renderHistoryItemHTML(item, showPrices) {
     <div class="${rowClass}">
       <span class="view-history-name">${escapeAttr(item.productName)}</span>
       ${materialHTML}
-      <span class="view-history-qty"><span class="view-history-qty-label">Quantity</span>${qtyText}</span>
+      <span class="view-history-qty"><span class="view-history-qty-label">Quantity</span><span class="view-history-qty-value">${qtyText}</span></span>
       ${moneyHTML}
     </div>
   `;
@@ -1501,8 +1505,13 @@ function renderViewCastPanelHTML(cast, draft) {
     : "";
 
   const currentHTML = currentItem
-    ? `<div class="view-current-item${enterClass}">${renderCurrentItemHTML(currentItem, showPrices)}</div>`
+    ? `<div class="view-current-item${enterClass}">${renderCurrentItemHTML(currentItem, showPrices, !!draft._viewCurrentQtyChanged)}</div>`
     : "";
+  // Consumed for this render — clear it so an unrelated re-render of
+  // this same panel (triggered by another cast's snapshot) does not
+  // replay the blink. The next genuine qty change on this session's
+  // current item sets it again (see attachCastDraftListener).
+  draft._viewCurrentQtyChanged = false;
 
   const historyHTML = historyItems.length
     ? `<div class="view-history-list">${historyItems
@@ -1566,6 +1575,7 @@ function attachCastDraftListener(watchSessionId) {
         // casts reflow — no heartbeat required for this to happen.
         delete viewDraftCache[watchSessionId];
         delete viewDraftItemCounts[watchSessionId];
+        delete viewDraftCurrentQty[watchSessionId];
         removeCastFromControlDoc(watchSessionId);
         return;
       }
@@ -1580,6 +1590,18 @@ function attachCastDraftListener(watchSessionId) {
       // (price/qty change) to the item that was already current.
       data._viewIsNewCurrentItem = itemCount > prevCount;
       viewDraftItemCounts[watchSessionId] = itemCount;
+
+      // Local-only flag driving the "current weight" blink: true only
+      // when the current item's qty is different from the last value
+      // seen for this session (covers both a brand-new item and a
+      // weight update on the same item), so the blink never replays on
+      // unrelated re-renders (see renderViewCastPanelHTML, which
+      // consumes and clears this flag once it's used).
+      const currentItem = itemCount ? data.items[0] : null;
+      const currentQty = currentItem ? currentItem.qty : null;
+      data._viewCurrentQtyChanged =
+        currentQty !== null && currentQty !== viewDraftCurrentQty[watchSessionId];
+      viewDraftCurrentQty[watchSessionId] = currentQty;
 
       viewDraftCache[watchSessionId] = data;
       renderViewLivePanels();
@@ -1603,6 +1625,7 @@ function applyViewCasts(casts) {
       delete viewDraftUnsubs[id];
       delete viewDraftCache[id];
       delete viewDraftItemCounts[id];
+      delete viewDraftCurrentQty[id];
     }
   }
 

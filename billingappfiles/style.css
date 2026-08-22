@@ -2476,23 +2476,17 @@ input {
    (selectProduct() unshifts to the front) — this is deliberately NOT a
    generic "last item" fallback. This block is the strongest visual
    element on the panel; everything below it (history) is deliberately
-   quieter.
-
-   Structure: .view-current-primary (product name + quantity — the two
-   most important facts) and .view-current-secondary (material +
-   financial info). By default these stack vertically (narrow panels,
-   3-4 active casts). At wide panel widths (1-2 casts, see the
-   [data-cast-count] rules further down) they sit side by side in a
-   two-column grid instead, so a wide desktop panel is used
-   deliberately rather than leaving the right side empty. */
+   quieter. */
 .view-current-item {
+  /* Single source of truth for the current product-name size — the
+     current weight is always exactly 2x this value (see
+     .view-current-qty-value below), computed rather than hard-coded so
+     the 2x relationship holds automatically at every cast-count/screen
+     breakpoint that adjusts this variable. */
+  --view-current-name-size: 40px;
   padding-bottom: var(--view-space-lg);
   margin-bottom: var(--view-space-lg);
   border-bottom: 1px solid var(--color-border);
-}
-
-.view-current-secondary {
-  margin-top: var(--view-space-md);
 }
 
 @keyframes viewCurrentItemEnter {
@@ -2505,7 +2499,7 @@ input {
 }
 
 .view-current-name {
-  font-size: 40px;
+  font-size: var(--view-current-name-size);
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: -0.01em;
@@ -2520,6 +2514,7 @@ input {
   font-size: 18px;
   font-weight: 500;
   color: var(--color-text-secondary);
+  margin-top: var(--view-space-xs);
 }
 
 .view-current-qty-row {
@@ -2538,9 +2533,26 @@ input {
 }
 
 .view-current-qty-value {
-  font-size: 26px;
+  /* Exactly 2x the current product-name size, derived from the same
+     --view-current-name-size variable set on .view-current-item. */
+  font-size: calc(var(--view-current-name-size) * 2);
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   color: var(--color-text-primary);
+}
+
+/* Blinks exactly twice (2 complete cycles) when a new/updated weight
+   is rendered, then stops and remains normally visible — class is
+   only present on the DOM node for the render where the value
+   actually changed (see renderViewCastPanelHTML), so it never repeats
+   or runs continuously. */
+@keyframes viewQtyBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+.view-current-qty-value--blink {
+  animation: viewQtyBlink 0.5s ease-in-out 2;
 }
 
 .view-current-price-block {
@@ -2629,6 +2641,16 @@ input {
   margin-right: 6px;
 }
 
+.view-history-qty-value {
+  /* Completed/weighed products: displayed weight doubled from its
+     previous 14px (inherited from .view-history-row) to 28px. Only
+     the value is doubled — the label above stays at its existing
+     size/weight. */
+  font-size: 28px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
 .view-history-money {
   text-align: right;
   font-weight: 600;
@@ -2637,9 +2659,8 @@ input {
 
 .view-live-total-row {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: baseline;
-  gap: var(--view-space-md);
   padding-top: var(--view-space-md);
   margin-top: var(--view-space-sm);
   border-top: 1px solid var(--color-border-strong);
@@ -2659,38 +2680,18 @@ input {
   color: var(--color-text-primary);
 }
 
-/* Wide panels (1-2 active casts): the current-item block uses the
-   available desktop width deliberately — product name + quantity form
-   a primary column, material + financial info sit in an adjacent
-   secondary column, instead of a narrow stack of left-aligned text
-   leaving the rest of the panel empty. Narrow panels (3-4 casts, and
-   the default/fallback below) keep the simple vertical stack, since
-   there isn't enough width for a meaningful second column. */
-.view-live-stage[data-cast-count="1"] .view-current-item,
-.view-live-stage[data-cast-count="2"] .view-current-item {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(200px, 340px);
-  column-gap: var(--view-space-xl);
-  align-items: start;
-}
-
-.view-live-stage[data-cast-count="1"] .view-current-secondary,
-.view-live-stage[data-cast-count="2"] .view-current-secondary {
-  margin-top: 0;
-}
-
 /* Current-item typography scales down as more panels share the width —
    purely cosmetic, driven by the data-cast-count set in
-   renderViewLivePanels(); no Firestore involvement. */
-.view-live-stage[data-cast-count="2"] .view-current-name { font-size: 32px; }
-.view-live-stage[data-cast-count="2"] .view-current-qty-value { font-size: 22px; }
+   renderViewLivePanels(); no Firestore involvement. Only
+   --view-current-name-size needs to be set per breakpoint — the
+   current weight (.view-current-qty-value) always derives its size
+   from it at exactly 2x (see rule above). */
+.view-live-stage[data-cast-count="2"] .view-current-item { --view-current-name-size: 32px; }
 
-.view-live-stage[data-cast-count="3"] .view-current-name { font-size: 26px; }
-.view-live-stage[data-cast-count="3"] .view-current-qty-value { font-size: 19px; }
+.view-live-stage[data-cast-count="3"] .view-current-item { --view-current-name-size: 26px; }
 .view-live-stage[data-cast-count="3"] .view-current-material { font-size: 15px; }
 
-.view-live-stage[data-cast-count="4"] .view-current-name { font-size: 21px; }
-.view-live-stage[data-cast-count="4"] .view-current-qty-value { font-size: 16px; }
+.view-live-stage[data-cast-count="4"] .view-current-item { --view-current-name-size: 21px; }
 .view-live-stage[data-cast-count="4"] .view-current-material { font-size: 13px; }
 .view-live-stage[data-cast-count="4"] .view-current-price-row { font-size: 14px; }
 
@@ -2831,8 +2832,7 @@ input {
 ================================ */
 @media (min-width: 1600px) {
   .view-live-customer { font-size: 40px; }
-  .view-current-name { font-size: 52px; }
-  .view-current-qty-value { font-size: 32px; }
+  .view-current-item { --view-current-name-size: 52px; }
   .view-live-total-value { font-size: 34px; }
 }
 
@@ -2851,22 +2851,8 @@ input {
     border-bottom: 1px solid var(--color-border);
   }
 
-  /* The two-column current-item layout only makes sense on a genuinely
-     wide desktop panel; below this breakpoint always fall back to the
-     simple stacked layout regardless of active cast count. */
-  .view-live-stage[data-cast-count="1"] .view-current-item,
-  .view-live-stage[data-cast-count="2"] .view-current-item {
-    display: block;
-  }
-
-  .view-live-stage[data-cast-count="1"] .view-current-secondary,
-  .view-live-stage[data-cast-count="2"] .view-current-secondary {
-    margin-top: var(--view-space-md);
-  }
-
   .view-live-customer { font-size: 22px; }
-  .view-current-name { font-size: 26px; }
-  .view-current-qty-value { font-size: 19px; }
+  .view-current-item { --view-current-name-size: 26px; }
   .view-live-total-value { font-size: 20px; }
 }
 
