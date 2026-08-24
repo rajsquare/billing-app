@@ -2484,6 +2484,7 @@ input {
      the 2x relationship holds automatically at every cast-count/screen
      breakpoint that adjusts this variable. */
   --view-current-name-size: 40px;
+  --view-current-image-size: 220px;
   padding-bottom: var(--view-space-lg);
   margin-bottom: var(--view-space-lg);
   border-bottom: 1px solid var(--color-border);
@@ -2496,6 +2497,74 @@ input {
 
 .view-current-item--enter {
   animation: viewCurrentItemEnter 220ms ease;
+}
+
+/* Product photo — primary visual identifier for the current item,
+   replacing the previous generic/text-only presentation. Sized off
+   --view-current-image-size (scaled per cast-count/breakpoint below)
+   so it stays prominent for 1 cast but never crowds out the quantity
+   at 3-4 casts. object-fit: contain keeps the whole product visible
+   rather than cropping it. */
+.view-product-image {
+  width: var(--view-current-image-size);
+  height: var(--view-current-image-size);
+  max-width: 100%;
+  margin: 0 0 var(--view-space-md);
+  border-radius: var(--view-radius);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.view-product-image-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Neutral placeholder (no image found, or a resolved image URL that
+   failed to load) — a plain outline icon, never a broken-image icon
+   or empty gap. Layout stays identical whether a photo is present or
+   not. */
+.view-product-image--placeholder {
+  color: var(--color-text-muted);
+}
+
+.view-product-image-icon {
+  width: 34%;
+  height: 34%;
+}
+
+/* Small thumbnail variant — reused by history rows via the exact same
+   renderProductImageHTML()/cache/placeholder/broken-image mechanism as
+   the current item's large photo, just capped to a size that can never
+   compete with it. */
+.view-product-image--thumb {
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.view-product-image--thumb .view-product-image-icon {
+  width: 55%;
+  height: 55%;
+}
+
+/* Brief skeleton shown only while a lookup is actually in flight for a
+   not-yet-cached serial — resolves (or fails) once, gets cached, and
+   never re-appears for that product again on subsequent re-renders.
+   Deliberately a static tint, not an animated shimmer: the spec rules
+   out infinite/continuous image animation, and a real photo usually
+   arrives within one round trip anyway. */
+.view-product-image--loading {
+  background: var(--color-border);
 }
 
 .view-current-name {
@@ -2588,8 +2657,8 @@ input {
 
 /* --- Previous items (compact history). Only this list scrolls if the
    bill is long — the current item and total always stay in view. Each
-   row is a simple grid so name / material / Wt-Qty / money line up
-   consistently from row to row. --- */
+   row is a simple grid so thumbnail / name / material / Wt-Qty / money
+   line up consistently from row to row. --- */
 .view-history-list {
   flex: 1 1 auto;
   min-height: 0;
@@ -2598,8 +2667,8 @@ input {
 
 .view-history-row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
-  align-items: baseline;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
   column-gap: var(--view-space-md);
   padding: 10px 0;
   font-size: 14px;
@@ -2608,7 +2677,7 @@ input {
 }
 
 .view-history-row--priced {
-  grid-template-columns: 1fr auto auto auto;
+  grid-template-columns: auto 1fr auto auto auto;
 }
 
 .view-history-name {
@@ -2680,18 +2749,30 @@ input {
   color: var(--color-text-primary);
 }
 
-/* Current-item typography scales down as more panels share the width —
-   purely cosmetic, driven by the data-cast-count set in
-   renderViewLivePanels(); no Firestore involvement. Only
-   --view-current-name-size needs to be set per breakpoint — the
+/* Current-item typography (and product photo) scale down as more
+   panels share the width — purely cosmetic, driven by the
+   data-cast-count set in renderViewLivePanels(); no Firestore
+   involvement. --view-current-name-size and --view-current-image-size
+   are the only two variables that need setting per breakpoint — the
    current weight (.view-current-qty-value) always derives its size
-   from it at exactly 2x (see rule above). */
-.view-live-stage[data-cast-count="2"] .view-current-item { --view-current-name-size: 32px; }
+   from the name size at exactly 2x (see rule above). Readability of
+   product/quantity/history takes priority over photo size as more
+   casts share the screen. */
+.view-live-stage[data-cast-count="2"] .view-current-item {
+  --view-current-name-size: 32px;
+  --view-current-image-size: 160px;
+}
 
-.view-live-stage[data-cast-count="3"] .view-current-item { --view-current-name-size: 26px; }
+.view-live-stage[data-cast-count="3"] .view-current-item {
+  --view-current-name-size: 26px;
+  --view-current-image-size: 120px;
+}
 .view-live-stage[data-cast-count="3"] .view-current-material { font-size: 15px; }
 
-.view-live-stage[data-cast-count="4"] .view-current-item { --view-current-name-size: 21px; }
+.view-live-stage[data-cast-count="4"] .view-current-item {
+  --view-current-name-size: 21px;
+  --view-current-image-size: 90px;
+}
 .view-live-stage[data-cast-count="4"] .view-current-material { font-size: 13px; }
 .view-live-stage[data-cast-count="4"] .view-current-price-row { font-size: 14px; }
 
@@ -2832,7 +2913,10 @@ input {
 ================================ */
 @media (min-width: 1600px) {
   .view-live-customer { font-size: 40px; }
-  .view-current-item { --view-current-name-size: 52px; }
+  .view-current-item {
+    --view-current-name-size: 52px;
+    --view-current-image-size: 280px;
+  }
   .view-live-total-value { font-size: 34px; }
 }
 
@@ -2852,7 +2936,10 @@ input {
   }
 
   .view-live-customer { font-size: 22px; }
-  .view-current-item { --view-current-name-size: 26px; }
+  .view-current-item {
+    --view-current-name-size: 26px;
+    --view-current-image-size: 140px;
+  }
   .view-live-total-value { font-size: 20px; }
 }
 

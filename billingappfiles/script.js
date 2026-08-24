@@ -195,6 +195,146 @@ let viewDraftItemCounts = {};
 // never written to Firestore.
 let viewDraftCurrentQty = {};
 
+/* --- Product photo lookup (current-item photo AND history thumbnails
+   share this exact mechanism — no separate loading path for either) ---
+   productSr -> Cloudinary imageUrl, resolved from the existing
+   pricelistDb.productImages collection (never written to, read-only).
+   Keyed by String(sr) so lookups are stable regardless of whether the
+   sr arrives as a number (from a live draft item) or a string (e.g.
+   from a DOM dataset attribute in the error handler below). A cached
+   value of `null` means "looked up, no image available" — that result
+   is cached too, so a product with no photo is not re-queried on
+   every render. Shared across all cast panels AND across the
+   current/history split within a single panel, so a product appearing
+   as the current item and again later in that same bill's history
+   (or the same serial across multiple simultaneous casts) is only
+   ever looked up once. Session-lifetime only, by design (see spec: no
+   IndexedDB/localStorage/service worker needed for this). */
+const productImageCache = new Map();
+const productImagePending = new Set();
+
+const VIEW_IMAGE_PLACEHOLDER_SVG =
+  `<svg viewBox="0 0 24 24" class="view-product-image-icon" fill="none" ` +
+  `stroke="currentColor" stroke-width="1.5" stroke-linecap="round" ` +
+  `stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2">` +
+  `</rect><circle cx="9" cy="10" r="1.5"></circle>` +
+  `<path d="M21 16l-5.5-5.5a2 2 0 0 0-2.8 0L5 18"></path></svg>`;
+
+/* Fire-and-forget: resolves productSr -> imageUrl via a single
+   `where("sr","==",sr)` query against the existing pricelistDb,
+   decoupled from rendering (renderProductImageHTML only ever
+   calls this when the sr isn't already cached or already in flight,
+   so quantity/price edits on the same current item never trigger a
+   repeat lookup). Re-renders the View once, only when the lookup
+   actually completes, so the resolved photo can appear. */
+function resolveProductImage(sr) {
+  if (sr === undefined || sr === null || sr === "") {
+    return;
+  }
+
+  const key = String(sr);
+
+  if (productImageCache.has(key) || productImagePending.has(key)) {
+    return;
+  }
+
+  productImagePending.add(key);
+
+  (async () => {
+    let resolvedUrl = null;
+
+    try {
+      const snap = await getDocs(
+        query(
+          collection(pricelistDb, "productImages"),
+          where("sr", "==", sr)
+        )
+      );
+
+      // Data model uses random document IDs with `sr` as a field, so
+      // more than one document can exist for the same serial. If that
+      // happens, prefer the most recently created valid entry
+      // (createdAt); fall back to the first valid entry found if
+      // createdAt is missing on all of them.
+      let best = null;
+
+      snap.forEach(docSnap => {
+        const d = docSnap.data();
+
+        if (!d || !d.imageUrl) {
+          return;
+        }
+
+        if (!best) {
+          best = d;
+          return;
+        }
+
+        const bestTime =
+          best.createdAt && best.createdAt.toMillis
+            ? best.createdAt.toMillis()
+            : 0;
+        const dTime =
+          d.createdAt && d.createdAt.toMillis
+            ? d.createdAt.toMillis()
+            : 0;
+
+        if (dTime > bestTime) {
+          best = d;
+        }
+      });
+
+      resolvedUrl = best ? best.imageUrl : null;
+    } catch (err) {
+      // Non-fatal: the current item still renders (name/material/
+      // quantity), just with the neutral placeholder instead of a
+      // photo. Cached as "no image" below so a persistent failure
+      // (e.g. missing read permission) doesn't re-query on every
+      // subsequent render.
+      console.error("Product image lookup failed for sr", sr, err);
+    }
+
+    productImageCache.set(key, resolvedUrl);
+    productImagePending.delete(key);
+    renderViewLivePanels();
+  })();
+}
+
+/* Shared by BOTH the current-item photo and history thumbnails — same
+   cache, same pending set, same resolveProductImage(), same
+   placeholder/broken-image handling. `extraClass` is purely a CSS size
+   modifier (e.g. "view-product-image--thumb" for history); it never
+   affects caching/resolution, so a product appearing as the current
+   item and later in history is still only ever looked up once. */
+function renderProductImageHTML(sr, extraClass) {
+  const sizeClass = extraClass ? ` ${extraClass}` : "";
+
+  if (sr === undefined || sr === null || sr === "") {
+    // No serial on this item — either an image lookup genuinely found
+    // nothing, or (backward compatibility) this is an older live
+    // draft item written before productSr existed. Either way: a
+    // clean placeholder, never a guess and never a broken layout.
+    return `<div class="view-product-image view-product-image--placeholder${sizeClass}">${VIEW_IMAGE_PLACEHOLDER_SVG}</div>`;
+  }
+
+  const key = String(sr);
+
+  if (productImageCache.has(key)) {
+    const url = productImageCache.get(key);
+
+    return url
+      ? `<div class="view-product-image${sizeClass}"><img class="view-product-image-img" src="${escapeAttr(url)}" alt="" data-sr="${escapeAttr(key)}" onerror="handleProductImageError(this)"></div>`
+      : `<div class="view-product-image view-product-image--placeholder${sizeClass}">${VIEW_IMAGE_PLACEHOLDER_SVG}</div>`;
+  }
+
+  // Not resolved yet: kick off the (cached/deduped) lookup and show a
+  // brief skeleton in the meantime — the name/material/quantity below
+  // render immediately regardless, so the operator is never blocked
+  // on this.
+  resolveProductImage(sr);
+  return `<div class="view-product-image view-product-image--loading${sizeClass}"></div>`;
+}
+
 /* ---- VIEW SLIDESHOW STATE (local-only, no Firestore) ---- */
 let viewSlideshowImages = [];
 let viewSlideshowIndex = 0;
@@ -847,6 +987,8 @@ const sessionId =
 function buildDraftPayload() {
   const items =
     billItems.map(item => ({
+      productSr:
+        item.product.sr,
       productName:
         item.displayName ||
         item.product.productName,
@@ -1398,6 +1540,32 @@ function formatViewQty(qty) {
   return qty > 0 ? Number(qty).toFixed(2) : "—";
 }
 
+/* A resolved imageUrl that fails to actually load (e.g. the Cloudinary
+   asset was moved/deleted after the Firestore doc was written) is
+   treated the same as "no image" from then on, so later re-renders
+   show the placeholder instead of retrying a known-broken URL. Fixes
+   up the DOM immediately rather than waiting for the next snapshot.
+   Attached to window because script.js is a module (inline
+   onerror="" handlers run in global scope) — same pattern already
+   used for window.selectProduct etc. */
+window.handleProductImageError = function (imgEl) {
+  const key = imgEl.dataset.sr;
+
+  if (key) {
+    productImageCache.set(key, null);
+  }
+
+  const container = imgEl.closest(".view-product-image");
+
+  if (container) {
+    container.classList.remove("view-product-image--loading");
+    container.classList.add("view-product-image--placeholder");
+    container.innerHTML = VIEW_IMAGE_PLACEHOLDER_SVG;
+  } else {
+    imgEl.remove();
+  }
+};
+
 function renderCurrentItemHTML(item, showPrices, blinkQty) {
   // Material is shown as plain, neutral typography — deliberately NOT
   // passed through getMaterialClass() here, since that helper is what
@@ -1443,6 +1611,7 @@ function renderCurrentItemHTML(item, showPrices, blinkQty) {
   }
 
   return `
+    ${renderProductImageHTML(item.productSr)}
     <div class="view-current-name">${escapeAttr(item.productName)}</div>
     ${materialLine}
     ${qtyLine}
@@ -1478,6 +1647,7 @@ function renderHistoryItemHTML(item, showPrices) {
 
   return `
     <div class="${rowClass}">
+      ${renderProductImageHTML(item.productSr, "view-product-image--thumb")}
       <span class="view-history-name">${escapeAttr(item.productName)}</span>
       ${materialHTML}
       <span class="view-history-qty"><span class="view-history-qty-label">Quantity</span><span class="view-history-qty-value">${qtyText}</span></span>
