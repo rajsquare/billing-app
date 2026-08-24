@@ -297,9 +297,64 @@ async function fetchProductImageManifest() {
     }
   }
 
-  throw new Error(
-    "Product image manifest not found. Expected pricelistDb/productImageManifests/current."
-  );
+  return buildProductImageManifestFromExistingImages();
+}
+
+async function buildProductImageManifestFromExistingImages() {
+  const snap = await getDocs(collection(pricelistDb, "productImages"));
+  const bestBySr = new Map();
+
+  snap.forEach(docSnap => {
+    const data = docSnap.data();
+
+    if (!data || data.sr === undefined || data.sr === null || !data.imageUrl) {
+      return;
+    }
+
+    const key = String(data.sr);
+    const existing = bestBySr.get(key);
+    const existingTime =
+      existing && existing.createdAt && existing.createdAt.toMillis
+        ? existing.createdAt.toMillis()
+        : 0;
+    const dataTime =
+      data.createdAt && data.createdAt.toMillis
+        ? data.createdAt.toMillis()
+        : 0;
+
+    if (!existing || dataTime >= existingTime) {
+      bestBySr.set(key, data);
+    }
+  });
+
+  const images = {};
+
+  bestBySr.forEach((data, sr) => {
+    images[sr] = data.imageUrl;
+  });
+
+  if (!Object.keys(images).length) {
+    throw new Error("No product images are available to prepare.");
+  }
+
+  const version = String(Date.now());
+  const manifestRef = doc(pricelistDb, "productImageManifests", "current");
+
+  try {
+    await setDoc(manifestRef, {
+      version,
+      updatedAt: serverTimestamp(),
+      images
+    });
+  } catch (err) {
+    console.warn("Could not save product image manifest; using it for this run only:", err);
+  }
+
+  return {
+    version,
+    updatedAt: version,
+    images
+  };
 }
 
 async function getProductImageCache() {
@@ -416,11 +471,12 @@ function updatePrepareViewStatus(state) {
   const done = state.done || 0;
   const pct = total ? Math.round((done / total) * 100) : 0;
   const message =
-    state.status === "running"
+    state.message ||
+    (state.status === "running"
       ? `Preparing View Display · ${done} / ${total}`
       : state.status === "done"
         ? `View ready · ${state.cached || 0} images cached${state.failed ? ` · ${state.failed} unavailable` : ""}`
-        : `View preparation unavailable`;
+        : `View preparation unavailable`);
 
   statusEl.innerHTML = `
     <div class="prepare-view-display-message">${escapeAttr(message)}</div>
@@ -498,6 +554,7 @@ async function prepareViewDisplayImages() {
 
   const promise = (async () => {
     try {
+      state.message = "Preparing View Display · loading manifest";
       updatePrepareViewStatus(state);
 
       const manifest = await fetchProductImageManifest();
@@ -532,6 +589,7 @@ async function prepareViewDisplayImages() {
 
       state.total = entries.length;
       state.done = state.cached;
+      state.message = "";
       updatePrepareViewStatus(state);
 
       const downloadedUrls = new Set();
@@ -595,8 +653,9 @@ async function prepareViewDisplayImages() {
     } catch (err) {
       console.error("View display preparation failed:", err);
       state.status = "error";
+      state.message = err.message || "View preparation unavailable";
       updatePrepareViewStatus(state);
-      showToast("View preparation unavailable", "error");
+      showToast(state.message, "error");
     } finally {
       productImagePrepareJob = null;
     }
