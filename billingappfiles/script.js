@@ -208,10 +208,21 @@ let viewDraftCurrentQty = {};
    current/history split within a single panel, so a product appearing
    as the current item and again later in that same bill's history
    (or the same serial across multiple simultaneous casts) is only
-   ever looked up once. Session-lifetime only, by design (see spec: no
-   IndexedDB/localStorage/service worker needed for this). */
+   ever looked up once. The optional Daybook "Prepare View Display"
+   workflow warms a persistent Cache API layer underneath this same
+   in-memory map, without changing normal startup behavior. */
 const productImageCache = new Map();
 const productImagePending = new Set();
+const PRODUCT_IMAGE_CACHE_NAME = "billing-view-product-images-v1";
+const PRODUCT_IMAGE_CACHE_META_KEY = "billingViewProductImageCacheMetaV1";
+const PRODUCT_IMAGE_MANIFEST_REFS = [
+  ["productImageManifests", "current"],
+  ["appConfig", "productImageManifest"]
+];
+const PRODUCT_IMAGE_PREPARE_CONCURRENCY = 6;
+let productImageCacheMeta = readProductImageCacheMeta();
+let productImagePrepareJob = null;
+let productImageBlobUrls = new Map();
 
 const VIEW_IMAGE_PLACEHOLDER_SVG =
   `<svg viewBox="0 0 24 24" class="view-product-image-icon" fill="none" ` +
@@ -219,6 +230,381 @@ const VIEW_IMAGE_PLACEHOLDER_SVG =
   `stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2">` +
   `</rect><circle cx="9" cy="10" r="1.5"></circle>` +
   `<path d="M21 16l-5.5-5.5a2 2 0 0 0-2.8 0L5 18"></path></svg>`;
+
+function readProductImageCacheMeta() {
+  try {
+    const raw = localStorage.getItem(PRODUCT_IMAGE_CACHE_META_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+
+    return parsed && parsed.images && typeof parsed.images === "object"
+      ? parsed
+      : { version: "", updatedAt: "", images: {}, failures: {} };
+  } catch (err) {
+    localStorage.removeItem(PRODUCT_IMAGE_CACHE_META_KEY);
+    return { version: "", updatedAt: "", images: {}, failures: {} };
+  }
+}
+
+function writeProductImageCacheMeta() {
+  try {
+    localStorage.setItem(
+      PRODUCT_IMAGE_CACHE_META_KEY,
+      JSON.stringify(productImageCacheMeta)
+    );
+  } catch (err) {
+    console.warn("Could not persist product image cache metadata:", err);
+  }
+}
+
+function normalizeProductImageManifest(data) {
+  if (!data || typeof data !== "object") {
+    return null;
+  }
+
+  const rawImages = data.images || data.productImages || data.imageMap || {};
+  const images = {};
+
+  Object.entries(rawImages).forEach(([sr, url]) => {
+    if (sr !== "" && typeof url === "string" && url.trim()) {
+      images[String(sr)] = url.trim();
+    }
+  });
+
+  return {
+    version:
+      data.version ||
+      data.revision ||
+      data.updatedAt?.toMillis?.() ||
+      "",
+    updatedAt:
+      data.updatedAt?.toMillis?.() ||
+      data.updatedAt ||
+      "",
+    images
+  };
+}
+
+async function fetchProductImageManifest() {
+  for (const [collectionName, docId] of PRODUCT_IMAGE_MANIFEST_REFS) {
+    const snap = await getDoc(doc(pricelistDb, collectionName, docId));
+
+    if (snap.exists()) {
+      const manifest = normalizeProductImageManifest(snap.data());
+
+      if (manifest && Object.keys(manifest.images).length) {
+        return manifest;
+      }
+    }
+  }
+
+  throw new Error(
+    "Product image manifest not found. Expected pricelistDb/productImageManifests/current."
+  );
+}
+
+async function getProductImageCache() {
+  if (!("caches" in window)) {
+    return null;
+  }
+
+  return caches.open(PRODUCT_IMAGE_CACHE_NAME);
+}
+
+async function getCachedProductImageUrl(sr) {
+  const key = String(sr);
+  const meta = productImageCacheMeta.images[key];
+
+  if (!meta || !meta.url) {
+    return null;
+  }
+
+  if (productImageBlobUrls.has(key)) {
+    return productImageBlobUrls.get(key);
+  }
+
+  try {
+    const cache = await getProductImageCache();
+
+    if (!cache) {
+      return null;
+    }
+
+    const response = await cache.match(meta.url);
+
+    if (!response || !response.ok) {
+      return null;
+    }
+
+    const blobUrl = URL.createObjectURL(await response.blob());
+    productImageBlobUrls.set(key, blobUrl);
+    return blobUrl;
+  } catch (err) {
+    console.warn("Failed to read cached product image for sr", sr, err);
+    return null;
+  }
+}
+
+async function cacheProductImage(sr, url) {
+  const key = String(sr);
+  const cache = await getProductImageCache();
+
+  if (!cache) {
+    throw new Error("Browser Cache API is unavailable");
+  }
+
+  const response = await fetch(url, {
+    mode: "cors",
+    cache: "reload"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Image request failed with ${response.status}`);
+  }
+
+  await cache.put(url, response.clone());
+
+  const oldBlobUrl = productImageBlobUrls.get(key);
+  if (oldBlobUrl) {
+    URL.revokeObjectURL(oldBlobUrl);
+    productImageBlobUrls.delete(key);
+  }
+
+  productImageCacheMeta.images[key] = {
+    url,
+    cachedAt: Date.now()
+  };
+
+  if (productImageCacheMeta.failures) {
+    delete productImageCacheMeta.failures[key];
+  }
+
+  productImageCache.set(key, await getCachedProductImageUrl(key));
+}
+
+async function cacheProductImageFromResolvedUrl(sr, url) {
+  if (!url) {
+    return;
+  }
+
+  try {
+    await cacheProductImage(sr, url);
+    writeProductImageCacheMeta();
+  } catch (err) {
+    console.warn("Failed to persist resolved product image for sr", sr, err);
+  }
+}
+
+function updatePrepareViewStatus(state) {
+  const statusEl = document.getElementById("prepareViewDisplayStatus");
+  const btn = document.getElementById("prepareViewDisplayBtn");
+
+  if (!statusEl || !btn) {
+    return;
+  }
+
+  if (!state || state.status === "idle") {
+    statusEl.innerHTML = "";
+    btn.classList.remove("prepare-view-display-btn--active");
+    btn.removeAttribute("aria-busy");
+    return;
+  }
+
+  btn.classList.toggle("prepare-view-display-btn--active", state.status === "running");
+  btn.setAttribute("aria-busy", state.status === "running" ? "true" : "false");
+
+  const total = state.total || 0;
+  const done = state.done || 0;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  const message =
+    state.status === "running"
+      ? `Preparing View Display · ${done} / ${total}`
+      : state.status === "done"
+        ? `View ready · ${state.cached || 0} images cached${state.failed ? ` · ${state.failed} unavailable` : ""}`
+        : `View preparation unavailable`;
+
+  statusEl.innerHTML = `
+    <div class="prepare-view-display-message">${escapeAttr(message)}</div>
+    ${state.status === "running"
+      ? `<div class="prepare-view-display-track"><div class="prepare-view-display-fill" style="width:${pct}%"></div></div>`
+      : ""}
+  `;
+}
+
+function yieldToBrowser() {
+  return new Promise(resolve => setTimeout(resolve, 0));
+}
+
+async function runWithConcurrency(items, limitCount, worker) {
+  let index = 0;
+
+  async function runNext() {
+    while (index < items.length) {
+      const currentIndex = index++;
+      await worker(items[currentIndex], currentIndex);
+      if (currentIndex % 12 === 0) {
+        await yieldToBrowser();
+      }
+    }
+  }
+
+  await Promise.all(
+    Array.from(
+      { length: Math.min(limitCount, items.length) },
+      runNext
+    )
+  );
+}
+
+async function cleanupObsoleteProductImages(manifestImages) {
+  const cache = await getProductImageCache();
+
+  if (!cache) {
+    return;
+  }
+
+  const currentUrls = new Set(Object.values(manifestImages));
+
+  await Promise.all(
+    Object.entries(productImageCacheMeta.images).map(async ([sr, meta]) => {
+      if (manifestImages[sr] !== meta.url) {
+        if (!currentUrls.has(meta.url)) {
+          await cache.delete(meta.url);
+        }
+        delete productImageCacheMeta.images[sr];
+        const blobUrl = productImageBlobUrls.get(sr);
+        if (blobUrl) {
+          URL.revokeObjectURL(blobUrl);
+          productImageBlobUrls.delete(sr);
+        }
+        productImageCache.delete(sr);
+      }
+    })
+  );
+}
+
+async function prepareViewDisplayImages() {
+  if (productImagePrepareJob) {
+    updatePrepareViewStatus(productImagePrepareJob.state);
+    return productImagePrepareJob.promise;
+  }
+
+  const state = {
+    status: "running",
+    total: 0,
+    done: 0,
+    cached: 0,
+    failed: 0
+  };
+
+  const promise = (async () => {
+    try {
+      updatePrepareViewStatus(state);
+
+      const manifest = await fetchProductImageManifest();
+      const entries = Object.entries(manifest.images);
+      const cache = await getProductImageCache();
+
+      if (!cache) {
+        throw new Error("Browser Cache API is unavailable");
+      }
+
+      await cleanupObsoleteProductImages(manifest.images);
+
+      const toDownload = [];
+
+      for (const [sr, url] of entries) {
+        const meta = productImageCacheMeta.images[sr];
+        const existing = meta && meta.url === url
+          ? await cache.match(url)
+          : null;
+
+        if (existing && existing.ok) {
+          state.cached += 1;
+          productImageCache.set(sr, await getCachedProductImageUrl(sr));
+        } else {
+          toDownload.push({ sr, url });
+        }
+
+        if ((state.cached + toDownload.length) % 25 === 0) {
+          await yieldToBrowser();
+        }
+      }
+
+      state.total = entries.length;
+      state.done = state.cached;
+      updatePrepareViewStatus(state);
+
+      const downloadedUrls = new Set();
+
+      await runWithConcurrency(
+        toDownload,
+        PRODUCT_IMAGE_PREPARE_CONCURRENCY,
+        async ({ sr, url }) => {
+          try {
+            if (!downloadedUrls.has(url)) {
+              await cacheProductImage(sr, url);
+              downloadedUrls.add(url);
+            } else {
+              productImageCacheMeta.images[sr] = {
+                url,
+                cachedAt: Date.now()
+              };
+              productImageCache.set(sr, await getCachedProductImageUrl(sr));
+            }
+
+            state.cached += 1;
+          } catch (err) {
+            state.failed += 1;
+            productImageCacheMeta.failures = productImageCacheMeta.failures || {};
+            productImageCacheMeta.failures[sr] = {
+              url,
+              failedAt: Date.now(),
+              message: err.message || String(err)
+            };
+            console.warn("Product image preparation failed for sr", sr, err);
+          } finally {
+            state.done += 1;
+            updatePrepareViewStatus(state);
+          }
+        }
+      );
+
+      productImageCacheMeta.version = manifest.version || "";
+      productImageCacheMeta.updatedAt = manifest.updatedAt || "";
+      productImageCacheMeta.preparedAt = Date.now();
+      writeProductImageCacheMeta();
+
+      state.status = "done";
+      updatePrepareViewStatus(state);
+
+      activateView("view");
+
+      requestAnimationFrame(() => {
+        if (viewView && !document.fullscreenElement) {
+          viewView.requestFullscreen().catch(err => {
+            console.warn("Fullscreen request was rejected:", err);
+          });
+        }
+      });
+
+      setTimeout(() => {
+        if (!productImagePrepareJob) {
+          updatePrepareViewStatus({ status: "idle" });
+        }
+      }, 6000);
+    } catch (err) {
+      console.error("View display preparation failed:", err);
+      state.status = "error";
+      updatePrepareViewStatus(state);
+      showToast("View preparation unavailable", "error");
+    } finally {
+      productImagePrepareJob = null;
+    }
+  })();
+
+  productImagePrepareJob = { promise, state };
+  return promise;
+}
 
 /* Fire-and-forget: resolves productSr -> imageUrl via a single
    `where("sr","==",sr)` query against the existing pricelistDb,
@@ -244,6 +630,15 @@ function resolveProductImage(sr) {
     let resolvedUrl = null;
 
     try {
+      const cachedUrl = await getCachedProductImageUrl(key);
+
+      if (cachedUrl) {
+        productImageCache.set(key, cachedUrl);
+        productImagePending.delete(key);
+        renderViewLivePanels();
+        return;
+      }
+
       const snap = await getDocs(
         query(
           collection(pricelistDb, "productImages"),
@@ -285,6 +680,11 @@ function resolveProductImage(sr) {
       });
 
       resolvedUrl = best ? best.imageUrl : null;
+
+      if (resolvedUrl) {
+        await cacheProductImageFromResolvedUrl(key, resolvedUrl);
+        resolvedUrl = productImageCache.get(key) || resolvedUrl;
+      }
     } catch (err) {
       // Non-fatal: the current item still renders (name/material/
       // quantity), just with the neutral placeholder instead of a
@@ -294,7 +694,9 @@ function resolveProductImage(sr) {
       console.error("Product image lookup failed for sr", sr, err);
     }
 
-    productImageCache.set(key, resolvedUrl);
+    if (!productImageCache.has(key)) {
+      productImageCache.set(key, resolvedUrl);
+    }
     productImagePending.delete(key);
     renderViewLivePanels();
   })();
@@ -452,6 +854,8 @@ const updatePricelistBtn =
 
 const daybookFooterDate =
   document.getElementById("daybookFooterDate");
+const prepareViewDisplayBtn =
+  document.getElementById("prepareViewDisplayBtn");
 
 const inventoryPasswordModal =
   document.getElementById("inventoryPasswordModal");
@@ -3860,6 +4264,12 @@ daybookTab.addEventListener(
     renderDaybook();
   }
 );
+
+if (prepareViewDisplayBtn) {
+  prepareViewDisplayBtn.addEventListener("click", () => {
+    prepareViewDisplayImages();
+  });
+}
 
 /* ================================
    MANUAL PRICE UPDATE SIGNAL
