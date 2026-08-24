@@ -1000,7 +1000,9 @@ function buildDraftPayload() {
       price:
         item.price || 0,
       total:
-        item.total || 0
+        item.total || 0,
+      priceType:
+        item.product.priceType || ""
     }));
 
   const subtotal =
@@ -1688,7 +1690,18 @@ function renderHistoryItemHTML(item, showPrices, index) {
       item.qty > 0 && item.price > 0
         ? "₹" + formatIndianMoneyWhole(Math.abs(item.total))
         : "—";
-    moneyHTML = `<span class="view-history-money">${rateText} · ${amountText}</span>`;
+    moneyHTML = `
+      <div class="view-history-money-grid">
+        <div class="view-history-money-block">
+          <span class="view-history-money-label">Rate</span>
+          <span class="view-history-money-value">${rateText}</span>
+        </div>
+        <div class="view-history-money-block">
+          <span class="view-history-money-label">Amount</span>
+          <span class="view-history-money-value">${amountText}</span>
+        </div>
+      </div>
+    `;
   }
 
   const rowClass = showPrices
@@ -1704,7 +1717,6 @@ function renderHistoryItemHTML(item, showPrices, index) {
       <span class="view-item-index">${index}</span>
       ${renderProductImageHTML(item.productSr, "view-product-image--thumb")}
       <div class="view-history-info">
-        <span class="view-added-earlier">Added Earlier</span>
         <span class="view-history-name">${escapeAttr(item.productName)}</span>
         ${materialHTML}
       </div>
@@ -1746,8 +1758,16 @@ function formatViewSummaryNumber(n) {
   return Number.isInteger(n) ? String(n) : n.toFixed(2);
 }
 
-function renderViewSummaryPanelHTML(items) {
+function renderViewSummaryPanelHTML(items, showPrices, grandTotal) {
   const summary = computeViewSummary(items);
+  const grandTotalHTML = showPrices
+    ? `
+      <div class="view-summary-grand-total">
+        <span class="view-summary-label">Grand Total</span>
+        <div class="view-summary-grand-value">₹${formatIndianMoneyWhole(grandTotal || 0)}</div>
+      </div>
+    `
+    : "";
 
   return `
     <div class="view-summary-panel">
@@ -1776,6 +1796,7 @@ function renderViewSummaryPanelHTML(items) {
           <span class="view-summary-sub">Items added so far</span>
         </div>
       </div>
+      ${grandTotalHTML}
       <div class="view-summary-footer">
         ${VIEW_CLOCK_ICON_SVG}
         <span>Data is real-time and updates automatically as items are added.</span>
@@ -1793,7 +1814,6 @@ function renderViewCastPanelHTML(cast, draft) {
   const items = draft.items || [];
   const currentItem = items.length ? items[0] : null;
   const historyItems = items.length > 1 ? items.slice(1) : [];
-  const totalItemCount = items.length;
 
   // Only plays the entrance transition when a NEW item has actually
   // arrived (see attachCastDraftListener), never on ordinary edits to
@@ -1822,28 +1842,19 @@ function renderViewCastPanelHTML(cast, draft) {
         .join("")}</div>`
     : "";
 
-  const totalRow = showPrices && items.length
-    ? `<div class="view-live-total-row"><span class="view-live-total-label">Total</span><span class="view-live-total-value">₹${formatIndianMoneyWhole(draft.subtotal || 0)}</span></div>`
-    : "";
-
   return `
     <div class="view-cast-panel">
       <div class="view-main-col">
-        <div class="view-live-header">
-          <span class="view-walkin-bar"></span>
-          <span class="view-live-customer">${escapeAttr(draft.customerName || "WALK-IN")}</span>
-        </div>
-        <div class="view-items-heading">Items Added (Most Recent First)</div>
+        <div class="view-items-heading">Items Added</div>
         ${currentHTML}
         ${historyHTML}
-        ${totalRow}
         <div class="view-info-bar">
           ${VIEW_INFO_ICON_SVG}
           <span>This is a view only screen. No actions can be performed here.</span>
         </div>
       </div>
       <div class="view-summary-col">
-        ${renderViewSummaryPanelHTML(items)}
+        ${renderViewSummaryPanelHTML(items, showPrices, draft.subtotal || 0)}
       </div>
     </div>
   `;

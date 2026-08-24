@@ -2489,36 +2489,10 @@ input {
   top: var(--view-space-xl);
 }
 
-.view-live-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.view-walkin-bar {
-  width: 4px;
-  height: 18px;
-  border-radius: 3px;
-  background: var(--view-blue);
-  flex-shrink: 0;
-}
-
-.view-live-customer {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--view-blue);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .view-items-heading {
   font-size: 19px;
   font-weight: 700;
   color: var(--view-navy);
-  margin-top: var(--view-space-lg);
   padding-bottom: var(--view-space-md);
   border-bottom: 1px solid var(--view-card-border);
 }
@@ -2796,14 +2770,6 @@ input {
   gap: 2px;
 }
 
-.view-added-earlier {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--view-muted);
-}
-
 .view-history-name {
   font-weight: 700;
   font-size: 17px;
@@ -2844,33 +2810,33 @@ input {
   margin-left: 2px;
 }
 
-.view-history-money {
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--view-muted);
-}
-
-.view-live-total-row {
+.view-history-money-grid {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: var(--view-space-md) 4px 0;
-  margin-top: var(--view-space-sm);
-  border-top: 1px solid var(--view-card-border);
+  justify-content: flex-end;
+  gap: 18px;
+  margin-top: 6px;
 }
 
-.view-live-total-label {
-  font-size: 13px;
+.view-history-money-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.view-history-money-label {
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--view-label-color);
 }
 
-.view-live-total-value {
-  font-size: 24px;
+.view-history-money-value {
+  font-size: 13px;
   font-weight: 700;
   color: var(--view-navy);
+  font-variant-numeric: tabular-nums;
 }
 
 /* --- Bottom view-only informational bar --- */
@@ -2921,7 +2887,7 @@ input {
 }
 
 .view-summary-metric:last-of-type {
-  border-bottom: none;
+  border-bottom: 1px solid var(--view-card-border);
 }
 
 .view-summary-icon {
@@ -2982,6 +2948,19 @@ input {
 .view-summary-sub {
   font-size: 12px;
   color: var(--view-muted);
+}
+
+.view-summary-grand-total {
+  padding: var(--view-space-lg) 0;
+  border-bottom: 1px solid var(--view-card-border);
+}
+
+.view-summary-grand-value {
+  margin-top: 4px;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--view-navy);
+  font-variant-numeric: tabular-nums;
 }
 
 .view-summary-footer {
