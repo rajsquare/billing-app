@@ -286,7 +286,14 @@ function normalizeProductImageManifest(data) {
 
 async function fetchProductImageManifest() {
   for (const [collectionName, docId] of PRODUCT_IMAGE_MANIFEST_REFS) {
-    const snap = await getDoc(doc(pricelistDb, collectionName, docId));
+    let snap = null;
+
+    try {
+      snap = await getDoc(doc(pricelistDb, collectionName, docId));
+    } catch (err) {
+      console.warn("Product image manifest read failed:", collectionName, docId, err);
+      continue;
+    }
 
     if (snap.exists()) {
       const manifest = normalizeProductImageManifest(snap.data());
@@ -300,8 +307,94 @@ async function fetchProductImageManifest() {
   return buildProductImageManifestFromExistingImages();
 }
 
+async function fetchLatestProductImageUrlForSr(sr) {
+  const snap = await getDocs(
+    query(
+      collection(pricelistDb, "productImages"),
+      where("sr", "==", sr)
+    )
+  );
+
+  let best = null;
+
+  snap.forEach(docSnap => {
+    const data = docSnap.data();
+
+    if (!data || !data.imageUrl) {
+      return;
+    }
+
+    if (!best) {
+      best = data;
+      return;
+    }
+
+    const bestTime =
+      best.createdAt && best.createdAt.toMillis
+        ? best.createdAt.toMillis()
+        : 0;
+    const dataTime =
+      data.createdAt && data.createdAt.toMillis
+        ? data.createdAt.toMillis()
+        : 0;
+
+    if (dataTime > bestTime) {
+      best = data;
+    }
+  });
+
+  return best ? best.imageUrl : "";
+}
+
+async function buildProductImageManifestFromKnownProducts() {
+  if (!products.length) {
+    await loadProducts();
+  }
+
+  const productSrs = products
+    .map(product => product && product.sr)
+    .filter(sr => sr !== undefined && sr !== null && sr !== "");
+  const images = {};
+
+  await runWithConcurrency(
+    productSrs,
+    PRODUCT_IMAGE_PREPARE_CONCURRENCY,
+    async sr => {
+      try {
+        const url = await fetchLatestProductImageUrlForSr(sr);
+
+        if (url) {
+          images[String(sr)] = url;
+        }
+      } catch (err) {
+        console.warn("Product image lookup failed while building local manifest for sr", sr, err);
+      }
+    }
+  );
+
+  if (!Object.keys(images).length) {
+    throw new Error("No product images are available to prepare, or image reads are not permitted.");
+  }
+
+  const version = String(Date.now());
+
+  return {
+    version,
+    updatedAt: version,
+    images
+  };
+}
+
 async function buildProductImageManifestFromExistingImages() {
-  const snap = await getDocs(collection(pricelistDb, "productImages"));
+  let snap = null;
+
+  try {
+    snap = await getDocs(collection(pricelistDb, "productImages"));
+  } catch (err) {
+    console.warn("Product image collection scan failed; falling back to per-product lookups:", err);
+    return buildProductImageManifestFromKnownProducts();
+  }
+
   const bestBySr = new Map();
 
   snap.forEach(docSnap => {
@@ -338,17 +431,6 @@ async function buildProductImageManifestFromExistingImages() {
   }
 
   const version = String(Date.now());
-  const manifestRef = doc(pricelistDb, "productImageManifests", "current");
-
-  try {
-    await setDoc(manifestRef, {
-      version,
-      updatedAt: serverTimestamp(),
-      images
-    });
-  } catch (err) {
-    console.warn("Could not save product image manifest; using it for this run only:", err);
-  }
 
   return {
     version,
