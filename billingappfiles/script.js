@@ -1566,24 +1566,67 @@ window.handleProductImageError = function (imgEl) {
   }
 };
 
-function renderCurrentItemHTML(item, showPrices, blinkQty) {
-  // Material is shown as plain, neutral typography — deliberately NOT
-  // passed through getMaterialClass() here, since that helper is what
-  // drives the colorful category badges used elsewhere (suggestion
-  // cards, filter chips). The View must never color-code material.
+/* Display-only quantity metadata, derived purely from the existing
+   item.priceType ("KG" or "PP", written at draft-save time — see
+   buildDraftPayload) that already drives Total Quantity on the
+   printed invoice (buildTotalQuantityHTML). Never introduces a new
+   field: just a display label/unit pairing for an existing one. */
+function getViewQtyMeta(item) {
+  if (item && item.priceType === "KG") {
+    return { label: "WEIGHT", unit: "kg" };
+  }
+  if (item && item.priceType === "PP") {
+    return { label: "PIECES", unit: "pcs" };
+  }
+  return { label: "QUANTITY", unit: "" };
+}
+
+const VIEW_INFO_ICON_SVG =
+  `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" ` +
+  `stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle>` +
+  `<path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>`;
+
+const VIEW_CLOCK_ICON_SVG =
+  `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" ` +
+  `stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle>` +
+  `<path d="M12 7v5l3 3"></path></svg>`;
+
+const VIEW_WEIGHT_ICON_SVG =
+  `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" ` +
+  `stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4"></path>` +
+  `<path d="M7 7h10l2 13H5L7 7Z"></path><path d="M9 11a3 3 0 0 0 6 0"></path></svg>`;
+
+const VIEW_PIECES_ICON_SVG =
+  `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" ` +
+  `stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5Z"></path>` +
+  `<path d="M3 8v8l9 5 9-5V8"></path><path d="M12 13v8"></path></svg>`;
+
+const VIEW_ITEMS_ICON_SVG =
+  `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" ` +
+  `stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"></path>` +
+  `<path d="M12 20V4"></path><path d="M20 20v-7"></path></svg>`;
+
+function renderCurrentItemHTML(item, showPrices, blinkQty, index) {
+  // Material is shown as a compact neutral badge, matching the
+  // reference design's soft beige pill — the underlying material
+  // value/data is untouched, this is purely a presentational wrapper.
   const materialText = (item.material || "").trim();
   const materialLine = materialText
-    ? `<div class="view-current-material">${escapeAttr(materialText)}</div>`
+    ? `<span class="view-material-badge">${escapeAttr(materialText)}</span>`
     : "";
 
+  const qtyMeta = getViewQtyMeta(item);
   const qtyText = formatViewQty(item.qty);
   const qtyValueClass = blinkQty
     ? "view-current-qty-value view-current-qty-value--blink"
     : "view-current-qty-value";
-  const qtyLine = `
-    <div class="view-current-qty-row">
-      <span class="view-current-qty-label">Quantity</span>
-      <span class="${qtyValueClass}">${qtyText}</span>
+  const unitHTML = qtyMeta.unit
+    ? `<span class="view-current-qty-unit">${qtyMeta.unit}</span>`
+    : "";
+  const qtyBlock = `
+    <div class="view-current-qty-block">
+      <span class="view-current-qty-label">${qtyMeta.label}</span>
+      <div class="${qtyValueClass}">${qtyText} ${unitHTML}</div>
     </div>
   `;
 
@@ -1611,24 +1654,31 @@ function renderCurrentItemHTML(item, showPrices, blinkQty) {
   }
 
   return `
+    <span class="view-item-index">${index}</span>
     ${renderProductImageHTML(item.productSr)}
-    <div class="view-current-name">${escapeAttr(item.productName)}</div>
-    ${materialLine}
-    ${qtyLine}
-    ${priceBlock}
+    <div class="view-current-info">
+      <span class="view-just-added">Just Added</span>
+      <div class="view-current-name">${escapeAttr(item.productName)}</div>
+      ${materialLine}
+    </div>
+    <div class="view-current-side">
+      ${qtyBlock}
+      ${priceBlock}
+    </div>
   `;
 }
 
-function renderHistoryItemHTML(item, showPrices) {
-  // As with the current item, material is plain neutral text in the
+function renderHistoryItemHTML(item, showPrices, index) {
+  // As with the current item, material is a plain neutral badge in the
   // View — getMaterialClass() is intentionally not used here so no
   // colorful category badge is applied.
   const materialText = (item.material || "").trim();
+  const qtyMeta = getViewQtyMeta(item);
   const qtyText = formatViewQty(item.qty);
 
   const materialHTML = materialText
-    ? `<span class="view-history-material">${escapeAttr(materialText)}</span>`
-    : `<span class="view-history-material view-history-material--empty"></span>`;
+    ? `<span class="view-material-badge">${escapeAttr(materialText)}</span>`
+    : "";
 
   let moneyHTML = "";
   if (showPrices) {
@@ -1645,13 +1695,91 @@ function renderHistoryItemHTML(item, showPrices) {
     ? "view-history-row view-history-row--priced"
     : "view-history-row";
 
+  const unitHTML = qtyMeta.unit
+    ? `<span class="view-history-qty-unit">${qtyMeta.unit}</span>`
+    : "";
+
   return `
     <div class="${rowClass}">
+      <span class="view-item-index">${index}</span>
       ${renderProductImageHTML(item.productSr, "view-product-image--thumb")}
-      <span class="view-history-name">${escapeAttr(item.productName)}</span>
-      ${materialHTML}
-      <span class="view-history-qty"><span class="view-history-qty-label">Quantity</span><span class="view-history-qty-value">${qtyText}</span></span>
-      ${moneyHTML}
+      <div class="view-history-info">
+        <span class="view-added-earlier">Added Earlier</span>
+        <span class="view-history-name">${escapeAttr(item.productName)}</span>
+        ${materialHTML}
+      </div>
+      <div class="view-history-side">
+        <span class="view-history-qty-label">${qtyMeta.label}</span>
+        <span class="view-history-qty-value">${qtyText} ${unitHTML}</span>
+        ${moneyHTML}
+      </div>
+    </div>
+  `;
+}
+
+/* Summary metrics — a VIEW of data the draft already carries, never a
+   new source of truth. Sums the same item.qty/priceType fields that
+   already drive the current/history rows above and the printed
+   invoice's Total Quantity line (buildTotalQuantityHTML); no new
+   Firestore read, query, or persistent counter is introduced. */
+function computeViewSummary(items) {
+  let totalWeight = 0;
+  let totalPieces = 0;
+
+  items.forEach(item => {
+    const qty = parseFloat(item.qty) || 0;
+    if (item.priceType === "KG") {
+      totalWeight += qty;
+    } else if (item.priceType === "PP") {
+      totalPieces += qty;
+    }
+  });
+
+  return {
+    totalWeight,
+    totalPieces,
+    totalItems: items.length
+  };
+}
+
+function formatViewSummaryNumber(n) {
+  return Number.isInteger(n) ? String(n) : n.toFixed(2);
+}
+
+function renderViewSummaryPanelHTML(items) {
+  const summary = computeViewSummary(items);
+
+  return `
+    <div class="view-summary-panel">
+      <div class="view-summary-title">Total Quantity Added So Far</div>
+      <div class="view-summary-metric view-summary-metric--blue">
+        <div class="view-summary-icon">${VIEW_WEIGHT_ICON_SVG}</div>
+        <div class="view-summary-text">
+          <span class="view-summary-label">Total Weight</span>
+          <div class="view-summary-value">${formatViewSummaryNumber(summary.totalWeight)}<span class="view-summary-unit">kg</span></div>
+          <span class="view-summary-sub">Cumulative weight added so far</span>
+        </div>
+      </div>
+      <div class="view-summary-metric view-summary-metric--green">
+        <div class="view-summary-icon">${VIEW_PIECES_ICON_SVG}</div>
+        <div class="view-summary-text">
+          <span class="view-summary-label">Total Pieces</span>
+          <div class="view-summary-value">${formatViewSummaryNumber(summary.totalPieces)}<span class="view-summary-unit">pcs</span></div>
+          <span class="view-summary-sub">Cumulative pieces added so far</span>
+        </div>
+      </div>
+      <div class="view-summary-metric view-summary-metric--purple">
+        <div class="view-summary-icon">${VIEW_ITEMS_ICON_SVG}</div>
+        <div class="view-summary-text">
+          <span class="view-summary-label">Total Items Added</span>
+          <div class="view-summary-value">${formatViewSummaryNumber(summary.totalItems)}</div>
+          <span class="view-summary-sub">Items added so far</span>
+        </div>
+      </div>
+      <div class="view-summary-footer">
+        ${VIEW_CLOCK_ICON_SVG}
+        <span>Data is real-time and updates automatically as items are added.</span>
+      </div>
     </div>
   `;
 }
@@ -1665,6 +1793,7 @@ function renderViewCastPanelHTML(cast, draft) {
   const items = draft.items || [];
   const currentItem = items.length ? items[0] : null;
   const historyItems = items.length > 1 ? items.slice(1) : [];
+  const totalItemCount = items.length;
 
   // Only plays the entrance transition when a NEW item has actually
   // arrived (see attachCastDraftListener), never on ordinary edits to
@@ -1675,7 +1804,7 @@ function renderViewCastPanelHTML(cast, draft) {
     : "";
 
   const currentHTML = currentItem
-    ? `<div class="view-current-item${enterClass}">${renderCurrentItemHTML(currentItem, showPrices, !!draft._viewCurrentQtyChanged)}</div>`
+    ? `<div class="view-current-item${enterClass}">${renderCurrentItemHTML(currentItem, showPrices, !!draft._viewCurrentQtyChanged, 1)}</div>`
     : "";
   // Consumed for this render — clear it so an unrelated re-render of
   // this same panel (triggered by another cast's snapshot) does not
@@ -1683,9 +1812,13 @@ function renderViewCastPanelHTML(cast, draft) {
   // current item sets it again (see attachCastDraftListener).
   draft._viewCurrentQtyChanged = false;
 
+  // historyItems is already newest-first (items.slice(1) of an array
+  // where items[0] is current) — so index simply continues counting
+  // down from the current item's "1", matching the reference's visual
+  // ordering (top = most recently added = lowest number).
   const historyHTML = historyItems.length
     ? `<div class="view-history-list">${historyItems
-        .map(item => renderHistoryItemHTML(item, showPrices))
+        .map((item, i) => renderHistoryItemHTML(item, showPrices, i + 2))
         .join("")}</div>`
     : "";
 
@@ -1695,12 +1828,23 @@ function renderViewCastPanelHTML(cast, draft) {
 
   return `
     <div class="view-cast-panel">
-      <div class="view-live-header">
-        <div class="view-live-customer">${escapeAttr(draft.customerName || "WALK-IN")}</div>
+      <div class="view-main-col">
+        <div class="view-live-header">
+          <span class="view-walkin-bar"></span>
+          <span class="view-live-customer">${escapeAttr(draft.customerName || "WALK-IN")}</span>
+        </div>
+        <div class="view-items-heading">Items Added (Most Recent First)</div>
+        ${currentHTML}
+        ${historyHTML}
+        ${totalRow}
+        <div class="view-info-bar">
+          ${VIEW_INFO_ICON_SVG}
+          <span>This is a view only screen. No actions can be performed here.</span>
+        </div>
       </div>
-      ${currentHTML}
-      ${historyHTML}
-      ${totalRow}
+      <div class="view-summary-col">
+        ${renderViewSummaryPanelHTML(items)}
+      </div>
     </div>
   `;
 }
