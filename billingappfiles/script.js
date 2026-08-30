@@ -58,6 +58,8 @@ const pricelistDb =
 const billsCollection = collection(db, "bills");
 const daybookCollection = collection(db, "daybook");
 const liveDraftBillsCollection = collection(db, "liveDraftBills");
+const inventorySalesCollection = collection(db, "inventorySales");
+const inventoryAccountingCollection = collection(db, "inventoryAccounting");
 
 /* View casting uses a single, dedicated document as a lightweight handoff
    signal between Billing and the View (wall display) screen — the same
@@ -149,6 +151,7 @@ let currentMaterialFilter = null;
 
 let incomingBillCache = {};
 let daybookCache = {};
+let inventorySalesCache = {};
 
 let isReceiverBusy = false;
 let isSendingBill = false;
@@ -1027,6 +1030,20 @@ const inventorySaveBtn =
   document.getElementById("inventorySaveBtn");
 const inventoryCancelBtn =
   document.getElementById("inventoryCancelBtn");
+const inventoryStockModeBtn =
+  document.getElementById("inventoryStockModeBtn");
+const inventorySalesModeBtn =
+  document.getElementById("inventorySalesModeBtn");
+const inventoryOverviewTitle =
+  document.getElementById("inventoryOverviewTitle");
+const inventoryOverviewList =
+  document.getElementById("inventoryOverviewList");
+const inventoryResetSalesBtn =
+  document.getElementById("inventoryResetSalesBtn");
+const inventoryStockEditorFields =
+  document.getElementById("inventoryStockEditorFields");
+const inventorySalesReadout =
+  document.getElementById("inventorySalesReadout");
 
 const materialFilterDiv =
   document.getElementById("materialFilter");
@@ -4046,6 +4063,8 @@ async function loadProducts({ forceRefresh = false } = {}) {
       p => productsBySr.set(p.sr, p)
     );
 
+    renderInventoryOverview();
+
     if (!forceRefresh) {
       restoreDraft();
     }
@@ -6690,6 +6709,24 @@ onSnapshot(
   }
 );
 
+onSnapshot(
+  inventorySalesCollection,
+  snapshot => {
+    snapshot.docChanges().forEach(
+      change => {
+        if (change.type === "removed") {
+          delete inventorySalesCache[change.doc.id];
+        } else {
+          inventorySalesCache[change.doc.id] =
+            change.doc.data();
+        }
+      }
+    );
+
+    renderInventoryOverview();
+  }
+);
+
 let isInitialSnapshot = true;
 
 onSnapshot(
@@ -6949,6 +6986,7 @@ daybookFooterDate.textContent =
 let _inventorySelectedSr = null;
 let _inventorySearchTimer = null;
 let _inventorySaving = false;
+let _inventoryMode = "stock";
 
 function openInventoryPasswordModal() {
   inventoryPasswordInput.value = "";
@@ -7007,6 +7045,7 @@ function openInventoryModal() {
   inventoryClearSearch.style.display = "none";
   inventoryEditorView.style.display = "none";
   inventorySearchView.style.display = "block";
+  setInventoryMode("stock");
   inventoryModal.style.display = "flex";
   inventorySearchBox.focus();
 }
@@ -7019,6 +7058,104 @@ inventoryCloseBtn.addEventListener(
   "click",
   closeInventoryModal
 );
+
+function getProductSalesQty(sr) {
+  const record =
+    inventorySalesCache[String(sr)];
+  const qty =
+    record ? Number(record.qtySold) || 0 : 0;
+  return Math.max(0, qty);
+}
+
+function setInventoryMode(mode) {
+  _inventoryMode =
+    mode === "sales" ? "sales" : "stock";
+
+  inventoryStockModeBtn.classList.toggle(
+    "inventory-mode-active",
+    _inventoryMode === "stock"
+  );
+  inventorySalesModeBtn.classList.toggle(
+    "inventory-mode-active",
+    _inventoryMode === "sales"
+  );
+
+  inventorySearchBox.placeholder =
+    _inventoryMode === "sales"
+      ? "Search product sales..."
+      : "Search product stock...";
+
+  inventoryOverviewTitle.textContent =
+    _inventoryMode === "sales"
+      ? "Sales Overview"
+      : "Stock Overview";
+
+  inventoryResetSalesBtn.style.display =
+    _inventoryMode === "sales"
+      ? "inline-flex"
+      : "none";
+
+  _inventorySelectedSr = null;
+  inventoryEditorView.style.display = "none";
+  inventorySearchView.style.display = "block";
+  inventorySearchBox.value = "";
+  inventorySuggestions.innerHTML = "";
+  inventoryClearSearch.style.display = "none";
+  renderInventoryOverview();
+  inventorySearchBox.focus();
+}
+
+inventoryStockModeBtn.addEventListener(
+  "click",
+  () => setInventoryMode("stock")
+);
+
+inventorySalesModeBtn.addEventListener(
+  "click",
+  () => setInventoryMode("sales")
+);
+
+function renderInventoryOverview() {
+  if (!inventoryOverviewList) {
+    return;
+  }
+
+  const rows =
+    products.map(product => {
+      const qty =
+        _inventoryMode === "sales"
+          ? getProductSalesQty(product.sr)
+          : Math.max(0, Number(product.s) || 0);
+
+      return {
+        product,
+        qty
+      };
+    })
+      .filter(row => row.qty > 0)
+      .sort((a, b) => b.qty - a.qty);
+
+  if (!rows.length) {
+    inventoryOverviewList.innerHTML = `
+      <div class="empty-state">
+        ${_inventoryMode === "sales" ? "No sales since reset" : "No stock available"}
+      </div>
+    `;
+    return;
+  }
+
+  inventoryOverviewList.innerHTML =
+    rows.map(row => `
+      <div class="inventory-overview-row">
+        <div class="inventory-overview-name">
+          ${escapeAttr(row.product.productName)}
+        </div>
+        <div class="inventory-overview-qty">
+          ${roundQty(row.qty)}
+        </div>
+      </div>
+    `).join("");
+}
 
 /* Reuses searchProducts()/escapeAttr()/getMaterialClass() exactly as used
    by the Billing search — only the rendered card and click target differ,
@@ -7044,13 +7181,20 @@ function renderInventorySuggestions(results) {
               ${escapeAttr(product.productName)}
             </div>
             <div class="badge-row">
-              <div class="unit">
-                ${escapeAttr(product.priceType || "")}
-              </div>
               ${
-                product.material
-                  ? `<div class="unit ${getMaterialClass(product.material)}">${escapeAttr(product.material)}</div>`
-                  : ""
+                _inventoryMode === "sales"
+                  ? `<div class="unit">Sold Since Reset: ${roundQty(getProductSalesQty(product.sr))}</div>`
+                  : `
+                    <div class="unit">
+                      ${escapeAttr(product.priceType || "")}
+                    </div>
+                    ${
+                      product.material
+                        ? `<div class="unit ${getMaterialClass(product.material)}">${escapeAttr(product.material)}</div>`
+                        : ""
+                    }
+                    <div class="unit">Current Stock: ${roundQty(Math.max(0, Number(product.s) || 0))}</div>
+                  `
               }
             </div>
           </div>
@@ -7110,7 +7254,19 @@ window.selectInventoryProduct = function(sr) {
 
   _inventorySelectedSr = sr;
   inventoryProductName.textContent = product.productName;
-  inventoryCodeInput.value = product.s ?? 0;
+
+  if (_inventoryMode === "sales") {
+    inventoryStockEditorFields.style.display = "none";
+    inventorySaveBtn.style.display = "none";
+    inventorySalesReadout.style.display = "block";
+    inventorySalesReadout.textContent =
+      `Sold Since Reset: ${roundQty(getProductSalesQty(sr))}`;
+  } else {
+    inventoryStockEditorFields.style.display = "block";
+    inventorySaveBtn.style.display = "inline-flex";
+    inventorySalesReadout.style.display = "none";
+    inventoryCodeInput.value = Math.max(0, Number(product.s) || 0);
+  }
 
   inventorySearchView.style.display = "none";
   inventoryEditorView.style.display = "block";
@@ -7122,6 +7278,7 @@ inventoryCancelBtn.addEventListener(
     _inventorySelectedSr = null;
     inventoryEditorView.style.display = "none";
     inventorySearchView.style.display = "block";
+    inventorySaveBtn.style.display = "inline-flex";
     inventorySearchBox.focus();
   }
 );
@@ -7179,6 +7336,10 @@ async function backfillStockLedger(map) {
  * touches only this one product's entry in the map.
  */
 async function saveProductStockValue(sr, newValue) {
+  if (!Number.isFinite(newValue) || newValue < 0) {
+    throw new Error("Stock cannot be negative.");
+  }
+
   await writeStockFields({ [`stock.${sr}`]: newValue });
 
   const local = productsBySr.get(sr);
@@ -7200,6 +7361,11 @@ inventorySaveBtn.addEventListener(
       return;
     }
 
+    if (newValue < 0) {
+      showToast("Stock cannot be negative", "error");
+      return;
+    }
+
     _inventorySaving = true;
     inventorySaveBtn.disabled = true;
 
@@ -7208,8 +7374,10 @@ inventorySaveBtn.addEventListener(
         _inventorySelectedSr,
         newValue
       );
+      renderInventoryOverview();
     } catch (err) {
       console.error("Failed to save stock:", err);
+      showToast("Failed to save stock", "error");
     } finally {
       _inventorySaving = false;
       inventorySaveBtn.disabled = false;
@@ -7224,67 +7392,238 @@ inventorySaveBtn.addEventListener(
   }
 );
 
-/**
- * Best-effort stock deduction, called only after a bill has already been
- * successfully moved to Daybook (i.e. after that Firestore transaction
- * has committed). Aggregates quantities per product sr, reads current
- * values from the durable stock ledger (falling back to the in-memory
- * product cache for anything not yet in the ledger), and performs a
- * single read + single write against appConfig/updateSignal — never
- * against catalog/current, so pricelist updates can't erase deductions
- * either. Items from bills finalized before this feature shipped won't
- * carry "sr" and are silently skipped, per spec (only future bills affect
- * stock). Any failure here is only logged — it must never surface to the
- * user or affect billing/Daybook, which have already succeeded by this
- * point.
- */
-async function deductStockForBillItems(items) {
-  if (!Array.isArray(items) || !items.length) {
-    return;
-  }
+inventoryResetSalesBtn.addEventListener(
+  "click",
+  async () => {
+    if (_inventoryMode !== "sales") {
+      return;
+    }
 
+    const confirmed = confirm(
+      "Reset all sales counters?\n\nAll sales quantities since the last reset will be permanently deleted."
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    inventoryResetSalesBtn.disabled = true;
+
+    try {
+      const snap =
+        await getDocs(inventorySalesCollection);
+      const batches = [];
+      let batch = writeBatch(db);
+      let count = 0;
+
+      snap.docs.forEach(docSnap => {
+        batch.delete(docSnap.ref);
+        count++;
+
+        if (count === 500) {
+          batches.push(batch);
+          batch = writeBatch(db);
+          count = 0;
+        }
+      });
+
+      if (count > 0) {
+        batches.push(batch);
+      }
+
+      for (const pendingBatch of batches) {
+        await pendingBatch.commit();
+      }
+
+      inventorySalesCache = {};
+      renderInventoryOverview();
+      showToast("Sales counters reset", "success");
+    } catch (err) {
+      console.error("Failed to reset sales counters:", err);
+      showToast("Failed to reset sales counters", "error");
+    } finally {
+      inventoryResetSalesBtn.disabled = false;
+    }
+  }
+);
+
+function aggregateBillItemQuantities(items) {
   const deltas = new Map();
+
+  if (!Array.isArray(items)) {
+    return deltas;
+  }
 
   items.forEach(item => {
     if (item.sr == null) {
       return;
     }
+
     const qty = Number(item.qty) || 0;
-    deltas.set(item.sr, (deltas.get(item.sr) || 0) + qty);
+
+    if (qty <= 0) {
+      return;
+    }
+
+    const key = String(item.sr);
+    deltas.set(key, (deltas.get(key) || 0) + qty);
   });
 
-  if (!deltas.size) {
+  return deltas;
+}
+
+function createInventoryAccountingPlan(billId, bill) {
+  const deltas =
+    aggregateBillItemQuantities(bill.items);
+
+  return {
+    billId,
+    markerRef:
+      doc(inventoryAccountingCollection, billId),
+    deltas
+  };
+}
+
+async function readInventoryAccountingSnapshots(transaction, plans) {
+  const markerSnaps = new Map();
+  const uniqueSrs = new Set();
+
+  for (const plan of plans) {
+    markerSnaps.set(
+      plan.billId,
+      await transaction.get(plan.markerRef)
+    );
+
+    if (!markerSnaps.get(plan.billId).exists()) {
+      plan.deltas.forEach((qty, sr) => {
+        if (qty > 0) {
+          uniqueSrs.add(sr);
+        }
+      });
+    }
+  }
+
+  const stockSnap =
+    await transaction.get(updateSignalRef);
+  const salesSnaps = new Map();
+
+  for (const sr of uniqueSrs) {
+    salesSnaps.set(
+      sr,
+      await transaction.get(
+        doc(inventorySalesCollection, sr)
+      )
+    );
+  }
+
+  return {
+    markerSnaps,
+    stockSnap,
+    salesSnaps
+  };
+}
+
+function applyInventoryAccountingWrites(transaction, plans, snapshots) {
+  const stockLedger =
+    (snapshots.stockSnap.exists() && snapshots.stockSnap.data().stock) || {};
+  const stockPatch = {};
+  const salesTotals = new Map();
+  const accountedPlans = [];
+
+  plans.forEach(plan => {
+    const markerSnap =
+      snapshots.markerSnaps.get(plan.billId);
+
+    if (markerSnap && markerSnap.exists()) {
+      return;
+    }
+
+    plan.deltas.forEach((qty, sr) => {
+      salesTotals.set(sr, (salesTotals.get(sr) || 0) + qty);
+
+      const localStock =
+        productsBySr.get(Number(sr))?.s ?? 0;
+      const currentStock =
+        Object.prototype.hasOwnProperty.call(stockLedger, sr)
+          ? Number(stockLedger[sr]) || 0
+          : Number(localStock) || 0;
+      const currentPatchedStock =
+        Object.prototype.hasOwnProperty.call(stockPatch, sr)
+          ? stockPatch[sr]
+          : currentStock;
+
+      stockPatch[sr] =
+        Math.max(0, currentPatchedStock - qty);
+    });
+
+    accountedPlans.push(plan);
+  });
+
+  if (Object.keys(stockPatch).length) {
+    if (snapshots.stockSnap.exists()) {
+      const stockUpdates = {};
+      Object.entries(stockPatch).forEach(([sr, value]) => {
+        stockUpdates[`stock.${sr}`] = value;
+      });
+      transaction.update(updateSignalRef, stockUpdates);
+    } else {
+      transaction.set(
+        updateSignalRef,
+        { stock: stockPatch },
+        { merge: true }
+      );
+    }
+  }
+
+  salesTotals.forEach((qty, sr) => {
+    const salesSnap =
+      snapshots.salesSnaps.get(sr);
+    const currentSold =
+      salesSnap && salesSnap.exists()
+        ? Number(salesSnap.data().qtySold) || 0
+        : 0;
+
+    transaction.set(
+      doc(inventorySalesCollection, sr),
+      {
+        qtySold:
+          currentSold + qty
+      },
+      { merge: true }
+    );
+  });
+
+  accountedPlans.forEach(plan => {
+    transaction.set(
+      plan.markerRef,
+      {
+        billId:
+          plan.billId,
+        accountedAt:
+          serverTimestamp()
+      }
+    );
+  });
+
+  return {
+    stockPatch,
+    salesTotals
+  };
+}
+
+function applyLocalInventoryAccountingResult(result) {
+  if (!result || !result.stockPatch) {
     return;
   }
 
-  try {
-    const stockSnap = await getDoc(updateSignalRef);
-    const stockLedger =
-      (stockSnap.exists() && stockSnap.data().stock) || {};
+  Object.entries(result.stockPatch).forEach(([sr, value]) => {
+    const local = productsBySr.get(Number(sr));
+    if (local) {
+      local.s = value;
+    }
+  });
 
-    const updates = {};
-
-    deltas.forEach((qty, sr) => {
-      const key = String(sr);
-      const currentStock =
-        Object.prototype.hasOwnProperty.call(stockLedger, key)
-          ? stockLedger[key]
-          : (productsBySr.get(sr)?.s ?? 0);
-
-      updates[`stock.${key}`] = currentStock - qty;
-    });
-
-    await writeStockFields(updates);
-
-    deltas.forEach((qty, sr) => {
-      const local = productsBySr.get(sr);
-      if (local) {
-        local.s = (local.s ?? 0) - qty;
-      }
-    });
-  } catch (err) {
-    console.error("Stock deduction failed:", err);
-  }
+  renderInventoryOverview();
 }
 
 window.doneReceivedBill =
@@ -7327,15 +7666,14 @@ window.doneReceivedBill =
       isReceiverBusy = true;
 
       let movedCount = 0;
-      let committedItems = [];
+      let accountingResult = null;
 
       try {
         await runTransaction(
           db,
           async transaction => {
-            // Reset on every attempt so a retried transaction callback can't
-            // accumulate items from a prior, discarded attempt.
-            committedItems = [];
+            movedCount = 0;
+            accountingResult = null;
 
             // Firestore requires all reads to complete before any writes inside
             // a transaction. Read sequentially to satisfy this constraint.
@@ -7345,18 +7683,51 @@ window.doneReceivedBill =
               snaps.push({ id, snap });
             }
 
-            // Queue all writes after reads are done
+            const billsToMove = [];
+            const accountingPlans = [];
+
             for (const { id, snap } of snaps) {
               if (!snap.exists()) continue;
 
               const bill = snap.data();
 
               // Re-validate inside transaction (Firestore server state may differ)
-              if (bill.status !== "printed") continue;
+              if (
+                bill.status !== "printed" ||
+                bill.effectiveVersion === false
+              ) {
+                continue;
+              }
 
-              const billRef     = doc(db, "bills", id);
               const chainIds    = getBillChainIds(id);
               const chainToLock = chainIds.filter(cid => cid !== id);
+
+              billsToMove.push({
+                id,
+                bill,
+                chainToLock
+              });
+              accountingPlans.push(
+                createInventoryAccountingPlan(id, bill)
+              );
+            }
+
+            const accountingSnapshots =
+              await readInventoryAccountingSnapshots(
+                transaction,
+                accountingPlans
+              );
+
+            accountingResult =
+              applyInventoryAccountingWrites(
+                transaction,
+                accountingPlans,
+                accountingSnapshots
+              );
+
+            // Queue all Daybook/bill writes after every transaction read is done.
+            for (const { id, bill, chainToLock } of billsToMove) {
+              const billRef = doc(db, "bills", id);
 
               transaction.set(
                 doc(daybookCollection),
@@ -7378,13 +7749,10 @@ window.doneReceivedBill =
                   { isLocked: true }
                 );
               });
-
-              if (Array.isArray(bill.items)) {
-                committedItems.push(...bill.items);
-              }
-
-              movedCount++;
             }
+
+            movedCount =
+              billsToMove.length;
           }
         );
 
@@ -7393,8 +7761,7 @@ window.doneReceivedBill =
           "success"
         );
 
-        // Best-effort — must never affect the success path above.
-        deductStockForBillItems(committedItems);
+        applyLocalInventoryAccountingResult(accountingResult);
       } catch (err) {
         console.error(err);
         showToast("Failed to complete bills", "error");
@@ -7426,7 +7793,7 @@ window.doneReceivedBill =
         id => id !== docId
       );
 
-    let committedBillItems = null;
+    let accountingResult = null;
 
     try {
       await runTransaction(
@@ -7456,6 +7823,34 @@ window.doneReceivedBill =
               "Bill must be printed first."
             );
           }
+
+          if (
+            bill.effectiveVersion === false
+          ) {
+            throw new Error(
+              "Only the effective bill version can be completed."
+            );
+          }
+
+          const accountingPlans = [
+            createInventoryAccountingPlan(
+              docId,
+              bill
+            )
+          ];
+
+          const accountingSnapshots =
+            await readInventoryAccountingSnapshots(
+              transaction,
+              accountingPlans
+            );
+
+          accountingResult =
+            applyInventoryAccountingWrites(
+              transaction,
+              accountingPlans,
+              accountingSnapshots
+            );
 
           transaction.set(
             doc(
@@ -7489,15 +7884,10 @@ window.doneReceivedBill =
               { isLocked: true }
             );
           });
-
-          // Reset on every attempt so a retried transaction callback can't
-          // carry over items from a prior, discarded attempt.
-          committedBillItems = bill.items;
         }
       );
 
-      // Best-effort — must never affect the success path above.
-      deductStockForBillItems(committedBillItems);
+      applyLocalInventoryAccountingResult(accountingResult);
     } catch (err) {
       console.error(err);
 

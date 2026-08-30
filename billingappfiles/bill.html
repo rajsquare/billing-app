@@ -314,6 +314,10 @@
     <div class="live-modal-card">
 
       <div class="inventory-modal-topbar">
+        <div class="inventory-mode-tabs" role="tablist" aria-label="Stock management mode">
+          <button id="inventoryStockModeBtn" class="inventory-mode-btn inventory-mode-stock inventory-mode-active" type="button">STOCK</button>
+          <button id="inventorySalesModeBtn" class="inventory-mode-btn inventory-mode-sales" type="button">SALES</button>
+        </div>
         <button id="inventoryCloseBtn" class="live-close-btn">✕</button>
       </div>
 
@@ -327,15 +331,23 @@
         </div>
 
         <div id="inventorySuggestions"></div>
+
+        <div class="inventory-section-head">
+          <div id="inventoryOverviewTitle">Stock Overview</div>
+          <button id="inventoryResetSalesBtn" class="danger-btn inventory-reset-btn" type="button" style="display:none;">Reset All</button>
+        </div>
+        <div id="inventoryOverviewList"></div>
       </div>
 
       <div id="inventoryEditorView" style="display:none;">
         <div id="inventoryProductName" class="suggestion-name"></div>
 
-        <div class="modal-group">
-          <label for="inventoryCodeInput">Code</label>
+        <div id="inventoryStockEditorFields" class="modal-group">
+          <label for="inventoryCodeInput">Current Stock</label>
           <input type="number" id="inventoryCodeInput" autocomplete="off">
         </div>
+
+        <div id="inventorySalesReadout" class="inventory-readout" style="display:none;"></div>
 
         <div class="modal-actions">
           <button id="inventoryCancelBtn" class="secondary-btn">Back</button>

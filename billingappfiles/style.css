@@ -804,6 +804,21 @@ input {
   transform: scale(0.98);
 }
 
+.danger-btn {
+  background: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(185,28,28,0.2);
+}
+
+.danger-btn:hover {
+  background: #dc2626;
+  box-shadow: 0 3px 8px rgba(185,28,28,0.26);
+}
+
+.danger-btn:active {
+  transform: scale(0.98);
+}
+
 .secondary-btn {
   background: #f1f5f9;
   color: #374151;
@@ -1509,9 +1524,115 @@ input {
 
 .inventory-modal-topbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 12px;
   flex-shrink: 0;
+}
+
+.inventory-mode-tabs {
+  display: inline-flex;
+  gap: 8px;
+  min-width: 0;
+}
+
+.inventory-mode-btn {
+  min-height: 34px;
+  padding: 7px 13px;
+  border-radius: 8px;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.inventory-mode-stock.inventory-mode-active {
+  color: #14532d;
+  background: #dcfce7;
+  border-color: #22c55e;
+}
+
+.inventory-mode-sales.inventory-mode-active {
+  color: #7f1d1d;
+  background: #fee2e2;
+  border-color: #ef4444;
+}
+
+.inventory-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 18px 0 8px;
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.inventory-reset-btn {
+  min-height: 32px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+#inventoryOverviewList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.empty-state {
+  padding: 14px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.inventory-overview-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.inventory-overview-name {
+  min-width: 0;
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.inventory-overview-qty {
+  color: #111827;
+  font-size: 14px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.inventory-readout {
+  margin: 14px 0;
+  padding: 14px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 900;
 }
 
 .live-modal-card {
