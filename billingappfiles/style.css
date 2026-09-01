@@ -3556,3 +3556,24 @@ body.slideshow-dedicated-mode #viewView {
   height: 100vh;
   min-height: 100vh;
 }
+
+/* YouTube-style auto-hiding controls, dedicated slideshow mode only.
+   Hidden by default; script.js toggles slideshow-controls-visible on
+   <body> while the mouse is moving (or shortly after a touch tap) and
+   removes it after ~2s of inactivity. Fade only — no layout shift.
+   Normal (non-dedicated) View-tab usage is untouched, since these
+   buttons already stay visible there via their base rules above.
+   Real browser Fullscreen (#viewView:fullscreen ...) still hides both
+   buttons outright regardless of hover state, exactly as before. */
+body.slideshow-dedicated-mode .view-settings-btn,
+body.slideshow-dedicated-mode .view-fullscreen-btn {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+body.slideshow-dedicated-mode.slideshow-controls-visible .view-settings-btn,
+body.slideshow-dedicated-mode.slideshow-controls-visible .view-fullscreen-btn {
+  opacity: 1;
+  pointer-events: auto;
+}

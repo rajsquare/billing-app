@@ -8036,4 +8036,44 @@ window.doneReceivedBill =
       });
     }
   });
+
+  // YouTube-style hover controls (dedicated slideshow mode only): fade
+  // the Fullscreen/Settings buttons in while the mouse is moving (or
+  // briefly after a touch tap), hide them after ~2s of inactivity.
+  // Controls start hidden. A single timer is reused on every move
+  // rather than creating a new one each time.
+  let hideControlsTimer = null;
+  let pointerOverSlideshowControls = false;
+
+  function showSlideshowControls() {
+    document.body.classList.add("slideshow-controls-visible");
+    clearTimeout(hideControlsTimer);
+    if (pointerOverSlideshowControls) {
+      // Cursor is resting on Fullscreen/Settings itself — stay visible
+      // until it leaves, so the buttons never disappear mid-click.
+      return;
+    }
+    hideControlsTimer = setTimeout(() => {
+      document.body.classList.remove("slideshow-controls-visible");
+    }, 2000);
+  }
+
+  if (viewView) {
+    viewView.addEventListener("mousemove", showSlideshowControls);
+    viewView.addEventListener("touchstart", showSlideshowControls, {
+      passive: true
+    });
+  }
+
+  [viewFullscreenBtn, viewSettingsBtn].forEach(btn => {
+    if (!btn) return;
+    btn.addEventListener("mouseenter", () => {
+      pointerOverSlideshowControls = true;
+      showSlideshowControls();
+    });
+    btn.addEventListener("mouseleave", () => {
+      pointerOverSlideshowControls = false;
+      showSlideshowControls();
+    });
+  });
 })();
