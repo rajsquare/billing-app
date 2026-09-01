@@ -1307,9 +1307,16 @@ function isEditableNameItem(item) {
   );
 }
 
+// A bill line is a RETURN only when explicitly marked so on that
+// individual line (item.lineType === "return"). Any missing/other
+// value — including bills saved before this field existed — is SALE.
+function isReturnItem(item) {
+  return item.lineType === "return";
+}
+
 function computeLineTotal(item, price, qty) {
   const raw = Math.round(price * qty * 100) / 100;
-  return isDiscountItem(item) ? -raw : raw;
+  return (isDiscountItem(item) || isReturnItem(item)) ? -raw : raw;
 }
 
 function clearDraft() {
@@ -1361,7 +1368,9 @@ function saveDraft() {
           note:
             item.note || "",
           displayName:
-            item.displayName || ""
+            item.displayName || "",
+          lineType:
+            isReturnItem(item) ? "return" : "sale"
         }))
     };
 
@@ -1464,7 +1473,9 @@ function restoreDraft() {
               savedItem.note || "",
             displayName:
               savedItem.displayName ||
-              product.productName
+              product.productName,
+            lineType:
+              savedItem.lineType === "return" ? "return" : "sale"
           };
           restoredItem.total =
             computeLineTotal(
@@ -1566,7 +1577,9 @@ function buildDraftPayload() {
       total:
         item.total || 0,
       priceType:
-        item.product.priceType || ""
+        item.product.priceType || "",
+      lineType:
+        isReturnItem(item) ? "return" : "sale"
     }));
 
   const subtotal =
@@ -4711,7 +4724,8 @@ window.selectProduct =
       total: 0,
       note: "",
       displayName:
-        product.productName
+        product.productName,
+      lineType: "sale"
     });
 
     renderBill();
@@ -4768,6 +4782,8 @@ function renderBill() {
     ) => {
       const isDiscount = isDiscountItem(item);
       const isEditable = isEditableNameItem(item);
+      const isReturn = isReturnItem(item);
+      const isNegativeTotal = item.total < 0;
 
       const safeQty =
         escapeAttr(item.qty);
@@ -4796,10 +4812,18 @@ function renderBill() {
                   : safeDisplayName
               }
             </div>
-            <button
-              class="delete-btn"
-              onclick="deleteItem(${index})"
-            >✕</button>
+            <div class="bill-row-actions">
+              <button
+                class="return-toggle-btn${isReturn ? ' active' : ''}"
+                onclick="toggleReturn(${index})"
+                title="${isReturn ? 'Marked as return' : 'Mark as return'}"
+                aria-pressed="${isReturn}"
+              >↩</button>
+              <button
+                class="delete-btn"
+                onclick="deleteItem(${index})"
+              >✕</button>
+            </div>
           </div>
 
           <div class="badge-row">
@@ -4856,8 +4880,8 @@ function renderBill() {
           }
 
           <div class="line-total-row">
-            <div class="line-total${isDiscount ? ' line-total--discount' : ''}" data-line-total="${index}">
-              ${isDiscount ? "−" : ""}₹${formatIndianMoney(Math.abs(item.total))}
+            <div class="line-total${isNegativeTotal ? ' line-total--negative' : ''}" data-line-total="${index}">
+              ${isNegativeTotal ? "−" : ""}₹${formatIndianMoney(Math.abs(item.total))}
             </div>
           </div>
 
@@ -4905,9 +4929,10 @@ window.updateQty =
 
     if (totalEl) {
       const item = billItems[index];
-      totalEl.classList.toggle("line-total--discount", isDiscountItem(item));
+      const isNegativeTotal = item.total < 0;
+      totalEl.classList.toggle("line-total--negative", isNegativeTotal);
       totalEl.innerText =
-        `${isDiscountItem(item) ? "−" : ""}₹${formatIndianMoney(Math.abs(item.total))}`;
+        `${isNegativeTotal ? "−" : ""}₹${formatIndianMoney(Math.abs(item.total))}`;
     }
   };
 
@@ -4967,9 +4992,10 @@ window.updatePrice =
 
     if (totalEl) {
       const item = billItems[index];
-      totalEl.classList.toggle("line-total--discount", isDiscountItem(item));
+      const isNegativeTotal = item.total < 0;
+      totalEl.classList.toggle("line-total--negative", isNegativeTotal);
       totalEl.innerText =
-        `${isDiscountItem(item) ? "−" : ""}₹${formatIndianMoney(Math.abs(item.total))}`;
+        `${isNegativeTotal ? "−" : ""}₹${formatIndianMoney(Math.abs(item.total))}`;
     }
   };
 
@@ -4987,6 +5013,37 @@ window.deleteItem =
     if (!billItems.length) {
       deleteLiveDraft();
     }
+  };
+
+// Toggles ONE bill line between SALE (default) and RETURN. This is
+// per-line state only — it never touches any other item in billItems,
+// there is no bill-level/global return flag. Full renderBill() is used
+// (instead of a targeted DOM patch) so the icon's active state, the
+// line total's sign/color, and the grand total all stay in sync from
+// one source of truth: billItems[index].lineType.
+window.toggleReturn =
+  function(index) {
+    if (!billItems[index]) {
+      return;
+    }
+
+    billItems[index].lineType =
+      isReturnItem(billItems[index]) ? "sale" : "return";
+
+    const qty =
+      roundQty(billItems[index].qty);
+
+    billItems[index].total =
+      computeLineTotal(
+        billItems[index],
+        billItems[index].price,
+        qty
+      );
+
+    renderBill();
+    updateGrandTotal();
+    debouncedSaveDraft();
+    debouncedSyncLiveDraft();
   };
 
 window.updateNote =
@@ -5310,7 +5367,10 @@ function createBillData() {
             item.note || "",
 
           priceType:
-            item.product.priceType || ""
+            item.product.priceType || "",
+
+          lineType:
+            isReturnItem(item) ? "return" : "sale"
         })
       )
   };
@@ -5530,7 +5590,9 @@ window.reviseBill =
             displayName:
               savedItem.productName ||
               product.productName,
-            total: 0
+            total: 0,
+            lineType:
+              savedItem.lineType === "return" ? "return" : "sale"
           };
 
           item.total =
@@ -7561,8 +7623,15 @@ function aggregateBillItemQuantities(items) {
       return;
     }
 
+    // SALE consumes stock / adds to sales (positive delta).
+    // RETURN restores stock / reverses sales (negative delta).
+    // Quantity itself is always entered as a positive number
+    // (never negative) — lineType alone determines direction.
+    const signedQty =
+      item.lineType === "return" ? -qty : qty;
+
     const key = String(item.sr);
-    deltas.set(key, (deltas.get(key) || 0) + qty);
+    deltas.set(key, (deltas.get(key) || 0) + signedQty);
   });
 
   return deltas;
@@ -7592,7 +7661,12 @@ async function readInventoryAccountingSnapshots(transaction, plans) {
 
     if (!markerSnaps.get(plan.billId).exists()) {
       plan.deltas.forEach((qty, sr) => {
-        if (qty > 0) {
+        // Prefetch the existing sales snapshot for any sr with a
+        // nonzero delta — including RETURN lines, whose delta is
+        // negative. Without this, a return-only sr would never get
+        // its real qtySold read, and the merge write below would
+        // overwrite it with just the (negative) return quantity.
+        if (qty !== 0) {
           uniqueSrs.add(sr);
         }
       });
