@@ -1206,6 +1206,18 @@ input {
   line-height: 1.1;
 }
 
+/* Negative printed amounts (returned items, negative subtotal/total)
+   are highlighted yellow. Applied only to the numeric value itself,
+   never the whole row. print-color-adjust is required so browsers
+   don't silently drop the background when actually printing. */
+.print-negative-value {
+  background-color: #ffe100;
+  padding: 0 3px;
+  border-radius: 2px;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
 .print-total-area {
   margin-top: 4px;
   break-inside: avoid;

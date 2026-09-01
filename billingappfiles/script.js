@@ -3441,11 +3441,11 @@ function buildRevisionOfficeSinglePage(
       rows += `
         <tr class="print-row-removed">
           <td>-</td>
-          <td>${escapeAttr(item.productName)}${item.note ? `<br><span class="print-item-note">${escapeAttr(item.note)}</span>` : ""}</td>
+          <td>${escapeAttr(getPrintProductName(item))}${item.note ? `<br><span class="print-item-note">${escapeAttr(item.note)}</span>` : ""}</td>
           <td>${shortMaterialName(item.material)}</td>
           <td>${roundQty(item.qty)}</td>
           <td>${formatIndianMoneyWhole(item.price)}</td>
-          <td>${formatIndianMoneyWhole(item.total)}</td>
+          <td>${formatPrintMoney(item.total)}</td>
         </tr>
       `;
     } else {
@@ -3469,11 +3469,11 @@ function buildRevisionOfficeSinglePage(
       rows += `
         <tr${trClass}>
           <td>${n}</td>
-          <td>${escapeAttr(item.productName)}${item.note ? `<br><span class="print-item-note">${escapeAttr(item.note)}</span>` : ""}</td>
+          <td>${escapeAttr(getPrintProductName(item))}${item.note ? `<br><span class="print-item-note">${escapeAttr(item.note)}</span>` : ""}</td>
           <td>${shortMaterialName(item.material)}</td>
           ${qtyCell}
           ${priceCell}
-          <td>${formatIndianMoneyWhole(item.total)}</td>
+          <td>${formatPrintMoney(item.total)}</td>
         </tr>
       `;
     }
@@ -3545,7 +3545,7 @@ function buildRevisionOfficeSinglePage(
 
         <div class="print-total-area">
           <div class="print-total">
-            Grand Total: ₹${formatIndianMoneyWhole(revisedBill.grandTotal)}/-
+            Grand Total: ₹${formatPrintMoney(revisedBill.grandTotal)}/-
           </div>
           <div class="print-gst-notice">
             GST @ 5% applicable as per prevailing tax regulations.
@@ -5841,15 +5841,39 @@ function withMeasurementSandbox(html, callback) {
   }
 }
 
+// Print-time-only display helpers. Neither of these mutates the
+// underlying bill/product data — they only decide what string/markup
+// gets rendered into the printed HTML. Missing lineType (older bills)
+// is always treated as a normal sale, so historical prints are
+// unaffected.
+function getPrintProductName(item) {
+  const name = item.productName;
+  return item.lineType === "return"
+    ? name + " (Returned)"
+    : name;
+}
+
+// Wraps a formatted money string in a yellow-highlight span whenever
+// the underlying numeric value is negative. Detection is based on the
+// actual number, not on the presence of a "-" character in the
+// formatted string.
+function formatPrintMoney(value) {
+  const num = Number(value) || 0;
+  const formatted = formatIndianMoneyWhole(num);
+  return num < 0
+    ? `<span class="print-negative-value">${formatted}</span>`
+    : formatted;
+}
+
 function buildPrintRowHTML(item, serialNumber) {
   return `
     <tr>
       <td>${serialNumber}</td>
-      <td>${escapeAttr(item.productName)}${item.note ? `<br><span class="print-item-note">${escapeAttr(item.note)}</span>` : ""}</td>
+      <td>${escapeAttr(getPrintProductName(item))}${item.note ? `<br><span class="print-item-note">${escapeAttr(item.note)}</span>` : ""}</td>
       <td>${shortMaterialName(item.material)}</td>
       <td>${roundQty(item.qty)}</td>
       <td>${formatIndianMoneyWhole(item.price)}</td>
-      <td>${formatIndianMoneyWhole(item.total)}</td>
+      <td>${formatPrintMoney(item.total)}</td>
     </tr>
   `;
 }
@@ -5956,7 +5980,7 @@ function buildPrintFooterHTML(billData, label, isLastPage) {
   return `
     <div class="print-total-area">
       <div class="print-total">
-        Grand Total: ₹${formatIndianMoneyWhole(billData.grandTotal)}/-
+        Grand Total: ₹${formatPrintMoney(billData.grandTotal)}/-
       </div>
       <div class="print-gst-notice">
         GST @ 5% applicable as per prevailing tax regulations.
