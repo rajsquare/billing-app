@@ -7993,3 +7993,47 @@ window.doneReceivedBill =
         false;
     }
   };
+
+/* ================================
+   DEDICATED SLIDESHOW ENTRY POINT (?view=slideshow)
+   Lets a display-only device open straight into the existing View
+   screen's slideshow, bypassing the dashboard. Reuses the existing
+   activateView("view") / enterViewScreen() / fullscreen mechanisms
+   as-is; no new slideshow implementation, no new Firestore access.
+   Normal app behavior (no query param) is completely unaffected.
+================================ */
+(function initDedicatedSlideshowMode() {
+  const params =
+    new URLSearchParams(window.location.search);
+
+  if (params.get("view") !== "slideshow") {
+    return;
+  }
+
+  // Hide the app-wide tab bar / unrelated navigation for this dedicated
+  // display mode. Controls are not removed from the app, only hidden
+  // via CSS (see .slideshow-dedicated-mode in style.css); normal
+  // navigation to the View tab is untouched.
+  document.body.classList.add(
+    "slideshow-dedicated-mode"
+  );
+
+  activateView("view");
+
+  // Attempt automatic fullscreen. Browsers block requestFullscreen()
+  // without a prior user gesture, which is expected here since the
+  // page was opened directly via URL — the slideshow still opens and
+  // stays fully usable, and the existing Fullscreen button inside the
+  // View screen (viewFullscreenBtn) remains available as a one-click
+  // fallback. Same pattern already used by "Prepare View Display".
+  requestAnimationFrame(() => {
+    if (viewView && !document.fullscreenElement) {
+      viewView.requestFullscreen().catch(err => {
+        console.warn(
+          "Automatic fullscreen was blocked (no user gesture yet); use the Fullscreen button instead:",
+          err
+        );
+      });
+    }
+  });
+})();

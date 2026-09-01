@@ -3528,3 +3528,13 @@ input {
 body.view-fullscreen-mode .app-tabs {
   display: none;
 }
+
+/* ================================
+   DEDICATED SLIDESHOW MODE (?view=slideshow)
+   Hides the app-wide tab bar for a display-only entry point. The
+   controls are not removed from the app, only hidden here; normal
+   navigation to the View tab still shows them as before.
+================================ */
+body.slideshow-dedicated-mode .app-tabs {
+  display: none;
+}
