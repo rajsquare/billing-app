@@ -3692,13 +3692,14 @@ function paginateRevisionOfficeByHeight(
 function buildRevisionAuditPreviewHTML(
   revisedBill,
   originalBill,
-  diff
+  diff,
+  label = "OFFICE COPY"
 ) {
   const pages =
     paginateByHeight(
       [...revisedBill.items].reverse(),
       revisedBill,
-      "OFFICE COPY"
+      label
     );
 
   const totalPages = pages.length;
@@ -3707,7 +3708,7 @@ function buildRevisionAuditPreviewHTML(
   pages.forEach((page, index) => {
     html += buildSingleCopyPage(
       revisedBill,
-      "OFFICE COPY",
+      label,
       page.chunk,
       index === totalPages - 1,
       index + 1,
@@ -3845,7 +3846,10 @@ function openRevisionPreview(
           page.serialOffset
         );
       });
-      previewContent.innerHTML = html;
+      setReceiverPreviewContent(
+        bill,
+        html
+      );
     } else {
       const pages =
         paginateByHeight(
@@ -3865,7 +3869,10 @@ function openRevisionPreview(
           page.serialOffset
         );
       });
-      previewContent.innerHTML = html;
+      setReceiverPreviewContent(
+        originalBill,
+        html
+      );
     }
   } else {
     if (!originalBill) {
@@ -3887,7 +3894,10 @@ function openRevisionPreview(
           page.serialOffset
         );
       });
-      previewContent.innerHTML = html;
+      setReceiverPreviewContent(
+        bill,
+        html
+      );
     } else {
       if (!revisionDiffCache[docId]) {
         revisionDiffCache[docId] =
@@ -3896,12 +3906,15 @@ function openRevisionPreview(
             bill
           );
       }
-      previewContent.innerHTML =
+      setReceiverPreviewContent(
+        bill,
         buildRevisionAuditPreviewHTML(
           bill,
           originalBill,
-          revisionDiffCache[docId]
-        );
+          revisionDiffCache[docId],
+          "VIEW"
+        )
+      );
     }
   }
 
@@ -3938,9 +3951,6 @@ async function loadProducts({ forceRefresh = false } = {}) {
 
         if (cached && cached.date === todayStr && cached.data) {
           catalogData = cached.data;
-          console.log(
-            "Using cached catalog from localStorage"
-          );
         }
       } catch (e) {
         localStorage.removeItem("catalogCache");
@@ -3973,9 +3983,6 @@ async function loadProducts({ forceRefresh = false } = {}) {
         console.warn("Could not cache catalog to localStorage:", e);
       }
 
-      console.log(
-        "Fetched catalog from Firestore and cached"
-      );
     }
 
     /*
@@ -5856,6 +5863,14 @@ function buildReceiverViewTotalQuantityHTML(billData) {
   `;
 }
 
+function setReceiverPreviewContent(billData, html) {
+  previewContent.innerHTML =
+    buildReceiverViewTotalQuantityHTML(
+      billData
+    ) +
+    html;
+}
+
 function buildPrintFooterHTML(billData, label, isLastPage) {
   const wholesaleFooter =
     billData.mode === "W" && isLastPage
@@ -6196,11 +6211,10 @@ function previewReceipt(
     }
   );
 
-  previewContent.innerHTML =
-    html +
-    buildReceiverViewTotalQuantityHTML(
-      billData
-    );
+  setReceiverPreviewContent(
+    billData,
+    html
+  );
 
   previewModal.style.display =
     "flex";

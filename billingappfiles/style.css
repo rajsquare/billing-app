@@ -923,6 +923,10 @@ input {
   display: none;
 }
 
+.preview-content .print-bottom-footer {
+  display: none;
+}
+
 .receiver-view-total-quantity {
   margin: 10px 10px 0;
   font-size: 14px;
