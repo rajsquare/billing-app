@@ -1376,6 +1376,56 @@ input {
 }
 
 /* ================================
+   SALES PRINT
+================================ */
+.sales-print-wrapper {
+  padding: 8mm 6mm;
+}
+
+.sales-print-title {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.sales-print-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 11px;
+}
+
+.sales-print-table th,
+.sales-print-table td {
+  border: 1px solid #000;
+  padding: 5px 6px;
+  vertical-align: top;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.sales-print-table th:nth-child(1),
+.sales-print-table td:nth-child(1) {
+  width: 58%;
+  text-align: left;
+}
+
+.sales-print-table th:nth-child(2),
+.sales-print-table td:nth-child(2) {
+  width: 14%;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sales-print-table th:nth-child(3),
+.sales-print-table td:nth-child(3) {
+  width: 28%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ================================
    DESKTOP
 ================================ */
 @media (min-width: 1024px) {
@@ -1572,7 +1622,14 @@ input {
   font-weight: 900;
 }
 
-.inventory-reset-btn {
+.inventory-sales-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inventory-reset-btn,
+.inventory-print-btn {
   min-height: 32px;
   padding: 7px 12px;
   border-radius: 8px;

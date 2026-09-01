@@ -1040,6 +1040,8 @@ const inventoryOverviewList =
   document.getElementById("inventoryOverviewList");
 const inventoryResetSalesBtn =
   document.getElementById("inventoryResetSalesBtn");
+const inventoryPrintSalesBtn =
+  document.getElementById("inventoryPrintSalesBtn");
 const inventoryStockEditorFields =
   document.getElementById("inventoryStockEditorFields");
 const inventorySalesReadout =
@@ -7094,6 +7096,10 @@ function setInventoryMode(mode) {
     _inventoryMode === "sales"
       ? "inline-flex"
       : "none";
+  inventoryPrintSalesBtn.style.display =
+    _inventoryMode === "sales"
+      ? "inline-flex"
+      : "none";
 
   _inventorySelectedSr = null;
   inventoryEditorView.style.display = "none";
@@ -7115,11 +7121,7 @@ inventorySalesModeBtn.addEventListener(
   () => setInventoryMode("sales")
 );
 
-function renderInventoryOverview() {
-  if (!inventoryOverviewList) {
-    return;
-  }
-
+function getInventoryOverviewRows() {
   const rows =
     products.map(product => {
       const qty =
@@ -7134,6 +7136,17 @@ function renderInventoryOverview() {
     })
       .filter(row => row.qty > 0)
       .sort((a, b) => b.qty - a.qty);
+
+  return rows;
+}
+
+function renderInventoryOverview() {
+  if (!inventoryOverviewList) {
+    return;
+  }
+
+  const rows =
+    getInventoryOverviewRows();
 
   if (!rows.length) {
     inventoryOverviewList.innerHTML = `
@@ -7156,6 +7169,58 @@ function renderInventoryOverview() {
       </div>
     `).join("");
 }
+
+function buildSalesOverviewPrintHTML() {
+  const rows =
+    getInventoryOverviewRows();
+
+  const body =
+    rows.length
+      ? rows.map(row => `
+          <tr>
+            <td>${escapeAttr(row.product.productName)}</td>
+            <td>${escapeAttr(shortMaterialName(row.product.material))}</td>
+            <td>${roundQty(row.qty)}</td>
+          </tr>
+        `).join("")
+      : `
+          <tr>
+            <td colspan="3">No sales since reset</td>
+          </tr>
+        `;
+
+  return `
+    <div class="print-wrapper sales-print-wrapper">
+      <div class="sales-print-title">SALES SINCE LAST RESET</div>
+      <table class="sales-print-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Mat</th>
+            <th>Quantity Sold</th>
+          </tr>
+        </thead>
+        <tbody>${body}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function printSalesOverview() {
+  printInvoice.innerHTML =
+    buildSalesOverviewPrintHTML();
+
+  window.print();
+}
+
+inventoryPrintSalesBtn.addEventListener(
+  "click",
+  () => {
+    if (_inventoryMode === "sales") {
+      printSalesOverview();
+    }
+  }
+);
 
 /* Reuses searchProducts()/escapeAttr()/getMaterialClass() exactly as used
    by the Billing search — only the rendered card and click target differ,
