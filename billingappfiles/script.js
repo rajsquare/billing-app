@@ -4452,6 +4452,9 @@ adminSignalBtn.addEventListener(
         },
         { merge: true }
       );
+
+      updatePopupVisible = true;
+      updatePricelistModal.style.display = "flex";
     } catch (err) {
       console.error(err);
     }
@@ -5830,6 +5833,29 @@ function buildTotalQuantityHTML(billData) {
   return `<div class="print-qty-summary">Total Quantity: ${parts.join(", ")}</div>`;
 }
 
+function buildReceiverViewTotalQuantityHTML(billData) {
+  const totalQty =
+    (billData.items || []).reduce(
+      (sum, item) => sum + (parseFloat(item.qty) || 0),
+      0
+    );
+
+  if (totalQty <= 0) {
+    return "";
+  }
+
+  const displayQty =
+    Number.isInteger(totalQty)
+      ? totalQty
+      : parseFloat(totalQty.toFixed(3));
+
+  return `
+    <div class="receiver-view-total-quantity">
+      Total quantity: ${displayQty}
+    </div>
+  `;
+}
+
 function buildPrintFooterHTML(billData, label, isLastPage) {
   const wholesaleFooter =
     billData.mode === "W" && isLastPage
@@ -6171,7 +6197,10 @@ function previewReceipt(
   );
 
   previewContent.innerHTML =
-    html;
+    html +
+    buildReceiverViewTotalQuantityHTML(
+      billData
+    );
 
   previewModal.style.display =
     "flex";
@@ -6749,25 +6778,6 @@ onSnapshot(
       return;
     }
 
-    let localSignal = 0;
-
-    try {
-      localSignal =
-        Number(
-          localStorage.getItem(
-            LAST_PROCESSED_SIGNAL_KEY
-          )
-        ) || 0;
-    } catch (e) {}
-
-    if (
-      remoteSignal > localSignal &&
-      !isUpdatingCatalog &&
-      !updatePopupVisible
-    ) {
-      updatePopupVisible = true;
-      updatePricelistModal.style.display = "flex";
-    }
   }
 );
 
