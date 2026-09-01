@@ -5814,10 +5814,15 @@ function buildWholesaleBottomFooterHTML(billData, label) {
   `;
 }
 
-function buildTotalQuantityHTML(billData) {
+// Shared unit-detection helper: reused by both the print Total Quantity
+// line (buildTotalQuantityHTML) and the on-screen Receiver View Total
+// quantity line (buildReceiverViewTotalQuantityHTML) so KG and piece
+// quantities are always derived the same way, from each item's existing
+// priceType, and are never mathematically combined.
+function computeUnitSeparatedQuantities(items) {
   var totalKg = 0;
   var totalPcs = 0;
-  (billData.items || []).forEach(function(item) {
+  (items || []).forEach(function(item) {
     var qty = parseFloat(item.qty) || 0;
     if (item.priceType === "KG") {
       totalKg += qty;
@@ -5825,50 +5830,42 @@ function buildTotalQuantityHTML(billData) {
       totalPcs += qty;
     }
   });
+  return { kg: totalKg, pcs: totalPcs };
+}
+
+function formatQtyNumber(value) {
+  return Number.isInteger(value) ? value : parseFloat(value.toFixed(3));
+}
+
+function buildTotalQuantityHTML(billData) {
+  var totals = computeUnitSeparatedQuantities(billData.items);
   var parts = [];
-  if (totalKg > 0) {
-    parts.push(
-      (Number.isInteger(totalKg) ? totalKg : parseFloat(totalKg.toFixed(3))) + " kg"
-    );
+  if (totals.kg > 0) {
+    parts.push(formatQtyNumber(totals.kg) + " kg");
   }
-  if (totalPcs > 0) {
-    parts.push(
-      (Number.isInteger(totalPcs) ? totalPcs : parseFloat(totalPcs.toFixed(3))) + " pcs"
-    );
+  if (totals.pcs > 0) {
+    parts.push(formatQtyNumber(totals.pcs) + " pcs");
   }
   if (parts.length === 0) return "";
   return `<div class="print-qty-summary">Total Quantity: ${parts.join(", ")}</div>`;
 }
 
 function buildReceiverViewTotalQuantityHTML(billData) {
-  const totalQty =
-    (billData.items || []).reduce(
-      (sum, item) => sum + (parseFloat(item.qty) || 0),
-      0
-    );
-
-  if (totalQty <= 0) {
-    return "";
+  var totals = computeUnitSeparatedQuantities(billData.items);
+  var parts = [];
+  if (totals.kg > 0) {
+    parts.push(formatQtyNumber(totals.kg) + " kg");
   }
+  if (totals.pcs > 0) {
+    parts.push(formatQtyNumber(totals.pcs) + " pieces");
+  }
+  if (parts.length === 0) return "";
 
-  const displayQty =
-    Number.isInteger(totalQty)
-      ? totalQty
-      : parseFloat(totalQty.toFixed(3));
-
-  return `
-    <div class="receiver-view-total-quantity">
-      Total quantity: ${displayQty}
-    </div>
-  `;
+  return `<div class="receiver-view-total-quantity">Total quantity: ${parts.join(", ")}</div>`;
 }
 
 function setReceiverPreviewContent(billData, html) {
-  previewContent.innerHTML =
-    buildReceiverViewTotalQuantityHTML(
-      billData
-    ) +
-    html;
+  previewContent.innerHTML = html;
 }
 
 function buildPrintFooterHTML(billData, label, isLastPage) {
@@ -5885,6 +5882,15 @@ function buildPrintFooterHTML(billData, label, isLastPage) {
       ? buildTotalQuantityHTML(billData)
       : "";
 
+  // On-screen Receiver / bill View ("VIEW" label): show a unit-aware
+  // Total quantity line immediately below the GST notice, at the bottom
+  // of the bill details, on the last page only. This does not affect
+  // the CUSTOMER COPY / OFFICE COPY print output.
+  const viewQtyHTML =
+    label === "VIEW" && isLastPage
+      ? buildReceiverViewTotalQuantityHTML(billData)
+      : "";
+
   return `
     <div class="print-total-area">
       <div class="print-total">
@@ -5894,6 +5900,7 @@ function buildPrintFooterHTML(billData, label, isLastPage) {
         GST @ 5% applicable as per prevailing tax regulations.
       </div>
       ${totalQtyHTML}
+      ${viewQtyHTML}
     </div>
     ${wholesaleFooter}
   `;
