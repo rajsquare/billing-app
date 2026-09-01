@@ -3538,3 +3538,21 @@ body.view-fullscreen-mode .app-tabs {
 body.slideshow-dedicated-mode .app-tabs {
   display: none;
 }
+
+/* #viewView's normal height (calc(100vh - 64px), set above) reserves
+   space for the app-tabs bar above it. In dedicated mode that bar is
+   hidden, so the reserved 64px was left as an empty strip at the
+   bottom of the page until the user manually entered fullscreen (which
+   happens to bypass the author-set height). Give #viewView the full
+   viewport here instead, so the slideshow fits correctly immediately,
+   with no white strip and no scrolling, before Fullscreen is ever
+   clicked. Scoped strictly to dedicated mode — normal View-tab usage
+   (tabs visible) is untouched. */
+body.slideshow-dedicated-mode {
+  overflow: hidden;
+}
+
+body.slideshow-dedicated-mode #viewView {
+  height: 100vh;
+  min-height: 100vh;
+}
