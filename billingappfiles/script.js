@@ -1879,18 +1879,32 @@ async function startViewCast() {
       // been touched in 2+ minutes, reusing the existing isDraftStale
       // convention) and free that slot. This only runs in the rare
       // case the deck is already full — not a recurring cost.
-      const staleIds = [];
-
-      for (const c of result.casts) {
-        const draftSnap = await getDoc(
-          doc(db, "liveDraftBills", c.draftId || c.sessionId)
-        );
-        if (!draftSnap.exists() || isDraftStale(draftSnap.data())) {
-          staleIds.push(c.sessionId);
-        }
-      }
+      // These are independent reads (one per existing cast slot, max 4) —
+      // firing them together instead of one-at-a-time is the same number
+      // of reads, just without stacking their round trips serially.
+      const staleChecks = await Promise.all(
+        result.casts.map(async c => {
+          const draftSnap = await getDoc(
+            doc(db, "liveDraftBills", c.draftId || c.sessionId)
+          );
+          return {
+            sessionId: c.sessionId,
+            stale: !draftSnap.exists() || isDraftStale(draftSnap.data())
+          };
+        })
+      );
+      const staleIds = staleChecks
+        .filter(r => r.stale)
+        .map(r => r.sessionId);
 
       if (staleIds.length) {
+        // Left sequential on purpose: each is its own read-modify-write
+        // transaction against the SAME shared viewCastRef document, so
+        // running them one after another (rather than concurrently)
+        // avoids extra optimistic-concurrency retries/contention on that
+        // single doc. This only runs in the rare case the deck is
+        // already full, so the small serial cost here is not felt by
+        // the common cast-start path.
         for (const id of staleIds) {
           await removeCastFromControlDoc(id);
         }
@@ -7674,15 +7688,26 @@ function createInventoryAccountingPlan(billId, bill) {
 }
 
 async function readInventoryAccountingSnapshots(transaction, plans) {
-  const markerSnaps = new Map();
-  const uniqueSrs = new Set();
-
-  for (const plan of plans) {
-    markerSnaps.set(
+  // All reads below are issued concurrently instead of one-at-a-time.
+  // Firestore transactions only require that every read happens before
+  // any write is staged (none are staged until applyInventoryAccountingWrites
+  // runs, after this function returns) — the reads themselves have no
+  // ordering dependency on each other, so awaiting them in a sequential
+  // for-loop was pure added latency (one extra network round trip per
+  // plan/product, serialized) with no correctness benefit. Firing them
+  // together cuts a multi-item bill's completion time from
+  // roughly (N round trips) down to roughly (1 round trip), while
+  // reading the exact same set of documents as before.
+  const markerEntries = await Promise.all(
+    plans.map(async plan => [
       plan.billId,
       await transaction.get(plan.markerRef)
-    );
+    ])
+  );
+  const markerSnaps = new Map(markerEntries);
 
+  const uniqueSrs = new Set();
+  plans.forEach(plan => {
     if (!markerSnaps.get(plan.billId).exists()) {
       plan.deltas.forEach((qty, sr) => {
         // Prefetch the existing sales snapshot for any sr with a
@@ -7695,20 +7720,18 @@ async function readInventoryAccountingSnapshots(transaction, plans) {
         }
       });
     }
-  }
+  });
 
-  const stockSnap =
-    await transaction.get(updateSignalRef);
-  const salesSnaps = new Map();
-
-  for (const sr of uniqueSrs) {
-    salesSnaps.set(
-      sr,
-      await transaction.get(
-        doc(inventorySalesCollection, sr)
-      )
-    );
-  }
+  const [stockSnap, salesEntries] = await Promise.all([
+    transaction.get(updateSignalRef),
+    Promise.all(
+      [...uniqueSrs].map(async sr => [
+        sr,
+        await transaction.get(doc(inventorySalesCollection, sr))
+      ])
+    )
+  ]);
+  const salesSnaps = new Map(salesEntries);
 
   return {
     markerSnaps,
@@ -7869,13 +7892,17 @@ window.doneReceivedBill =
             movedCount = 0;
             accountingResult = null;
 
-            // Firestore requires all reads to complete before any writes inside
-            // a transaction. Read sequentially to satisfy this constraint.
-            const snaps = [];
-            for (const id of eligibleIds) {
-              const snap = await transaction.get(doc(db, "bills", id));
-              snaps.push({ id, snap });
-            }
+            // Firestore requires all reads to complete before any writes are
+            // staged on the transaction — it does NOT require the reads
+            // themselves to be sequential. Issuing them together instead of
+            // one-at-a-time reads the exact same set of bill documents, just
+            // without paying a full network round trip per bill.
+            const snaps = await Promise.all(
+              eligibleIds.map(async id => ({
+                id,
+                snap: await transaction.get(doc(db, "bills", id))
+              }))
+            );
 
             const billsToMove = [];
             const accountingPlans = [];
