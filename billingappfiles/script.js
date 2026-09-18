@@ -4486,9 +4486,6 @@ adminSignalBtn.addEventListener(
         },
         { merge: true }
       );
-
-      updatePopupVisible = true;
-      updatePricelistModal.style.display = "flex";
     } catch (err) {
       console.error(err);
     }
@@ -6899,6 +6896,10 @@ onSnapshot(
       return;
     }
 
+    if (!updatePopupVisible) {
+      updatePopupVisible = true;
+      updatePricelistModal.style.display = "flex";
+    }
   }
 );
 
