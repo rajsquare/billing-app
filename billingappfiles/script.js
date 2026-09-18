@@ -6858,23 +6858,42 @@ onSnapshot(
   }
 );
 
-onSnapshot(
-  inventorySalesCollection,
-  snapshot => {
-    snapshot.docChanges().forEach(
-      change => {
-        if (change.type === "removed") {
-          delete inventorySalesCache[change.doc.id];
-        } else {
-          inventorySalesCache[change.doc.id] =
-            change.doc.data();
-        }
-      }
-    );
+let inventorySalesUnsub = null;
 
-    renderInventoryOverview();
+// The inventorySales collection backs ONLY the password-gated "Stock &
+// Sales Overview" modal (Sales tab) — nothing outside that modal reads
+// inventorySalesCache. It used to be subscribed at module load, which
+// meant every session paid the cost of reading every document in this
+// (ever-growing) collection on every page load, whether or not anyone
+// ever opened the modal. Scoping the listener to the modal's actual
+// open/close lifetime (same pattern already used for the View/cast
+// listeners elsewhere in this file) keeps the exact same realtime
+// behavior while the modal is open, at zero read cost while it's not.
+function subscribeInventorySales() {
+  if (inventorySalesUnsub) {
+    return;
   }
-);
+
+  inventorySalesUnsub = onSnapshot(
+    inventorySalesCollection,
+    snapshot => {
+      const freshCache = {};
+      snapshot.forEach(docSnap => {
+        freshCache[docSnap.id] = docSnap.data();
+      });
+      inventorySalesCache = freshCache;
+
+      renderInventoryOverview();
+    }
+  );
+}
+
+function unsubscribeInventorySales() {
+  if (inventorySalesUnsub) {
+    inventorySalesUnsub();
+    inventorySalesUnsub = null;
+  }
+}
 
 let isInitialSnapshot = true;
 
@@ -7179,6 +7198,7 @@ function openInventoryModal() {
   inventoryClearSearch.style.display = "none";
   inventoryEditorView.style.display = "none";
   inventorySearchView.style.display = "block";
+  subscribeInventorySales();
   setInventoryMode("stock");
   inventoryModal.style.display = "flex";
   inventorySearchBox.focus();
@@ -7186,6 +7206,7 @@ function openInventoryModal() {
 
 function closeInventoryModal() {
   inventoryModal.style.display = "none";
+  unsubscribeInventorySales();
 }
 
 inventoryCloseBtn.addEventListener(
