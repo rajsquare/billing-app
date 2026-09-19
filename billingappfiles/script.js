@@ -1,6 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
   collection,
   onSnapshot,
   doc,
@@ -34,7 +37,30 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+
+let db;
+try {
+  // persistentMultipleTabManager (rather than the single-tab variant) is
+  // required here because this app can legitimately be open in more than
+  // one tab/window of the same browser on the same device — without it,
+  // a second tab's persistence setup would conflict with the first's.
+  db = initializeFirestore(app, {
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager()
+    })
+  });
+} catch (err) {
+  // Falls back to exactly the previous behavior (in-memory cache only) on
+  // any environment where persistent/IndexedDB caching isn't available
+  // (e.g. some private-browsing modes). Every listener, query, and
+  // transaction in this file behaves identically either way — this only
+  // changes how much re-fetching a listener has to do after a reload.
+  console.warn(
+    "Persistent Firestore cache unavailable, falling back to in-memory cache:",
+    err
+  );
+  db = getFirestore(app);
+}
 
 /* ================================
    PRICE LIST FIREBASE
@@ -6895,11 +6921,23 @@ function unsubscribeInventorySales() {
   }
 }
 
+// Mirrors the ?view=slideshow check in initDedicatedSlideshowMode() below.
+// The dedicated View/Slideshow page is display-only: it has no Daybook,
+// no Update Pricelist button, and no use for the pricelist-update signal,
+// so that page should simply ignore it rather than popping up a modal
+// with no way for anyone standing at that screen to act on it.
+const isDedicatedSlideshowMode =
+  new URLSearchParams(window.location.search).get("view") === "slideshow";
+
 let isInitialSnapshot = true;
 
 onSnapshot(
   updateSignalRef,
   snap => {
+    if (isDedicatedSlideshowMode) {
+      return;
+    }
+
     if (!snap.exists()) {
       isInitialSnapshot = false;
       return;
