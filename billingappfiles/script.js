@@ -122,9 +122,37 @@ const _todayFmt = new Intl.DateTimeFormat("en-CA", {
   day: "2-digit"
 });
 
+/* The set of bill states that represent ACTIVE, UNFINISHED work.
+   `bills` is an active-work collection, not an archive: a document is
+   in it only while it still represents work that has not completed.
+
+   This is the single authoritative definition of "active". It is a
+   STATE list, never a date range — an unfinished bill from last year
+   is exactly as active as one from five minutes ago.
+
+   "pending" = sent to Receiver, not yet printed (no serial assigned).
+   "printed" = printed and serialised, awaiting Done.
+   Both are unfinished. There is no third state: a completed bill does
+   not have a state, it has no document. */
+const ACTIVE_BILL_STATUSES = ["pending", "printed"];
+
+/* Receiver listener. Filters on state alone.
+
+   Deliberately NOT `effectiveVersion == true`: a Firestore equality
+   filter excludes documents where the field is ABSENT, not merely
+   false, so any bill written before the revision feature existed
+   would be permanently invisible and permanently non-actionable
+   (Invariant 3). Filtering on status catches every unfinished
+   document regardless of which version of this app created it.
+
+   This intentionally also returns superseded revision ancestors
+   (which keep their status). They are filtered out of the rendered
+   list by renderIncomingBills, but having them in the cache is what
+   lets the chain resolver and the Receiver agree about what a
+   completed bill chain consists of. */
 const billsQuery = query(
   billsCollection,
-  where("effectiveVersion", "==", true)
+  where("status", "in", ACTIVE_BILL_STATUSES)
 );
 
 const daybookQuery = query(
@@ -3215,29 +3243,90 @@ function renderRevisionBanner() {
   `;
 }
 
-function getBillChainIds(docId) {
-  const bill = incomingBillCache[docId];
+/* Resolves the COMPLETE bill chain a document belongs to, from
+   Firestore rather than from incomingBillCache.
 
-  if (!bill) return [docId];
+   Chain shape (established by reviseBill + createBillData): the
+   structure is flat, not linked-list. reviseBill computes
+   `parentId = bill.isOriginal === false ? bill.parentBillId : docId`,
+   so every revision — including a revision of a revision — stores the
+   ROOT original's id in parentBillId. The chain is therefore exactly:
 
-  const originalId =
-    bill.isOriginal === false
+       root  +  every document whose parentBillId === root
+
+   Why Firestore and not the cache: the cache is a UI projection and
+   may legitimately be incomplete or stale (Invariant 9 — the cache
+   must never be treated as the database). Resolving the chain from a
+   single indexed equality query means the deletion set is correct even
+   on a device that has only just connected.
+
+   Cost: one indexed single-field query per Done, on a field that is
+   null for all non-revision bills, so it returns zero documents for
+   the common case.
+
+   Must be called BEFORE runTransaction — Firestore client transactions
+   can read documents by reference but cannot execute queries. */
+async function resolveBillChainIds(docId, billData) {
+  let bill =
+    billData || incomingBillCache[docId] || null;
+
+  // The cache is a UI projection and may not contain this document
+  // (e.g. the console migration tool operates on ids the Receiver has
+  // never rendered). Falling back to `rootId = docId` in that case
+  // would silently mis-resolve a revision's chain to itself and leave
+  // its ancestors behind, so read the document instead of guessing.
+  if (!bill) {
+    const snap = await getDoc(
+      doc(db, "bills", docId)
+    );
+
+    if (!snap.exists()) {
+      return [docId];
+    }
+
+    bill = snap.data();
+  }
+
+  const rootId =
+    bill.isOriginal === false &&
+    bill.parentBillId
       ? bill.parentBillId
       : docId;
 
-  if (!originalId) return [docId];
+  const ids = new Set([rootId, docId]);
 
-  const ids = new Set([originalId]);
-
-  Object.entries(incomingBillCache).forEach(
-    ([id, b]) => {
-      if (b.parentBillId === originalId) {
-        ids.add(id);
-      }
-    }
+  const descendants = await getDocs(
+    query(
+      billsCollection,
+      where("parentBillId", "==", rootId)
+    )
   );
 
+  descendants.forEach(d => ids.add(d.id));
+
   return [...ids];
+}
+
+/* Given the chain snapshots read inside a transaction, returns the ids
+   that are safe to delete alongside `completedId`.
+
+   A chain member is removed only if it is NOT the current effective
+   version. `effectiveVersion !== true` (rather than `=== false`) is
+   deliberate: it covers legacy ancestors written before the field
+   existed, while still refusing to touch a sibling that is somehow
+   currently effective — that would be an unfinished bill, and deleting
+   an unfinished bill is the one thing this lifecycle must never do. */
+function selectObsoleteChainIds(completedId, chainSnaps) {
+  const ids = [];
+
+  chainSnaps.forEach(({ id, snap }) => {
+    if (id === completedId) return;
+    if (!snap.exists()) return;
+    if (snap.data().effectiveVersion === true) return;
+    ids.push(id);
+  });
+
+  return ids;
 }
 
 /* ================================
@@ -6470,10 +6559,11 @@ function printDaybook() {
 /* ================================
    UI RENDERERS
 ================================ */
-// billsQuery no longer has a Firestore-side orderBy (see its definition —
-// it's now a single effectiveVersion==true filter with no date bound), so
-// display order is restored here instead, preserving the same "newest
-// first" list the old orderBy("createdAt","asc") + .reverse() produced.
+// billsQuery has no Firestore-side orderBy (see its definition — it's a
+// single status filter with no date bound), so display order is restored
+// here instead, preserving the same "newest first" list the old
+// orderBy("createdAt","asc") + .reverse() produced. createdAt is used
+// for DISPLAY ORDER ONLY — never to decide whether a bill is actionable.
 function getBillCreatedAtMillis(bill) {
   return bill.createdAt &&
     typeof bill.createdAt.toMillis === "function"
@@ -6491,31 +6581,37 @@ function getBillCreatedAtMillis(bill) {
 let receiverEmptyReconciled = false;
 let receiverReconciliationInFlight = false;
 
-// SECONDARY defensive check (the PRIMARY mechanism is unchanged: every
-// successful Done/Done All transaction below deletes its bill atomically
-// alongside the accounting + Daybook writes — if that transaction fails,
-// nothing is deleted and nothing else here needs to react). This runs
-// only when billsQuery's live listener reports zero actionable bills,
-// and double-checks Firestore directly via a DIFFERENT field
-// (status in ["pending","printed"]) than the live query filters on
-// (effectiveVersion==true) — specifically so it can catch a document the
-// live listener's own filter might miss (e.g. effectiveVersion missing
-// or corrupted on some document), which a same-field re-check couldn't.
+// SECONDARY SAFETY NET. The PRIMARY mechanism is the Done/Done All
+// transaction, which atomically deletes the completed bill and its
+// obsolete chain. Under healthy operation this function finds nothing
+// to do — it exists only to clean up documents left behind by earlier
+// versions of the app, and it is never how an ordinary bill completes.
 //
-// It intentionally never deletes anything. Given this app's actual
-// lifecycle, a normal bill document is only ever removed by a
-// successful, atomic Done transaction (accounting + Daybook + delete,
-// all-or-nothing) — there is no other state in which a normal bill
-// exists in Firestore yet is "already completed". So if this sweep
-// finds a document the live listener isn't showing, that can only mean
-// (a) it's a legitimate effectiveVersion:false revision/audit record —
-// left untouched, exactly as always, or (b) it's a genuinely unfinished
-// bill the live listener/query missed — in which case the correct fix
-// is to make it visible/actionable again, not to destroy it. This also
-// makes it safe under multiple devices (Scenario H): it never writes or
-// deletes, so it can never race a concurrent Done on another device —
-// at worst it re-surfaces a bill a split second before that other
-// device's own Done transaction removes it again via the normal path.
+// It runs only on a genuine transition into "zero actionable bills",
+// guarded by receiverEmptyReconciled, and never on every render,
+// snapshot or repaint.
+//
+// Concurrency (the reason this is not a collection wipe):
+//
+//   Step A  re-query Firestore fresh. A local empty cache proves
+//           nothing about global state and never authorises deletion.
+//   Step B  if ANY active unfinished bill exists, do nothing
+//           destructive — re-surface it into the Receiver instead.
+//   Step C  only with zero active unfinished bills, classify the
+//           remainder.
+//   Step D  delete only what is provably obsolete, each in its own
+//           transaction that re-reads the document first.
+//
+// A bill another device creates at any point during this is written
+// with effectiveVersion:true, so it can never enter the obsolete set,
+// and the per-document re-read in Step D means a concurrent write
+// always wins over the sweep.
+//
+// OLD BEHAVIOUR DELIBERATELY REMOVED: the previous version of this
+// function treated effectiveVersion:false as permanent archival data
+// and never deleted anything. That retention rule no longer exists —
+// `bills` holds active work only, so a superseded revision whose
+// chain has already been completed is obsolete, not archive.
 async function reconcileEmptyReceiver() {
   if (receiverReconciliationInFlight) {
     return;
@@ -6523,37 +6619,102 @@ async function reconcileEmptyReceiver() {
   receiverReconciliationInFlight = true;
 
   try {
+    // Step A — fresh Firestore state. Never the local cache.
     const snap = await getDocs(
       query(
         billsCollection,
-        where("status", "in", ["pending", "printed"])
+        where("status", "in", ACTIVE_BILL_STATUSES)
       )
     );
 
-    let recovered = 0;
+    const activeUnfinished = [];
+    const obsolete = [];
 
     snap.forEach(docSnap => {
       const bill = docSnap.data();
 
       if (bill.effectiveVersion === false) {
-        // Legitimate revision/audit record — never actionable, never
-        // touched, regardless of its status field (see reviseBill()).
-        return;
-      }
-
-      if (!incomingBillCache[docSnap.id]) {
-        incomingBillCache[docSnap.id] = bill;
-        recovered++;
+        // Superseded revision. Obsolete ONLY if no active unfinished
+        // bill exists anywhere — decided in Step C, not here.
+        obsolete.push({ id: docSnap.id, bill });
+      } else {
+        activeUnfinished.push({ id: docSnap.id, bill });
       }
     });
 
-    if (recovered > 0) {
+    // Step B — any active unfinished work at all means this sweep does
+    // nothing destructive. Firestore wins over the cache: if the live
+    // listener missed something, re-surface it rather than delete it.
+    if (activeUnfinished.length) {
+      let recovered = 0;
+
+      activeUnfinished.forEach(({ id, bill }) => {
+        if (!incomingBillCache[id]) {
+          incomingBillCache[id] = bill;
+          recovered++;
+        }
+      });
+
+      if (recovered > 0) {
+        console.warn(
+          `[reconcileEmptyReceiver] Receiver appeared empty but ${recovered} ` +
+          "active unfinished bill(s) were found in Firestore and were not " +
+          "reflected by the live listener. Re-surfacing them rather than " +
+          "deleting anything — this indicates a listener/query sync issue."
+        );
+        renderIncomingBills();
+      }
+
+      return;
+    }
+
+    if (!obsolete.length) {
+      return;
+    }
+
+    // Step C/D — zero active unfinished bills exist anywhere. Every
+    // remaining superseded revision therefore belongs to a chain whose
+    // effective version is already gone, i.e. a completed chain.
+    //
+    // Each deletion re-reads its document inside its own transaction
+    // and aborts if the document changed, so a concurrent write on
+    // another device always wins. Separate transactions rather than one
+    // batch so a single conflict cannot block the rest.
+    let removed = 0;
+
+    for (const { id } of obsolete) {
+      try {
+        await runTransaction(db, async transaction => {
+          const ref = doc(db, "bills", id);
+          const s = await transaction.get(ref);
+
+          if (!s.exists()) {
+            return;
+          }
+
+          // Re-verify against fresh state. Anything that is no longer
+          // a superseded revision is left strictly alone.
+          if (s.data().effectiveVersion !== false) {
+            return;
+          }
+
+          transaction.delete(ref);
+        });
+
+        delete incomingBillCache[id];
+        removed++;
+      } catch (err) {
+        console.error(
+          `[reconcileEmptyReceiver] Could not reconcile bills/${id}:`,
+          err
+        );
+      }
+    }
+
+    if (removed > 0) {
       console.warn(
-        `[reconcileEmptyReceiver] Receiver appeared empty but ${recovered} ` +
-        "actionable bill(s) were found directly in Firestore and were not " +
-        "reflected by the live listener. Re-surfacing them into the " +
-        "Receiver rather than deleting anything — this indicates a " +
-        "listener/query sync issue worth investigating."
+        `[reconcileEmptyReceiver] Removed ${removed} obsolete revision ` +
+        "document(s) belonging to already-completed bill chains."
       );
       renderIncomingBills();
     }
@@ -8027,10 +8188,13 @@ window.doneReceivedBill =
 
     // ── BULK: move every eligible printed bill currently actionable ──
     if (bulkAll) {
-      // incomingBillCache now reflects billsQuery's effectiveVersion==true
-      // filter (no date bound), so this naturally includes any backlog of
-      // older unfinished printed bills as well as today's — no date
-      // comparison is needed or wanted here.
+      // incomingBillCache reflects billsQuery's state filter (no date
+      // bound), so this naturally includes any backlog of older
+      // unfinished printed bills as well as today's. No date
+      // comparison is needed or wanted here — age is not a lifecycle
+      // concept. Superseded revisions are excluded because they are
+      // not independently completable; they are removed as part of
+      // their own chain when its effective version completes.
       const eligibleIds =
         Object.keys(incomingBillCache)
           .filter(id => {
@@ -8053,6 +8217,26 @@ window.doneReceivedBill =
 
       let movedCount = 0;
       let accountingResult = null;
+
+      // Same chain resolution as the individual Done path — Done All
+      // must not have a weaker deletion model. Resolved before the
+      // transaction because transactions cannot run queries.
+      let chainMap;
+
+      try {
+        const resolved = await Promise.all(
+          eligibleIds.map(async id => [
+            id,
+            await resolveBillChainIds(id)
+          ])
+        );
+        chainMap = new Map(resolved);
+      } catch (err) {
+        console.error(err);
+        showToast("Failed to complete bills", "error");
+        isReceiverBusy = false;
+        return;
+      }
 
       try {
         await runTransaction(
@@ -8089,18 +8273,35 @@ window.doneReceivedBill =
                 continue;
               }
 
-              const chainIds    = getBillChainIds(id);
-              const chainToLock = chainIds.filter(cid => cid !== id);
-
-              billsToMove.push({
-                id,
-                bill,
-                chainToLock
-              });
+              billsToMove.push({ id, bill });
               accountingPlans.push(
                 createInventoryAccountingPlan(id, bill)
               );
             }
+
+            // Read every chain member of every bill that passed
+            // re-validation, still inside the read phase.
+            const chainSnapsById = new Map();
+
+            await Promise.all(
+              billsToMove.map(async ({ id }) => {
+                const others =
+                  (chainMap.get(id) || [id])
+                    .filter(cid => cid !== id);
+
+                chainSnapsById.set(
+                  id,
+                  await Promise.all(
+                    others.map(async cid => ({
+                      id: cid,
+                      snap: await transaction.get(
+                        doc(db, "bills", cid)
+                      )
+                    }))
+                  )
+                );
+              })
+            );
 
             const accountingSnapshots =
               await readInventoryAccountingSnapshots(
@@ -8116,9 +8317,11 @@ window.doneReceivedBill =
               );
 
             // Queue all Daybook/bill writes after every transaction read is done.
-            for (const { id, bill, chainToLock } of billsToMove) {
-              const billRef = doc(db, "bills", id);
+            // idsToDelete is a Set so that a document reachable from two
+            // bills' chains is only staged for deletion once.
+            const idsToDelete = new Set();
 
+            for (const { id, bill } of billsToMove) {
               transaction.set(
                 doc(daybookCollection),
                 {
@@ -8131,25 +8334,39 @@ window.doneReceivedBill =
                 }
               );
 
-              transaction.delete(billRef);
+              idsToDelete.add(id);
 
-              chainToLock.forEach(cid => {
-                transaction.update(
-                  doc(db, "bills", cid),
-                  { isLocked: true }
-                );
-              });
+              selectObsoleteChainIds(
+                id,
+                chainSnapsById.get(id) || []
+              ).forEach(cid => idsToDelete.add(cid));
             }
+
+            idsToDelete.forEach(id => {
+              transaction.delete(
+                doc(db, "bills", id)
+              );
+            });
 
             movedCount =
               billsToMove.length;
           }
         );
 
-        showToast(
-          `Successfully moved ${movedCount} bill${movedCount !== 1 ? "s" : ""} to Daybook.`,
-          "success"
-        );
+        // Completing nothing is not a successful completion. This can
+        // happen when server-side re-validation rejects every
+        // candidate (e.g. another device completed them first).
+        if (!movedCount) {
+          showToast(
+            "No bills were completed — they are no longer eligible.",
+            "error"
+          );
+        } else {
+          showToast(
+            `Successfully moved ${movedCount} bill${movedCount !== 1 ? "s" : ""} to Daybook.`,
+            "success"
+          );
+        }
 
         applyLocalInventoryAccountingResult(accountingResult);
       } catch (err) {
@@ -8173,12 +8390,24 @@ window.doneReceivedBill =
         docId
       );
 
-    // Resolve chain members from cache before entering the transaction.
-    // Ancestor bills (effectiveVersion:false) are immutable — safe to read from cache.
-    const chainIds =
-      getBillChainIds(docId);
+    // Resolve the complete chain from Firestore before entering the
+    // transaction (transactions cannot run queries). Every member of a
+    // completed chain is deleted with it — `bills` holds active work
+    // only, so once the effective revision completes there is nothing
+    // left in this chain that represents outstanding work.
+    let chainIds;
 
-    const chainToLock =
+    try {
+      chainIds =
+        await resolveBillChainIds(docId);
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to complete bill", "error");
+      isReceiverBusy = false;
+      return;
+    }
+
+    const chainOthers =
       chainIds.filter(
         id => id !== docId
       );
@@ -8222,6 +8451,22 @@ window.doneReceivedBill =
             );
           }
 
+          // Chain members are read here, while the transaction is
+          // still in its read phase — before ANY write is staged, and
+          // before anything is deleted. Reading them also puts them
+          // under the transaction's conflict detection, so a
+          // concurrent write to an ancestor on another device aborts
+          // and retries this transaction rather than racing it.
+          const chainSnaps =
+            await Promise.all(
+              chainOthers.map(async id => ({
+                id,
+                snap: await transaction.get(
+                  doc(db, "bills", id)
+                )
+              }))
+            );
+
           const accountingPlans = [
             createInventoryAccountingPlan(
               docId,
@@ -8262,16 +8507,25 @@ window.doneReceivedBill =
             }
           );
 
+          // The Daybook entry above was built from `bill`, which
+          // already carries the serial number copied down from the
+          // original at revision time (see reviseBill's transaction).
+          // Every field the Daybook and accounting need has been read;
+          // only now is anything deleted.
           transaction.delete(
             billRef
           );
 
-          // Lock ancestor revision chain atomically.
-          // If locking fails, the entire transaction rolls back — no partial success.
-          chainToLock.forEach(id => {
-            transaction.update(
-              doc(db, "bills", id),
-              { isLocked: true }
+          // Delete the obsolete remainder of this completed chain in
+          // the same transaction. If any part of this fails, nothing
+          // commits — accounting, Daybook and all deletions are one
+          // atomic unit.
+          selectObsoleteChainIds(
+            docId,
+            chainSnaps
+          ).forEach(id => {
+            transaction.delete(
+              doc(db, "bills", id)
             );
           });
         }
@@ -8289,76 +8543,86 @@ window.doneReceivedBill =
   };
 
 /* ================================
-   MANUAL CLEANUP / AUDIT UTILITY (largely superseded, kept for reference)
+   ONE-TIME HISTORICAL MIGRATION TOOL (manual, console-invoked only)
    ---------------------------------------------------------------
-   This was originally written because billsQuery was scoped to
-   createdAt >= start of today, which let a printed-but-not-Done bill
-   silently fall out of the query (and out of the Done/Done All UI
-   entirely) after midnight. That root cause is now fixed directly at
-   billsQuery's definition (it filters on effectiveVersion==true instead
-   of by date), so old orphaned "printed" bills now simply reappear in
-   the live Receiver list on their own and can be completed normally —
-   this utility is no longer the only way to reach them.
-   It's kept anyway (unmodified) as a harmless, independent, read-first
-   diagnostic/manual-completion tool — it reuses the same accounting +
-   Daybook + delete transaction as the live Done button, so running it
-   is never less safe than pressing Done normally would have been.
+   Nothing here runs automatically. It is never wired into startup,
+   render, snapshot or the Done path, so ordinary operation never
+   pays for a historical scan (§14, §15).
 
-   It intentionally does NOT touch:
-     - status:"pending" bills — never printed, no serial number, no
-       way to know whether they represent an abandoned draft-that-was-
-       sent or something still awaiure of being physically handled.
-       There is no cancel/void workflow in this app, so these are
-       genuinely ambiguous and are only ever reported, never modified.
-     - effectiveVersion:false bills — these are superseded revision
-       ancestors, kept permanently by the existing revision system as
-       an audit trail (see reviseBill / the isLocked chain-locking in
-       the Done paths above). Never deleted, regardless of age.
-     - anything from today — the existing live Receiver/Done/Done All
-       flow already owns those correctly.
+   It exists only for documents written by earlier versions of this
+   app, from before `bills` was an active-work-only collection. New
+   documents cannot reach these states: the Done transaction removes
+   the whole completed chain atomically.
+
+   Classification is by STATE, never by age. There is deliberately no
+   createdAt comparison anywhere in this tool — an old unfinished bill
+   is just an unfinished bill.
 ================================ */
-async function auditOldReceiverBills() {
-  const oldBillsSnap = await getDocs(
-    query(
-      billsCollection,
-      where("createdAt", "<", getStartOfTodayTimestamp())
-    )
-  );
+async function auditBillsCollection() {
+  const snap = await getDocs(billsCollection);
 
-  const readyToComplete = [];
-  const ambiguousPending = [];
-  const other = [];
+  const activeUnfinished = [];   // real outstanding work — never touched
+  const readyToComplete = [];    // printed, effective: completable now
+  const awaitingPrint = [];      // pending: must be printed to get a serial
+  const orphanedRevisions = [];  // superseded, effective head gone
+  const supersededInChain = [];  // superseded, effective head still present
+  const unclassified = [];
 
-  oldBillsSnap.forEach(docSnap => {
-    const bill = docSnap.data();
+  const rows = [];
+  snap.forEach(d => rows.push({ id: d.id, bill: d.data() }));
+
+  // A superseded revision is obsolete only if no effective member of
+  // its own chain is still present. Chain membership comes from the
+  // same relationship fields the app itself uses.
+  const effectiveRoots = new Set();
+
+  rows.forEach(({ id, bill }) => {
+    if (bill.effectiveVersion === false) return;
+    if (!ACTIVE_BILL_STATUSES.includes(bill.status)) return;
+    effectiveRoots.add(
+      bill.isOriginal === false && bill.parentBillId
+        ? bill.parentBillId
+        : id
+    );
+  });
+
+  rows.forEach(({ id, bill }) => {
+    const entry = { id, bill };
 
     if (bill.effectiveVersion === false) {
-      // Superseded revision ancestor — retained by design, not part
-      // of this cleanup at all.
+      const rootId =
+        bill.isOriginal === false && bill.parentBillId
+          ? bill.parentBillId
+          : id;
+
+      if (effectiveRoots.has(rootId)) {
+        supersededInChain.push(entry);
+      } else {
+        orphanedRevisions.push(entry);
+      }
       return;
     }
 
-    if (
-      bill.status === "printed" &&
-      bill.isLocked !== true
-    ) {
-      readyToComplete.push({ id: docSnap.id, bill });
+    if (bill.status === "printed") {
+      activeUnfinished.push(entry);
+      readyToComplete.push(entry);
     } else if (bill.status === "pending") {
-      ambiguousPending.push({ id: docSnap.id, bill });
+      activeUnfinished.push(entry);
+      awaitingPrint.push(entry);
     } else {
-      // Anything else unexpected (e.g. printed but already locked,
-      // which shouldn't normally happen without effectiveVersion
-      // also being false) — surfaced for manual review rather than
-      // guessed at.
-      other.push({ id: docSnap.id, bill });
+      unclassified.push(entry);
     }
   });
 
   console.log(
-    `[auditOldReceiverBills] ${readyToComplete.length} old printed bill(s) safe to complete, ` +
-    `${ambiguousPending.length} old pending bill(s) left as ambiguous, ` +
-    `${other.length} unclassified.`
+    `[auditBillsCollection] ${rows.length} document(s).\n` +
+    `  ${readyToComplete.length} printed, completable now\n` +
+    `  ${awaitingPrint.length} pending, need printing first\n` +
+    `  ${supersededInChain.length} superseded (chain still active — leave alone)\n` +
+    `  ${orphanedRevisions.length} orphaned superseded revisions (safe to purge)\n` +
+    `  ${unclassified.length} unclassified (never touched)`
   );
+
   console.table(
     readyToComplete.map(({ id, bill }) => ({
       id, status: bill.status, mode: bill.mode,
@@ -8366,25 +8630,28 @@ async function auditOldReceiverBills() {
       customerName: bill.customerName
     }))
   );
-  if (ambiguousPending.length) {
-    console.log("Ambiguous (pending, left untouched):", ambiguousPending);
-  }
-  if (other.length) {
-    console.log("Unclassified (left untouched):", other);
+
+  if (unclassified.length) {
+    console.log("Unclassified (left untouched):", unclassified);
   }
 
-  return { readyToComplete, ambiguousPending, other };
+  return {
+    activeUnfinished,
+    readyToComplete,
+    awaitingPrint,
+    orphanedRevisions,
+    supersededInChain,
+    unclassified
+  };
 }
 
-// Completes exactly one old orphaned bill through the same
-// accounting-plan → Daybook write → delete transaction the live Done
-// button uses above. Chain-locking is intentionally omitted: any
-// ancestor of this bill was already marked effectiveVersion:false at
-// revision time, which is what excludes it from the Receiver list and
-// from being revised again — isLocked on top of that is a belt-and-
-// braces measure for same-day bills, not a correctness requirement.
-async function completeOrphanedPrintedBill(docId) {
+// Completes exactly one bill through the same accounting-plan →
+// Daybook → delete-the-whole-chain transaction the live Done button
+// uses. Identical lifecycle, no weaker model.
+async function completeBillById(docId) {
   const billRef = doc(db, "bills", docId);
+  const chainIds = await resolveBillChainIds(docId);
+  const chainOthers = chainIds.filter(id => id !== docId);
 
   let accountingResult = null;
 
@@ -8398,8 +8665,15 @@ async function completeOrphanedPrintedBill(docId) {
     const bill = billSnap.data();
 
     if (bill.status !== "printed" || bill.effectiveVersion === false) {
-      throw new Error("Bill is no longer eligible for cleanup.");
+      throw new Error("Bill is not in a completable state.");
     }
+
+    const chainSnaps = await Promise.all(
+      chainOthers.map(async id => ({
+        id,
+        snap: await transaction.get(doc(db, "bills", id))
+      }))
+    );
 
     const accountingPlans = [
       createInventoryAccountingPlan(docId, bill)
@@ -8429,24 +8703,68 @@ async function completeOrphanedPrintedBill(docId) {
     );
 
     transaction.delete(billRef);
+
+    selectObsoleteChainIds(docId, chainSnaps).forEach(id => {
+      transaction.delete(doc(db, "bills", id));
+    });
   });
 
   applyLocalInventoryAccountingResult(accountingResult);
 }
 
-// dryRun defaults to true on purpose: running this with no arguments
-// only reports what it WOULD do. Pass { dryRun: false } to actually
-// complete the "readyToComplete" set. Each bill is its own transaction
-// (matching the individual Done path, not Done All's single combined
-// transaction) so one failure never blocks or rolls back the rest of
-// the backlog.
-window.cleanupOrphanedPrintedBills = async function({ dryRun = true } = {}) {
-  const { readyToComplete } = await auditOldReceiverBills();
+/* Purges superseded revision documents whose chain has no effective
+   member left — i.e. leftovers of chains completed by an older build
+   that deleted only the effective bill.
+
+   Never touches an active unfinished bill. Each deletion re-reads its
+   document in its own transaction, so a concurrent write wins.
+   dryRun defaults to true. */
+window.purgeOrphanedRevisionBills = async function({ dryRun = true } = {}) {
+  const { orphanedRevisions } = await auditBillsCollection();
+
+  if (dryRun) {
+    console.log(
+      `Dry run only — ${orphanedRevisions.length} orphaned revision document(s) ` +
+      "would be removed. Call purgeOrphanedRevisionBills({ dryRun: false }) to run it."
+    );
+    return { dryRun: true, wouldRemove: orphanedRevisions.length };
+  }
+
+  let removed = 0;
+  const failed = [];
+
+  for (const { id } of orphanedRevisions) {
+    try {
+      await runTransaction(db, async transaction => {
+        const ref = doc(db, "bills", id);
+        const s = await transaction.get(ref);
+        if (!s.exists()) return;
+        if (s.data().effectiveVersion !== false) return;
+        transaction.delete(ref);
+      });
+      removed++;
+    } catch (err) {
+      console.error(`[purgeOrphanedRevisionBills] Failed for ${id}:`, err);
+      failed.push({ id, error: String(err) });
+    }
+  }
+
+  console.log(
+    `[purgeOrphanedRevisionBills] Removed ${removed}. ${failed.length} failed.`
+  );
+  return { dryRun: false, removed, failed };
+};
+
+/* Completes every printed, effective bill currently outstanding.
+   dryRun defaults to true. Each bill is its own transaction so one
+   failure never blocks the rest. */
+window.completeAllOutstandingPrintedBills = async function({ dryRun = true } = {}) {
+  const { readyToComplete } = await auditBillsCollection();
 
   if (dryRun) {
     console.log(
       `Dry run only — ${readyToComplete.length} bill(s) would be completed. ` +
-      `Call cleanupOrphanedPrintedBills({ dryRun: false }) to actually run it.`
+      "Call completeAllOutstandingPrintedBills({ dryRun: false }) to run it."
     );
     return { dryRun: true, wouldComplete: readyToComplete.length };
   }
@@ -8456,20 +8774,18 @@ window.cleanupOrphanedPrintedBills = async function({ dryRun = true } = {}) {
 
   for (const { id } of readyToComplete) {
     try {
-      await completeOrphanedPrintedBill(id);
+      await completeBillById(id);
       succeeded++;
     } catch (err) {
-      console.error(`[cleanupOrphanedPrintedBills] Failed for ${id}:`, err);
-      failed.push({ id, error: err && err.message });
+      console.error(`[completeAllOutstandingPrintedBills] Failed for ${id}:`, err);
+      failed.push({ id, error: String(err) });
     }
   }
 
   console.log(
-    `[cleanupOrphanedPrintedBills] Completed ${succeeded} bill(s). ${failed.length} failed and were left untouched.`
+    `[completeAllOutstandingPrintedBills] Completed ${succeeded}. ${failed.length} failed.`
   );
-  if (failed.length) {
-    console.table(failed);
-  }
+  if (failed.length) console.table(failed);
 
   return { dryRun: false, succeeded, failed };
 };
