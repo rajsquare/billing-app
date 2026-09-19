@@ -124,9 +124,7 @@ const _todayFmt = new Intl.DateTimeFormat("en-CA", {
 
 const billsQuery = query(
   billsCollection,
-  where("createdAt", ">=", getStartOfTodayTimestamp()),
-  orderBy("createdAt", "asc"),
-  limit(200)
+  where("effectiveVersion", "==", true)
 );
 
 const daybookQuery = query(
@@ -6472,11 +6470,120 @@ function printDaybook() {
 /* ================================
    UI RENDERERS
 ================================ */
+// billsQuery no longer has a Firestore-side orderBy (see its definition —
+// it's now a single effectiveVersion==true filter with no date bound), so
+// display order is restored here instead, preserving the same "newest
+// first" list the old orderBy("createdAt","asc") + .reverse() produced.
+function getBillCreatedAtMillis(bill) {
+  return bill.createdAt &&
+    typeof bill.createdAt.toMillis === "function"
+    ? bill.createdAt.toMillis()
+    // A just-created bill can briefly have a null createdAt on this same
+    // client, before the server timestamp resolves — treat that as "now"
+    // rather than "oldest", so it doesn't momentarily jump to the bottom
+    // of a newest-first list.
+    : Date.now();
+}
+
+// Guards reconcileEmptyReceiver() so it fires once per genuine transition
+// into "zero actionable bills", not repeatedly on every render/snapshot
+// while the Receiver stays empty, and not concurrently with itself.
+let receiverEmptyReconciled = false;
+let receiverReconciliationInFlight = false;
+
+// SECONDARY defensive check (the PRIMARY mechanism is unchanged: every
+// successful Done/Done All transaction below deletes its bill atomically
+// alongside the accounting + Daybook writes — if that transaction fails,
+// nothing is deleted and nothing else here needs to react). This runs
+// only when billsQuery's live listener reports zero actionable bills,
+// and double-checks Firestore directly via a DIFFERENT field
+// (status in ["pending","printed"]) than the live query filters on
+// (effectiveVersion==true) — specifically so it can catch a document the
+// live listener's own filter might miss (e.g. effectiveVersion missing
+// or corrupted on some document), which a same-field re-check couldn't.
+//
+// It intentionally never deletes anything. Given this app's actual
+// lifecycle, a normal bill document is only ever removed by a
+// successful, atomic Done transaction (accounting + Daybook + delete,
+// all-or-nothing) — there is no other state in which a normal bill
+// exists in Firestore yet is "already completed". So if this sweep
+// finds a document the live listener isn't showing, that can only mean
+// (a) it's a legitimate effectiveVersion:false revision/audit record —
+// left untouched, exactly as always, or (b) it's a genuinely unfinished
+// bill the live listener/query missed — in which case the correct fix
+// is to make it visible/actionable again, not to destroy it. This also
+// makes it safe under multiple devices (Scenario H): it never writes or
+// deletes, so it can never race a concurrent Done on another device —
+// at worst it re-surfaces a bill a split second before that other
+// device's own Done transaction removes it again via the normal path.
+async function reconcileEmptyReceiver() {
+  if (receiverReconciliationInFlight) {
+    return;
+  }
+  receiverReconciliationInFlight = true;
+
+  try {
+    const snap = await getDocs(
+      query(
+        billsCollection,
+        where("status", "in", ["pending", "printed"])
+      )
+    );
+
+    let recovered = 0;
+
+    snap.forEach(docSnap => {
+      const bill = docSnap.data();
+
+      if (bill.effectiveVersion === false) {
+        // Legitimate revision/audit record — never actionable, never
+        // touched, regardless of its status field (see reviseBill()).
+        return;
+      }
+
+      if (!incomingBillCache[docSnap.id]) {
+        incomingBillCache[docSnap.id] = bill;
+        recovered++;
+      }
+    });
+
+    if (recovered > 0) {
+      console.warn(
+        `[reconcileEmptyReceiver] Receiver appeared empty but ${recovered} ` +
+        "actionable bill(s) were found directly in Firestore and were not " +
+        "reflected by the live listener. Re-surfacing them into the " +
+        "Receiver rather than deleting anything — this indicates a " +
+        "listener/query sync issue worth investigating."
+      );
+      renderIncomingBills();
+    }
+  } catch (err) {
+    console.error("[reconcileEmptyReceiver] Reconciliation check failed:", err);
+  } finally {
+    receiverReconciliationInFlight = false;
+  }
+}
+
 function renderIncomingBills() {
   const ids =
     Object.keys(incomingBillCache)
     .filter(id => incomingBillCache[id].effectiveVersion !== false)
-    .reverse();
+    .sort((a, b) =>
+      getBillCreatedAtMillis(incomingBillCache[b]) -
+      getBillCreatedAtMillis(incomingBillCache[a])
+    );
+
+  // Secondary reconciliation (see reconcileEmptyReceiver below): only
+  // ever fires once per genuine transition into "zero actionable bills",
+  // not on every render while it stays empty.
+  if (ids.length === 0) {
+    if (!receiverEmptyReconciled) {
+      receiverEmptyReconciled = true;
+      reconcileEmptyReceiver();
+    }
+  } else {
+    receiverEmptyReconciled = false;
+  }
 
   /* Badge always updates regardless of which view is active */
   let pendingCount = 0;
@@ -7918,10 +8025,12 @@ window.doneReceivedBill =
       return;
     }
 
-    // ── BULK: move every eligible today's printed bill ──
+    // ── BULK: move every eligible printed bill currently actionable ──
     if (bulkAll) {
-      // incomingBillCache is already scoped to today by the Firestore query
-      // (where createdAt >= startOfToday), so no date comparison is needed.
+      // incomingBillCache now reflects billsQuery's effectiveVersion==true
+      // filter (no date bound), so this naturally includes any backlog of
+      // older unfinished printed bills as well as today's — no date
+      // comparison is needed or wanted here.
       const eligibleIds =
         Object.keys(incomingBillCache)
           .filter(id => {
@@ -8178,6 +8287,192 @@ window.doneReceivedBill =
         false;
     }
   };
+
+/* ================================
+   MANUAL CLEANUP / AUDIT UTILITY (largely superseded, kept for reference)
+   ---------------------------------------------------------------
+   This was originally written because billsQuery was scoped to
+   createdAt >= start of today, which let a printed-but-not-Done bill
+   silently fall out of the query (and out of the Done/Done All UI
+   entirely) after midnight. That root cause is now fixed directly at
+   billsQuery's definition (it filters on effectiveVersion==true instead
+   of by date), so old orphaned "printed" bills now simply reappear in
+   the live Receiver list on their own and can be completed normally —
+   this utility is no longer the only way to reach them.
+   It's kept anyway (unmodified) as a harmless, independent, read-first
+   diagnostic/manual-completion tool — it reuses the same accounting +
+   Daybook + delete transaction as the live Done button, so running it
+   is never less safe than pressing Done normally would have been.
+
+   It intentionally does NOT touch:
+     - status:"pending" bills — never printed, no serial number, no
+       way to know whether they represent an abandoned draft-that-was-
+       sent or something still awaiure of being physically handled.
+       There is no cancel/void workflow in this app, so these are
+       genuinely ambiguous and are only ever reported, never modified.
+     - effectiveVersion:false bills — these are superseded revision
+       ancestors, kept permanently by the existing revision system as
+       an audit trail (see reviseBill / the isLocked chain-locking in
+       the Done paths above). Never deleted, regardless of age.
+     - anything from today — the existing live Receiver/Done/Done All
+       flow already owns those correctly.
+================================ */
+async function auditOldReceiverBills() {
+  const oldBillsSnap = await getDocs(
+    query(
+      billsCollection,
+      where("createdAt", "<", getStartOfTodayTimestamp())
+    )
+  );
+
+  const readyToComplete = [];
+  const ambiguousPending = [];
+  const other = [];
+
+  oldBillsSnap.forEach(docSnap => {
+    const bill = docSnap.data();
+
+    if (bill.effectiveVersion === false) {
+      // Superseded revision ancestor — retained by design, not part
+      // of this cleanup at all.
+      return;
+    }
+
+    if (
+      bill.status === "printed" &&
+      bill.isLocked !== true
+    ) {
+      readyToComplete.push({ id: docSnap.id, bill });
+    } else if (bill.status === "pending") {
+      ambiguousPending.push({ id: docSnap.id, bill });
+    } else {
+      // Anything else unexpected (e.g. printed but already locked,
+      // which shouldn't normally happen without effectiveVersion
+      // also being false) — surfaced for manual review rather than
+      // guessed at.
+      other.push({ id: docSnap.id, bill });
+    }
+  });
+
+  console.log(
+    `[auditOldReceiverBills] ${readyToComplete.length} old printed bill(s) safe to complete, ` +
+    `${ambiguousPending.length} old pending bill(s) left as ambiguous, ` +
+    `${other.length} unclassified.`
+  );
+  console.table(
+    readyToComplete.map(({ id, bill }) => ({
+      id, status: bill.status, mode: bill.mode,
+      serialNumber: bill.serialNumber, date: bill.date,
+      customerName: bill.customerName
+    }))
+  );
+  if (ambiguousPending.length) {
+    console.log("Ambiguous (pending, left untouched):", ambiguousPending);
+  }
+  if (other.length) {
+    console.log("Unclassified (left untouched):", other);
+  }
+
+  return { readyToComplete, ambiguousPending, other };
+}
+
+// Completes exactly one old orphaned bill through the same
+// accounting-plan → Daybook write → delete transaction the live Done
+// button uses above. Chain-locking is intentionally omitted: any
+// ancestor of this bill was already marked effectiveVersion:false at
+// revision time, which is what excludes it from the Receiver list and
+// from being revised again — isLocked on top of that is a belt-and-
+// braces measure for same-day bills, not a correctness requirement.
+async function completeOrphanedPrintedBill(docId) {
+  const billRef = doc(db, "bills", docId);
+
+  let accountingResult = null;
+
+  await runTransaction(db, async transaction => {
+    const billSnap = await transaction.get(billRef);
+
+    if (!billSnap.exists()) {
+      throw new Error("Bill not found.");
+    }
+
+    const bill = billSnap.data();
+
+    if (bill.status !== "printed" || bill.effectiveVersion === false) {
+      throw new Error("Bill is no longer eligible for cleanup.");
+    }
+
+    const accountingPlans = [
+      createInventoryAccountingPlan(docId, bill)
+    ];
+
+    const accountingSnapshots = await readInventoryAccountingSnapshots(
+      transaction,
+      accountingPlans
+    );
+
+    accountingResult = applyInventoryAccountingWrites(
+      transaction,
+      accountingPlans,
+      accountingSnapshots
+    );
+
+    transaction.set(
+      doc(daybookCollection),
+      {
+        date: bill.date,
+        serialNumber: bill.serialNumber,
+        customerName: bill.customerName,
+        amount: bill.grandTotal,
+        mode: bill.mode || "W",
+        createdAt: serverTimestamp()
+      }
+    );
+
+    transaction.delete(billRef);
+  });
+
+  applyLocalInventoryAccountingResult(accountingResult);
+}
+
+// dryRun defaults to true on purpose: running this with no arguments
+// only reports what it WOULD do. Pass { dryRun: false } to actually
+// complete the "readyToComplete" set. Each bill is its own transaction
+// (matching the individual Done path, not Done All's single combined
+// transaction) so one failure never blocks or rolls back the rest of
+// the backlog.
+window.cleanupOrphanedPrintedBills = async function({ dryRun = true } = {}) {
+  const { readyToComplete } = await auditOldReceiverBills();
+
+  if (dryRun) {
+    console.log(
+      `Dry run only — ${readyToComplete.length} bill(s) would be completed. ` +
+      `Call cleanupOrphanedPrintedBills({ dryRun: false }) to actually run it.`
+    );
+    return { dryRun: true, wouldComplete: readyToComplete.length };
+  }
+
+  let succeeded = 0;
+  const failed = [];
+
+  for (const { id } of readyToComplete) {
+    try {
+      await completeOrphanedPrintedBill(id);
+      succeeded++;
+    } catch (err) {
+      console.error(`[cleanupOrphanedPrintedBills] Failed for ${id}:`, err);
+      failed.push({ id, error: err && err.message });
+    }
+  }
+
+  console.log(
+    `[cleanupOrphanedPrintedBills] Completed ${succeeded} bill(s). ${failed.length} failed and were left untouched.`
+  );
+  if (failed.length) {
+    console.table(failed);
+  }
+
+  return { dryRun: false, succeeded, failed };
+};
 
 /* ================================
    DEDICATED SLIDESHOW ENTRY POINT (?view=slideshow)
