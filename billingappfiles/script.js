@@ -1318,6 +1318,12 @@ function getMaterialClass(material) {
   return "";
 }
 
+// The three known materials return a fixed, safe short code. Anything
+// else is free text from the externally-edited pricelist document (a
+// different app, outside this codebase's control) and is inserted
+// directly into printed-bill/Daybook HTML by every caller of this
+// function, so it must be escaped here — the same defect class fixed
+// in renderBill's badge row (see selectProduct/renderBill comments).
 function shortMaterialName(material) {
   if (material === "Brass") {
     return "BR";
@@ -1331,7 +1337,7 @@ function shortMaterialName(material) {
     return "BZ";
   }
 
-  return material || "-";
+  return escapeAttr(material || "-");
 }
 
 function formatIndianMoney(value) {
@@ -4828,6 +4834,20 @@ function renderSuggestions(
 /* ================================
    BILLING
 ================================ */
+// Guards selectProduct against firing twice for what the user
+// experiences as one tap on a suggestion card. This is not a
+// Safari-only precaution: any platform that can dispatch two click
+// events for one gesture (a stray double-tap, a trackpad double-click,
+// a re-dispatched/replayed event) would otherwise unshift two items
+// for one product, one of which starts with qty:"" and is invisible to
+// the user if it renders behind/under the first — exactly the shape of
+// a "blank required-quantity item" Send validation correctly rejects.
+// A genuine second, deliberate add of the same product a moment later
+// is unaffected: the window is far shorter than a human reaction time
+// for an intentional second tap.
+const _recentProductAdds = new Map();
+const PRODUCT_ADD_DEBOUNCE_MS = 350;
+
 window.selectProduct =
   function(sr) {
     const product = productsBySr.get(sr);
@@ -4835,6 +4855,15 @@ window.selectProduct =
     if (!product) {
       return;
     }
+
+    const now = Date.now();
+    const lastAdd = _recentProductAdds.get(sr);
+
+    if (lastAdd && now - lastAdd < PRODUCT_ADD_DEBOUNCE_MS) {
+      return;
+    }
+
+    _recentProductAdds.set(sr, now);
 
     billItems.unshift({
       product,
@@ -4904,6 +4933,36 @@ function renderBill() {
       item,
       index
     ) => {
+      // A malformed entry (e.g. missing `.product`) must not throw here:
+      // forEach doesn't recover from an exception, so one bad item used
+      // to abort the loop and leave billItemsDiv showing the PREVIOUS
+      // render — a stale DOM that silently disagrees with billItems.length,
+      // which is indistinguishable from "blank card" to the user and
+      // defeats diagnoseBillItems' whole point (comparing state count to
+      // rendered count). Render a clearly-labeled error card instead, so
+      // the count always matches and the problem is visible, not hidden.
+      if (!item || !item.product) {
+        console.error(
+          `[renderBill] billItems[${index}] is missing its product data:`,
+          item
+        );
+        html += `
+          <div class="bill-card" style="border-color:#b91c1c;background:#fef2f2;">
+            <div class="bill-card-top">
+              <div class="bill-title" style="color:#b91c1c;">⚠ Item ${index + 1} failed to load</div>
+              <div class="bill-row-actions">
+                <button class="delete-btn" onclick="deleteItem(${index})">✕</button>
+              </div>
+            </div>
+            <div style="font-size:13px;color:#b91c1c;">
+              This item is missing required data and cannot be completed.
+              Remove it and re-add the product.
+            </div>
+          </div>
+        `;
+        return;
+      }
+
       const isDiscount = isDiscountItem(item);
       const isEditable = isEditableNameItem(item);
       const isReturn = isReturnItem(item);
@@ -4952,11 +5011,11 @@ function renderBill() {
 
           <div class="badge-row">
             <div class="unit">
-              ${item.product.priceType || ""}
+              ${escapeAttr(item.product.priceType || "")}
             </div>
             ${
               item.product.material
-                ? `<div class="unit ${getMaterialClass(item.product.material)}">${item.product.material}</div>`
+                ? `<div class="unit ${getMaterialClass(item.product.material)}">${escapeAttr(item.product.material)}</div>`
                 : ""
             }
           </div>
@@ -5201,7 +5260,7 @@ function updateGrandTotal() {
         item
       ) =>
         sum +
-        item.total,
+        (item.total || 0),
       0
     );
 
@@ -5212,6 +5271,77 @@ function updateGrandTotal() {
 /* ================================
    SEND FLOW
 ================================ */
+/* ================================
+   TEMPORARY DIAGNOSTIC — blank-item repro capture
+   ------------------------------------------------------------
+   Not wired into any automatic path; console-invoked only. Safe to
+   delete once the blank-item report is confirmed fixed.
+
+   Compares three independent views of the same bill at the moment
+   it's called:
+     underlying state  — billItems, as Send validation will read it
+     rendered DOM      — one .bill-card per state entry, in order
+     validation        — which specific entries fail the qty/price check
+
+   Run this the moment the blank card is visible, before touching
+   anything else, then again after Send is blocked.
+================================ */
+window.diagnoseBillItems = function () {
+  const cards =
+    billItemsDiv.querySelectorAll(".bill-card");
+
+  const rows = billItems.map((item, index) => {
+    const qty = parseFloat(item.qty);
+    const price = parseFloat(item.price);
+    const card = cards[index] || null;
+
+    return {
+      index,
+      itemIdentity: item.product ? item.product.sr : "<<NO product FIELD>>",
+      productName: item.product ? item.product.productName : "<<MISSING>>",
+      material: item.product ? item.product.material : undefined,
+      priceType: item.product ? item.product.priceType : undefined,
+      "qty (raw)": JSON.stringify(item.qty),
+      "qty (parsed)": qty,
+      "price (raw)": JSON.stringify(item.price),
+      failsQtyValidation: isNaN(qty) || qty <= 0,
+      failsPriceValidation: isNaN(price) || price <= 0,
+      domCardExists: !!card,
+      domCardText: card ? card.textContent.trim().slice(0, 60) : "<<NO DOM CARD AT THIS INDEX>>",
+      domCardHeightPx: card ? card.getBoundingClientRect().height : null
+    };
+  });
+
+  console.log(
+    `[diagnoseBillItems] billItems.length=${billItems.length}  ` +
+    `rendered .bill-card count=${cards.length}  ` +
+    `(these two counts MUST match — a mismatch means renderBill() did not ` +
+    `finish, most likely because it threw partway through the forEach loop)`
+  );
+  console.table(rows);
+
+  const failing = rows.filter(r => r.failsQtyValidation);
+  if (failing.length) {
+    console.log(
+      `[diagnoseBillItems] ${failing.length} item(s) will block Send on quantity:`,
+      failing
+    );
+  }
+
+  const blankLooking = rows.filter(
+    r => r.domCardExists && r.domCardHeightPx > 40 && r.domCardText.length < 3
+  );
+  if (blankLooking.length) {
+    console.log(
+      "[diagnoseBillItems] card(s) with real height but ~no visible text " +
+      "— likely candidate for the blank card:",
+      blankLooking
+    );
+  }
+
+  return rows;
+};
+
 function validateBillInputs() {
   if (
     !billItems.length
@@ -7638,7 +7768,7 @@ function buildSalesOverviewPrintHTML() {
       ? rows.map(row => `
           <tr>
             <td>${escapeAttr(row.product.productName)}</td>
-            <td>${escapeAttr(shortMaterialName(row.product.material))}</td>
+            <td>${shortMaterialName(row.product.material)}</td>
             <td>${roundQty(row.qty)}</td>
           </tr>
         `).join("")
