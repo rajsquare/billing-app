@@ -3654,9 +3654,15 @@ body.slideshow-dedicated-mode.slideshow-controls-visible .view-fullscreen-btn {
 
 .utensil-opt-row select.bill-input { flex: 1; }
 
+.total-amount-wrap {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+/* Small muted helper number sitting beside the Total inside the existing
+   row; same line, so the card does not grow. Never printed. */
 .total-ref {
-  text-align: right;
-  margin-top: 2px;
   font-size: 12px;
   font-weight: 600;
   color: #9ca3af;

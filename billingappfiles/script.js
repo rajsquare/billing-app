@@ -199,10 +199,33 @@ const UTENSIL_PRICE_TYPES = ["KG", "PP"];
 const UTENSIL_MATERIAL_OPTIONS = ["Brass", "Copper", "Kansa"];
 
 // Matched case-insensitively on the trimmed product name.
+// Names are normalised first ("+", "&" -> "and"), so "Packing + Forwarding",
+// "Packing & Forwarding" and "Packing and Forwarding" all match.
 const PACKING_FORWARDING_NAMES = new Set([
-  "packing and forwarding",
-  "packing & forwarding"
+  "packing and forwarding"
 ]);
+
+function normalizeHeadName(name) {
+  return String(name ?? "")
+    .toLowerCase()
+    .replace(/[&+]/g, " and ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Stable per-line identity. Survives renames, save, reopen and revise.
+// Legacy lines (saved before this existed) simply have none and keep the
+// old name+material matching.
+function newLineId() {
+  return "L" + Date.now().toString(36) +
+    Math.random().toString(36).slice(2, 8);
+}
+
+function revisionLineKey(item) {
+  return item && item.lineId
+    ? "id:" + item.lineId
+    : (item.productName + "||" + (item.material || ""));
+}
 
 /* ================================
    STATE
@@ -1352,16 +1375,11 @@ function shortMaterialName(material) {
 }
 
 // Custom ("Other") material abbreviation: first two letters, uppercase.
-// Predefined names always keep their fixed mapping (BR / CU / BZ) even
-// if typed into the custom box, so Kansa can never become "KA".
+// Only ever called for lines flagged custom. A PREDEFINED Kansa keeps BZ
+// via shortMaterialName; a custom "Kansa" typed under Other is KA.
 function customMaterialAbbrev(material) {
   const m = String(material ?? "").trim();
   if (!m) return "-";
-
-  const key = m.toLowerCase();
-  if (key === "brass") return "BR";
-  if (key === "copper") return "CU";
-  if (key === "kansa") return "BZ";
 
   const letters = m.match(/\p{L}/gu) || [];
   if (letters.length) {
@@ -1384,7 +1402,15 @@ function printMaterialLabel(item) {
 function getItemPriceType(item) {
   const o = item && item.priceTypeOverride;
   if (UTENSIL_PRICE_TYPES.includes(o)) return o;
-  return (item && item.product && item.product.priceType) || "";
+  const base = (item && item.product && item.product.priceType) || "";
+  // Utensils with no usable price type (new or legacy) default to KG.
+  if (
+    item && item.product && isEditableNameItem(item) &&
+    !UTENSIL_PRICE_TYPES.includes(base)
+  ) {
+    return "KG";
+  }
+  return base;
 }
 
 function getItemMaterial(item) {
@@ -1397,6 +1423,7 @@ function getItemMaterial(item) {
 function isItemMaterialCustom(item) {
   const m = String(getItemMaterial(item)).trim();
   if (!m) return false;
+  if (item && item.materialOther === true) return true;
   if (UTENSIL_MATERIAL_OPTIONS.includes(m)) return false;
   return (
     isEditableNameItem(item) ||
@@ -1413,7 +1440,7 @@ function isPackingForwardingItem(item) {
   const n = item && item.product && item.product.productName;
   return (
     typeof n === "string" &&
-    PACKING_FORWARDING_NAMES.has(n.trim().toLowerCase())
+    PACKING_FORWARDING_NAMES.has(normalizeHeadName(n))
   );
 }
 
@@ -1516,6 +1543,8 @@ function saveDraft() {
             item.note || "",
           displayName:
             item.displayName || "",
+          lineId:
+            item.lineId || "",
           priceTypeOverride:
             item.priceTypeOverride || "",
           materialOverride:
@@ -1632,6 +1661,7 @@ function restoreDraft() {
             lineType:
               savedItem.lineType === "return" ? "return" : "sale"
           };
+          if (savedItem.lineId) restoredItem.lineId = savedItem.lineId;
           applySavedUtensilFields(restoredItem, savedItem);
           restoredItem.total =
             computeLineTotal(
@@ -1720,6 +1750,8 @@ function buildDraftPayload() {
     billItems.map(item => ({
       productSr:
         item.product.sr,
+      lineId:
+        item.lineId || "",
       productName:
         item.displayName ||
         item.product.productName,
@@ -1815,6 +1847,10 @@ function simpleDraftHash(items, name) {
       items[i].product.productName +
       ":" +
       items[i].qty +
+      ":" +
+      getItemPriceType(items[i]) + "/" +
+      getItemMaterial(items[i]) + "/" +
+      (items[i].displayName || "") +
       ",";
   }
 
@@ -3448,19 +3484,13 @@ function buildRevisionDiff(
 
   const origMap = new Map();
   origItems.forEach(item => {
-    const key =
-      item.productName +
-      "||" +
-      (item.material || "");
+    const key = revisionLineKey(item);
     origMap.set(key, item);
   });
 
   const revMap = new Map();
   revItems.forEach(item => {
-    const key =
-      item.productName +
-      "||" +
-      (item.material || "");
+    const key = revisionLineKey(item);
     revMap.set(key, item);
   });
 
@@ -3470,10 +3500,7 @@ function buildRevisionDiff(
   const unchanged = [];
 
   origItems.forEach(origItem => {
-    const key =
-      origItem.productName +
-      "||" +
-      (origItem.material || "");
+    const key = revisionLineKey(origItem);
     const revItem = revMap.get(key);
 
     if (!revItem) {
@@ -3500,10 +3527,7 @@ function buildRevisionDiff(
   });
 
   revItems.forEach(revItem => {
-    const key =
-      revItem.productName +
-      "||" +
-      (revItem.material || "");
+    const key = revisionLineKey(revItem);
     if (!origMap.has(key)) {
       added.push(revItem);
     }
@@ -3584,20 +3608,12 @@ function buildMergedOfficeItems(
   diff
 ) {
   const removedKeys = new Set(
-    diff.removed.map(
-      item =>
-        item.productName +
-        "||" +
-        (item.material || "")
-    )
+    diff.removed.map(revisionLineKey)
   );
 
   const changedMap = new Map();
   diff.changed.forEach(c => {
-    const key =
-      c.revisedItem.productName +
-      "||" +
-      (c.revisedItem.material || "");
+    const key = revisionLineKey(c.revisedItem);
     changedMap.set(key, c);
   });
 
@@ -3606,20 +3622,14 @@ function buildMergedOfficeItems(
 
   const revItemsByKey = new Map();
   (revisedBill.items || []).forEach(item => {
-    const key =
-      item.productName +
-      "||" +
-      (item.material || "");
+    const key = revisionLineKey(item);
     revItemsByKey.set(key, item);
   });
 
   const merged = [];
 
   origChron.forEach(origItem => {
-    const key =
-      origItem.productName +
-      "||" +
-      (origItem.material || "");
+    const key = revisionLineKey(origItem);
 
     if (removedKeys.has(key)) {
       merged.push({
@@ -4977,6 +4987,7 @@ window.selectProduct =
       note: "",
       displayName:
         product.productName,
+      lineId: newLineId(),
       lineType: "sale"
     });
 
@@ -5363,7 +5374,6 @@ function buildUtensilOptionsHTML(item, index) {
     </div>
     <div class="input-row utensil-opt-row">
       <select class="bill-input" onchange="updateUtensilPriceType(${index}, this.value)">
-        ${UTENSIL_PRICE_TYPES.includes(pt) ? "" : `<option value=""${sel(true)}>Select</option>`}
         ${UTENSIL_PRICE_TYPES.map(t => `<option value="${t}"${sel(pt === t)}>${t}</option>`).join("")}
       </select>
       <select class="bill-input" onchange="updateUtensilMaterialChoice(${index}, this.value)">
@@ -5378,7 +5388,7 @@ function buildUtensilOptionsHTML(item, index) {
             class="bill-input discount-note-input"
             type="text"
             placeholder="Material name"
-            value="${escapeAttr(UTENSIL_MATERIAL_OPTIONS.includes(mat) ? "" : getItemMaterial(item))}"
+            value="${escapeAttr(getItemMaterial(item))}"
             oninput="updateUtensilCustomMaterial(${index}, this.value)"
             onblur="commitDisplayName()"
           >`
@@ -5460,9 +5470,10 @@ function updateGrandTotal() {
   const refEl = document.getElementById("grandTotalRef");
   if (refEl) {
     if (billItems.some(isPackingForwardingItem)) {
+      // Integer math avoids float drift (1250*1.05 -> 1312.5 -> 1313).
       const actual = Math.round(total);
       refEl.textContent =
-        `+5% reference: ₹${formatIndianMoneyWhole(actual * 1.05)}`;
+        formatIndianMoneyWhole(Math.round(actual * 105 / 100));
       refEl.hidden = false;
     } else {
       refEl.textContent = "";
@@ -5803,6 +5814,9 @@ function createBillData() {
           sr:
             item.product.sr,
 
+          lineId:
+            item.lineId || "",
+
           productName:
             item.displayName ||
             item.product.productName,
@@ -5992,15 +6006,25 @@ window.reviseBill =
     const restoredItems =
       (bill.items || []).map(
         savedItem => {
+          // Identity = stable product sr (saved on every bill line), NOT
+          // the editable display name. Name+material matching is only the
+          // fallback for legacy lines without a usable sr.
           let product =
-            products.find(
-              p =>
-                p.productName ===
-                  savedItem.productName &&
-                (!savedItem.material ||
-                  p.material ===
-                    savedItem.material)
-            );
+            savedItem.sr != null && savedItem.sr !== -1
+              ? productsBySr.get(savedItem.sr)
+              : undefined;
+
+          if (!product) {
+            product =
+              products.find(
+                p =>
+                  p.productName ===
+                    savedItem.productName &&
+                  (!savedItem.material ||
+                    p.material ===
+                      savedItem.material)
+              );
+          }
 
           if (!product) {
             product = {
@@ -6053,6 +6077,8 @@ window.reviseBill =
             lineType:
               savedItem.lineType === "return" ? "return" : "sale"
           };
+
+          if (savedItem.lineId) item.lineId = savedItem.lineId;
 
           if (
             isEditableNameItem(item) ||
