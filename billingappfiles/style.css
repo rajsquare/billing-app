@@ -3644,3 +3644,27 @@ body.slideshow-dedicated-mode.slideshow-controls-visible .view-fullscreen-btn {
   opacity: 1;
   pointer-events: auto;
 }
+
+
+/* ================================
+   UTENSILS OPTIONS + P&F +5% REFERENCE
+================================ */
+.utensil-opt-labels .input-label:first-child,
+.utensil-opt-labels .input-label:last-child { flex: 1; }
+
+.utensil-opt-row select.bill-input { flex: 1; }
+
+.total-ref {
+  text-align: right;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #9ca3af;
+  font-variant-numeric: tabular-nums;
+}
+
+.total-ref[hidden] { display: none; }
+
+@media print {
+  .total-ref { display: none !important; }
+}

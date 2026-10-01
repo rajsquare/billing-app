@@ -193,6 +193,17 @@ const EDITABLE_NAME_PRODUCTS = new Set([
   "Utensils"
 ]);
 
+// Editable per-line options for the Utensils head. Stored on the bill
+// LINE (never on the shared pricelist product object).
+const UTENSIL_PRICE_TYPES = ["KG", "PP"];
+const UTENSIL_MATERIAL_OPTIONS = ["Brass", "Copper", "Kansa"];
+
+// Matched case-insensitively on the trimmed product name.
+const PACKING_FORWARDING_NAMES = new Set([
+  "packing and forwarding",
+  "packing & forwarding"
+]);
+
 /* ================================
    STATE
 ================================ */
@@ -1340,6 +1351,84 @@ function shortMaterialName(material) {
   return escapeAttr(material || "-");
 }
 
+// Custom ("Other") material abbreviation: first two letters, uppercase.
+// Predefined names always keep their fixed mapping (BR / CU / BZ) even
+// if typed into the custom box, so Kansa can never become "KA".
+function customMaterialAbbrev(material) {
+  const m = String(material ?? "").trim();
+  if (!m) return "-";
+
+  const key = m.toLowerCase();
+  if (key === "brass") return "BR";
+  if (key === "copper") return "CU";
+  if (key === "kansa") return "BZ";
+
+  const letters = m.match(/\p{L}/gu) || [];
+  if (letters.length) {
+    return escapeAttr(letters.slice(0, 2).join("").toUpperCase());
+  }
+  return escapeAttr(m.slice(0, 2).toUpperCase());
+}
+
+// Printed material cell for a SAVED bill/draft item. Only lines flagged
+// materialCustom use the first-two-letters rule; everything else keeps
+// the existing shortMaterialName behaviour untouched.
+function printMaterialLabel(item) {
+  return item && item.materialCustom === true
+    ? customMaterialAbbrev(item.material)
+    : shortMaterialName(item && item.material);
+}
+
+// Effective per-line values (override first, then the pricelist product,
+// so legacy lines behave exactly as before).
+function getItemPriceType(item) {
+  const o = item && item.priceTypeOverride;
+  if (UTENSIL_PRICE_TYPES.includes(o)) return o;
+  return (item && item.product && item.product.priceType) || "";
+}
+
+function getItemMaterial(item) {
+  if (item && typeof item.materialOverride === "string") {
+    return item.materialOverride;
+  }
+  return (item && item.product && item.product.material) || "";
+}
+
+function isItemMaterialCustom(item) {
+  const m = String(getItemMaterial(item)).trim();
+  if (!m) return false;
+  if (UTENSIL_MATERIAL_OPTIONS.includes(m)) return false;
+  return (
+    isEditableNameItem(item) ||
+    (item && typeof item.materialOverride === "string")
+  );
+}
+
+// UI: is the Other (custom) option the active selection for this line?
+function isItemMaterialOtherMode(item) {
+  return item.materialOther === true || isItemMaterialCustom(item);
+}
+
+function isPackingForwardingItem(item) {
+  const n = item && item.product && item.product.productName;
+  return (
+    typeof n === "string" &&
+    PACKING_FORWARDING_NAMES.has(n.trim().toLowerCase())
+  );
+}
+
+function applySavedUtensilFields(item, saved) {
+  if (UTENSIL_PRICE_TYPES.includes(saved.priceTypeOverride)) {
+    item.priceTypeOverride = saved.priceTypeOverride;
+  }
+  if (typeof saved.materialOverride === "string") {
+    item.materialOverride = saved.materialOverride;
+  }
+  if (saved.materialOther === true) {
+    item.materialOther = true;
+  }
+}
+
 function formatIndianMoney(value) {
   return _moneyFmt.format(Number(value || 0));
 }
@@ -1427,6 +1516,14 @@ function saveDraft() {
             item.note || "",
           displayName:
             item.displayName || "",
+          priceTypeOverride:
+            item.priceTypeOverride || "",
+          materialOverride:
+            typeof item.materialOverride === "string"
+              ? item.materialOverride
+              : null,
+          materialOther:
+            item.materialOther === true,
           lineType:
             isReturnItem(item) ? "return" : "sale"
         }))
@@ -1535,6 +1632,7 @@ function restoreDraft() {
             lineType:
               savedItem.lineType === "return" ? "return" : "sale"
           };
+          applySavedUtensilFields(restoredItem, savedItem);
           restoredItem.total =
             computeLineTotal(
               restoredItem,
@@ -1626,8 +1724,9 @@ function buildDraftPayload() {
         item.displayName ||
         item.product.productName,
       material:
-        item.product.material ||
-        "",
+        getItemMaterial(item),
+      materialCustom:
+        isItemMaterialCustom(item),
       qty:
         roundQty(item.qty) || 0,
       price:
@@ -1635,7 +1734,7 @@ function buildDraftPayload() {
       total:
         item.total || 0,
       priceType:
-        item.product.priceType || "",
+        getItemPriceType(item),
       lineType:
         isReturnItem(item) ? "return" : "sale"
     }));
@@ -3010,7 +3109,7 @@ function renderLiveDraftDetail(
         item => `
         <tr>
           <td>${escapeAttr(item.productName)}</td>
-          <td>${shortMaterialName(item.material)}</td>
+          <td>${printMaterialLabel(item)}</td>
           <td>${item.qty > 0 ? item.qty : "—"}</td>
           <td>${item.price > 0 ? "₹" + formatIndianMoneyWhole(item.price) : "—"}</td>
           <td>${item.qty > 0 && item.price > 0 ? "₹" + formatIndianMoneyWhole(Math.abs(item.total)) : "—"}</td>
@@ -3575,7 +3674,7 @@ function buildRevisionOfficeSinglePage(
         <tr class="print-row-removed">
           <td>-</td>
           <td>${escapeAttr(getPrintProductName(item))}${item.note ? `<br><span class="print-item-note">${escapeAttr(item.note)}</span>` : ""}</td>
-          <td>${shortMaterialName(item.material)}</td>
+          <td>${printMaterialLabel(item)}</td>
           <td>${roundQty(item.qty)}</td>
           <td>${formatIndianMoneyWhole(item.price)}</td>
           <td>${formatPrintMoney(item.total)}</td>
@@ -3603,7 +3702,7 @@ function buildRevisionOfficeSinglePage(
         <tr${trClass}>
           <td>${n}</td>
           <td>${escapeAttr(getPrintProductName(item))}${item.note ? `<br><span class="print-item-note">${escapeAttr(item.note)}</span>` : ""}</td>
-          <td>${shortMaterialName(item.material)}</td>
+          <td>${printMaterialLabel(item)}</td>
           ${qtyCell}
           ${priceCell}
           <td>${formatPrintMoney(item.total)}</td>
@@ -5011,14 +5110,16 @@ function renderBill() {
 
           <div class="badge-row">
             <div class="unit">
-              ${escapeAttr(item.product.priceType || "")}
+              ${escapeAttr(getItemPriceType(item))}
             </div>
             ${
-              item.product.material
-                ? `<div class="unit ${getMaterialClass(item.product.material)}">${escapeAttr(item.product.material)}</div>`
+              getItemMaterial(item)
+                ? `<div class="unit ${getMaterialClass(getItemMaterial(item))}" data-mat-badge="${index}">${escapeAttr(getItemMaterial(item))}</div>`
                 : ""
             }
           </div>
+
+          ${isEditable ? buildUtensilOptionsHTML(item, index) : ""}
 
           <div class="input-labels-row">
             <span class="input-label">QTY</span>
@@ -5249,6 +5350,92 @@ window.updateDisplayName =
 window.commitDisplayName =
   function() { saveDraftNow(); };
 
+function buildUtensilOptionsHTML(item, index) {
+  const pt = getItemPriceType(item);
+  const mat = String(getItemMaterial(item)).trim();
+  const otherMode = isItemMaterialOtherMode(item);
+  const sel = (cond) => (cond ? " selected" : "");
+
+  return `
+    <div class="input-labels-row utensil-opt-labels">
+      <span class="input-label">PRICE TYPE</span>
+      <span class="input-label">MATERIAL</span>
+    </div>
+    <div class="input-row utensil-opt-row">
+      <select class="bill-input" onchange="updateUtensilPriceType(${index}, this.value)">
+        ${UTENSIL_PRICE_TYPES.includes(pt) ? "" : `<option value=""${sel(true)}>Select</option>`}
+        ${UTENSIL_PRICE_TYPES.map(t => `<option value="${t}"${sel(pt === t)}>${t}</option>`).join("")}
+      </select>
+      <select class="bill-input" onchange="updateUtensilMaterialChoice(${index}, this.value)">
+        ${mat || otherMode ? "" : `<option value=""${sel(true)}>Select</option>`}
+        ${UTENSIL_MATERIAL_OPTIONS.map(m => `<option value="${m}"${sel(!otherMode && mat === m)}>${m}</option>`).join("")}
+        <option value="__other__"${sel(otherMode)}>Other</option>
+      </select>
+    </div>
+    ${
+      otherMode
+        ? `<input
+            class="bill-input discount-note-input"
+            type="text"
+            placeholder="Material name"
+            value="${escapeAttr(UTENSIL_MATERIAL_OPTIONS.includes(mat) ? "" : getItemMaterial(item))}"
+            oninput="updateUtensilCustomMaterial(${index}, this.value)"
+            onblur="commitDisplayName()"
+          >`
+        : ""
+    }
+  `;
+}
+
+window.updateUtensilPriceType =
+  function(index, value) {
+    const item = billItems[index];
+    if (!item) return;
+    if (UTENSIL_PRICE_TYPES.includes(value)) {
+      item.priceTypeOverride = value;
+    } else {
+      delete item.priceTypeOverride;
+    }
+    saveDraftNow();
+    debouncedSyncLiveDraft();
+    renderBill();
+  };
+
+window.updateUtensilMaterialChoice =
+  function(index, value) {
+    const item = billItems[index];
+    if (!item) return;
+    if (value === "__other__") {
+      item.materialOther = true;
+      // Keep any existing custom text; a predefined name is cleared so
+      // the custom box starts empty.
+      const cur = String(getItemMaterial(item)).trim();
+      item.materialOverride =
+        UTENSIL_MATERIAL_OPTIONS.includes(cur) ? "" : cur;
+    } else if (UTENSIL_MATERIAL_OPTIONS.includes(value)) {
+      item.materialOther = false;
+      item.materialOverride = value;
+    } else {
+      item.materialOther = false;
+      delete item.materialOverride;
+    }
+    saveDraftNow();
+    debouncedSyncLiveDraft();
+    renderBill();
+  };
+
+window.updateUtensilCustomMaterial =
+  function(index, value) {
+    const item = billItems[index];
+    if (!item) return;
+    item.materialOther = true;
+    item.materialOverride = value;
+    const badge = document.querySelector(`[data-mat-badge="${index}"]`);
+    if (badge) badge.textContent = value.trim();
+    debouncedSaveDraft();
+    debouncedSyncLiveDraft();
+  };
+
 window.commitPrice =
   function() { saveDraftNow(); };
 
@@ -5266,6 +5453,22 @@ function updateGrandTotal() {
 
   grandTotalEl.innerText =
     `₹${formatIndianMoneyWhole(total)}`;
+
+  // Visual helper only: derived at render time from the final actual
+  // total (P&F already included). Never stored, never part of bill
+  // data, never printed.
+  const refEl = document.getElementById("grandTotalRef");
+  if (refEl) {
+    if (billItems.some(isPackingForwardingItem)) {
+      const actual = Math.round(total);
+      refEl.textContent =
+        `+5% reference: ₹${formatIndianMoneyWhole(actual * 1.05)}`;
+      refEl.hidden = false;
+    } else {
+      refEl.textContent = "";
+      refEl.hidden = true;
+    }
+  }
 }
 
 /* ================================
@@ -5605,8 +5808,10 @@ function createBillData() {
             item.product.productName,
 
           material:
-            item.product
-              .material || "",
+            getItemMaterial(item),
+
+          materialCustom:
+            isItemMaterialCustom(item),
 
           qty:
             roundQty(item.qty),
@@ -5621,7 +5826,7 @@ function createBillData() {
             item.note || "",
 
           priceType:
-            item.product.priceType || "",
+            getItemPriceType(item),
 
           lineType:
             isReturnItem(item) ? "return" : "sale"
@@ -5848,6 +6053,21 @@ window.reviseBill =
             lineType:
               savedItem.lineType === "return" ? "return" : "sale"
           };
+
+          if (
+            isEditableNameItem(item) ||
+            savedItem.materialCustom === true
+          ) {
+            if (UTENSIL_PRICE_TYPES.includes(savedItem.priceType)) {
+              item.priceTypeOverride = savedItem.priceType;
+            }
+            if (typeof savedItem.material === "string") {
+              item.materialOverride = savedItem.material;
+              if (savedItem.materialCustom === true) {
+                item.materialOther = true;
+              }
+            }
+          }
 
           item.total =
             computeLineTotal(
@@ -6124,7 +6344,7 @@ function buildPrintRowHTML(item, serialNumber) {
     <tr>
       <td>${serialNumber}</td>
       <td>${escapeAttr(getPrintProductName(item))}${item.note ? `<br><span class="print-item-note">${escapeAttr(item.note)}</span>` : ""}</td>
-      <td>${shortMaterialName(item.material)}</td>
+      <td>${printMaterialLabel(item)}</td>
       <td>${roundQty(item.qty)}</td>
       <td>${formatIndianMoneyWhole(item.price)}</td>
       <td>${formatPrintMoney(item.total)}</td>
